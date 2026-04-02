@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+            rel="stylesheet" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+            rel="stylesheet" />
+        <script
+            src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-fixed": "#f7d8ff",
+              "error-container": "#ffdad6",
+              "on-background": "#1b1c1d",
+              "on-primary-fixed-variant": "#5f3671",
+              "error": "#ba1a1a",
+              "surface-container-high": "#e9e7e9",
+              "on-error-container": "#93000a",
+              "on-primary": "#ffffff",
+              "on-tertiary-container": "#b1b565",
+              "on-tertiary-fixed-variant": "#474a03",
+              "on-secondary-fixed-variant": "#534059",
+              "tertiary-fixed": "#e4e893",
+              "primary": "#431b55",
+              "secondary": "#6b5772",
+              "surface-bright": "#fbf9fb",
+              "outline": "#7e747f",
+              "on-primary-container": "#cf9ee2",
+              "on-tertiary-fixed": "#1c1d00",
+              "on-tertiary": "#ffffff",
+              "on-secondary-fixed": "#25152c",
+              "on-surface": "#1b1c1d",
+              "inverse-surface": "#303032",
+              "surface-container": "#efedef",
+              "inverse-on-surface": "#f2f0f2",
+              "secondary-container": "#f1d7f7",
+              "surface-container-highest": "#e4e2e4",
+              "on-surface-variant": "#4c444e",
+              "surface-variant": "#e4e2e4",
+              "primary-container": "#5b326d",
+              "on-secondary": "#ffffff",
+              "surface-dim": "#dbd9db",
+              "surface": "#fbf9fb",
+              "surface-container-lowest": "#ffffff",
+              "inverse-primary": "#e7b4f9",
+              "outline-variant": "#cfc3cf",
+              "tertiary": "#2d2f00",
+              "secondary-fixed": "#f4daf9",
+              "secondary-fixed-dim": "#d7bedd",
+              "primary-fixed-dim": "#e7b4f9",
+              "surface-container-low": "#f5f3f5",
+              "on-error": "#ffffff",
+              "background": "#fbf9fb",
+              "tertiary-fixed-dim": "#c8cc7a",
+              "on-primary-fixed": "#2f0542",
+              "surface-tint": "#784d8a",
+              "tertiary-container": "#434600",
+              "on-secondary-container": "#705c76"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+        <style>
+      .glass-effect {
+        background: rgba(251, 249, 251, 0.7);
+        backdrop-filter: blur(20px);
+      }
+      .editorial-shadow {
+        box-shadow: 0 20px 40px rgba(27, 28, 29, 0.06);
+      }
+    </style>
+    </head>
+    <body
+        class="bg-background text-on-background font-body min-h-screen flex flex-col">
+        <!-- Top Navigation -->
+        <nav class="fixed top-0 w-full z-50">
+            <div
+                class="flex justify-between items-center px-8 py-6 w-full max-w-7xl mx-auto">
+                <img
+                    src="https://agencialuxviajes.com/wp-content/uploads/2024/04/Logo-principal-Lux-Viajes.png"
+                    alt="Luxviajes" class="h-20" />
+                <div class="flex gap-4">
+                    <a class="text-primary hover:opacity-80 transition-opacity"
+                        href="https://wa.me/593964220600">
+                        <!-- Changed mail icon to whatsapp icon as requested -->
+                        <svg class="w-8 h-8 fill-current" viewbox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"><path
+                                d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.185-.573c.948.517 2.039.887 3.144.887 3.181 0 5.767-2.586 5.767-5.766 0-3.18-2.587-5.729-5.765-5.729zm3.39 8.161c-.145.406-.848.741-1.168.787-.319.047-.714.063-1.168-.082-.27-.087-.611-.211-1.041-.397-1.826-.79-3.003-2.651-3.094-2.773-.092-.122-.745-.99-.745-1.89s.467-1.343.633-1.52c.166-.176.363-.221.484-.221s.241.001.346.006c.112.004.262-.042.411.319.148.358.508 1.241.553 1.332.045.091.075.197.015.318-.06.121-.09.197-.181.303-.091.106-.191.235-.272.316-.091.091-.186.19-.08.371.106.181.469.774.962 1.258.636.623 1.171.817 1.338.901.166.085.263.072.361-.04.098-.112.423-.493.536-.66.113-.167.227-.14.382-.082s.979.461 1.148.547c.169.085.282.128.324.2.041.072.041.417-.104.823zM12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.662 1.435 5.176L2 22l4.957-1.301C8.383 21.517 10.113 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18c-1.724 0-3.321-.466-4.691-1.272l-.337-.198-2.435.639.65-2.375-.218-.347C4.163 15.074 3.6 13.593 3.6 12c0-4.632 3.768-8.4 8.4-8.4s8.4 3.768 8.4 8.4-3.768 8.4-8.4 8.4z"></path></svg>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <!-- Main Content Canvas -->
+        <main
+            class="flex-grow flex flex-col items-center justify-center relative overflow-hidden px-6 py-24">
+            <!-- Background Decorative Element -->
+            <div class="absolute inset-0 -z-10">
+                <img class="w-full h-full object-cover opacity-10"
+                    data-alt="Dreamy aerial view of a tropical white sand beach with turquoise water and soft sunlight, high-end editorial travel style"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFAFR7iqrHxqtGsNxwFLtt1S3KE1W6PPHSmLypLx9MmWDLJV3me0vmWOhSEkVDSEyMkGLjvs2PtDQB_5dKsAy_laoEIbIZu_s9SYl39oMbH5K7jzX8SACXtC4cR_KCIOp30DvSA15wmDSFbAFrEVIWPbH6OriOJtP6_XacmrbwHRzJoK3EIMWx5NSRJJVcJLSYYd2MLgDX2wlffUEAWVlCC0RNZGMKNaRgZJOtPnGVo14fwfdeKQ8WrAVwtfRYIgSlwKNegGK3edEd" />
+                <div
+                    class="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background"></div>
+            </div>
+            <!-- Maintenance Content -->
+            <div class="max-w-4xl w-full text-center space-y-12">
+                <!-- Hero Typography -->
+                <div class="space-y-4">
+                    <div
+                        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary-container text-on-secondary-container font-label text-sm font-semibold tracking-wide">
+                        <span class="material-symbols-outlined text-sm"
+                            data-icon="auto_awesome">auto_awesome</span>
+                        PRÓXIMAMENTE
+                    </div>
+                    <h1
+                        class="text-5xl md:text-7xl font-headline font-extrabold text-primary tracking-tight leading-tight">
+                        Estamos en Mantenimiento
+                    </h1>
+                    <p
+                        class="text-lg md:text-xl text-on-surface-variant max-w-2xl mx-auto font-body leading-relaxed">
+                        Estamos preparando una nueva selección de experiencias
+                        exclusivas para tus próximos destinos. Volveremos pronto
+                        con lo mejor del lujo global.
+                    </p>
+                </div>
+                <!-- Prominent Contact Section -->
+                <div class="max-w-xl mx-auto w-full">
+                    <!-- Removed 'Nuevos Destinos 2024' card and centered/expanded 'Consulta Directa' -->
+                    <div
+                        class="bg-surface-container-lowest rounded-2xl p-10 editorial-shadow flex flex-col items-center text-center border-b-4 border-primary transition-all hover:scale-[1.01]">
+                        <div
+                            class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center mb-6">
+                            <span
+                                class="material-symbols-outlined text-primary text-4xl"
+                                data-icon="travel_explore">travel_explore</span>
+                        </div>
+                        <h3
+                            class="font-headline font-bold text-2xl text-primary mb-3">Consulta
+                            Directa</h3>
+                        <p
+                            class="text-on-surface-variant text-base max-w-sm mb-8">
+                            ¿Tienes una reserva activa o necesitas asistencia
+                            personalizada inmediata mientras nos renovamos?
+                        </p>
+                        <a
+                            class="inline-flex items-center justify-center py-4 px-10 rounded-full bg-gradient-to-tr from-primary to-primary-container text-on-primary font-label text-base font-bold transition-all shadow-lg hover:shadow-primary/20 active:scale-95"
+                            href="https://wa.me/593964220600">
+                            Contactar Soporte
+                        </a>
+                    </div>
+                </div>
+                <!-- Social Connect -->
+                <div
+                    class="pt-12 border-t border-outline-variant/30 flex flex-col items-center gap-6">
+                    <span
+                        class="font-label text-xs font-bold tracking-[0.2em] text-on-surface-variant uppercase">Síguenos
+                        en nuestro viaje</span>
+                    <div class="flex gap-8">
+                        <a class="group flex flex-col items-center gap-2"
+                            href="https://www.instagram.com/luxviajes.ec/">
+                            <div
+                                class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-300">
+                                <svg class="w-6 h-6 fill-current"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"><path
+                                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1 1 12.324 0 6.162 6.162 0 0 1-12.324 0zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm4.965-10.322a1.44 1.44 0 1 1 2.881.001 1.44 1.44 0 0 1-2.881-.001z" /></svg>
+                            </div>
+                            <span
+                                class="text-[10px] font-bold text-on-surface-variant">INSTAGRAM</span>
+                        </a>
+                        <a class="group flex flex-col items-center gap-2"
+                            href="https://www.facebook.com/luxviajes.ec">
+                            <div
+                                class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-300">
+                                <svg class="w-6 h-6 fill-current"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"><path
+                                        d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
+                            </div>
+                            <span
+                                class="text-[10px] font-bold text-on-surface-variant">FACEBOOK</span>
+                        </a>
+                        <a class="group flex flex-col items-center gap-2"
+                            href="https://www.youtube.com/@LuxViajesPodcast">
+                            <div
+                                class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-300">
+                                <span class="material-symbols-outlined"
+                                    data-icon="smart_display">smart_display</span>
+                            </div>
+                            <span
+                                class="text-[10px] font-bold text-on-surface-variant">YOUTUBE</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <!-- Footer -->
+        <footer
+            class="bg-[#f5f3f5] w-full py-12 flex flex-col items-center gap-6 mt-auto">
+            <!-- <div class="flex flex-col items-center gap-4">
+                <span
+                    class="text-[#431b55] font-bold text-lg font-headline">Luxviajes</span>
+                <div class="flex gap-8">
+                    <a
+                        class="text-slate-500 hover:text-[#431b55] transition-colors font-['Inter'] text-sm tracking-wide"
+                        href="#">Privacidad</a>
+                    <a
+                        class="text-slate-500 hover:text-[#431b55] transition-colors font-['Inter'] text-sm tracking-wide"
+                        href="#">Términos</a>
+                    <a
+                        class="text-slate-500 hover:text-[#431b55] transition-colors font-['Inter'] text-sm tracking-wide"
+                        href="#">Contacto</a>
+                </div>
+            </div> -->
+            <p class="text-slate-500 font-['Inter'] text-sm tracking-wide">©
+                2026 Luxviajes. Agencia de Viajes.</p>
+        </footer>
+    </body></html>
