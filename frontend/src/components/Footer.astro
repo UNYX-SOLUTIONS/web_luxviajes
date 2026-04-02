@@ -1,0 +1,53 @@
+---
+import { contactEmail } from '../data/site';
+---
+
+<footer class="border-t border-purple-200 bg-white">
+  <div class="mx-auto grid w-full max-w-7xl gap-8 px-5 py-12 md:grid-cols-4 md:px-8">
+    <div>
+      <p class="font-display text-3xl text-slate-900">Luxviajes</p>
+      <p class="mt-3 max-w-xs text-sm text-slate-600">The Digital Concierge Experience.</p>
+      <div class="mt-5 flex items-center gap-2 text-purple-700">
+        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-purple-100">◉</span>
+        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-purple-100">◌</span>
+        <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-purple-100">✦</span>
+      </div>
+    </div>
+
+    <div>
+      <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-purple-700">Quick Links</p>
+      <div class="mt-4 space-y-2 text-sm text-slate-600">
+        <a href="/" class="block hover:text-purple-700">Destinations</a>
+        <a href="/services/" class="block hover:text-purple-700">Services</a>
+        <a href="/packages/" class="block hover:text-purple-700">Luxury Travel</a>
+        <a href="/about-us/" class="block hover:text-purple-700">Corporate Travel</a>
+      </div>
+    </div>
+
+    <div>
+      <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-purple-700">Support</p>
+      <div class="mt-4 space-y-2 text-sm text-slate-600">
+        <a href="#" class="block hover:text-purple-700">Privacy Policy</a>
+        <a href="#" class="block hover:text-purple-700">Terms of Service</a>
+        <a href="/services/" class="block hover:text-purple-700">Travel Insurance</a>
+        <a href={`mailto:${contactEmail}`} class="block hover:text-purple-700">Contact Support</a>
+      </div>
+    </div>
+
+    <div>
+      <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-purple-700">Experience</p>
+      <p class="mt-4 text-sm text-slate-600">Siga nuestros viajes en redes sociales para inspiracion diaria.</p>
+      <div class="mt-5 flex items-center gap-2 text-purple-700">
+        <a href="https://www.instagram.com/luxviajes.ec/" target="_blank" rel="noreferrer" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 hover:bg-purple-200">◉</a>
+        <a href="https://www.facebook.com/luxviajes.ec" target="_blank" rel="noreferrer" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-purple-100 hover:bg-purple-200">◌</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="border-t border-purple-200">
+    <div class="mx-auto flex w-full max-w-7xl flex-col gap-2 px-5 py-4 text-[11px] uppercase tracking-[0.12em] text-slate-500 md:flex-row md:items-center md:justify-between md:px-8">
+      <p>© 2026 Luxviajes. The Digital Concierge Experience.</p>
+      <p>Designed for Excellence.</p>
+    </div>
+  </div>
+</footer>
