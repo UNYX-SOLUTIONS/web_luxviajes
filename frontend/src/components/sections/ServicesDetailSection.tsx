@@ -51,17 +51,17 @@ export function ServicesDetailSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Left Side - Sticky */}
-          <div className="lg:sticky lg:top-32 lg:self-start h-fit text-gray-800">
+          <div className="lg:sticky lg:top-32 lg:self-start h-fit">
             <div className="mb-8">
               <p className="text-sm font-semibold text-primary-600 uppercase tracking-wide mb-3">
                 Nuestros Servicios
               </p>
-              <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-6 text-neutral-900">
                 Todo lo que necesitas
                 <br />
                 <span className="text-primary-600">para tu viaje perfecto</span>
               </h2>
-              <p className="text-neutral-800 leading-relaxed mb-8">
+              <p className="text-neutral-700 leading-relaxed mb-8">
                 Elevamos cada trayecto a una obra maestra. Disfrute de un acompañamiento
                 personalizado diseñado para los viajeros más exigentes del mundo
               </p>
@@ -87,7 +87,7 @@ export function ServicesDetailSection() {
             {SERVICES_DETAILS.map((service, index) => (
               <div key={service.id}>
                 {/* Card Container */}
-                <div className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 group">
+                <div className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 group cursor-pointer">
                   {/* Background Image */}
                   <img
                     src={service.image}
@@ -105,9 +105,9 @@ export function ServicesDetailSection() {
                       <h3 className="text-xl font-bold">{service.title}</h3>
                     </div>
 
-                    {/* Badge */}
+                    {/* Badge Button */}
                     <div className="flex justify-end">
-                      <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors">
+                      <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors shadow-md hover:shadow-lg">
                         <span>Solicitar asesoría</span>
                         <svg
                           className="w-4 h-4"
@@ -123,13 +123,13 @@ export function ServicesDetailSection() {
                 </div>
 
                 {/* Description */}
-                <p className="mt-4 text-neutral-600 leading-relaxed">
+                <p className="mt-4 text-neutral-700 leading-relaxed">
                   {service.description}
                 </p>
 
                 {/* Divider - Hide on last item */}
                 {index < SERVICES_DETAILS.length - 1 && (
-                  <hr className="mt-8 border-neutral-200" />
+                  <hr className="mt-8 border-neutral-300" />
                 )}
               </div>
             ))}
