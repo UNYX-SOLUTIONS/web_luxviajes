@@ -1,11 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
       fontFamily: {
@@ -14,6 +10,9 @@ const config: Config = {
       colors: {
         // Primary Purple - #6B21A8
         primary: {
+          DEFAULT: '#6b21a8',
+          light: '#9333ea',
+          dark: '#581c87',
           50: '#faf5ff',
           100: '#f3e8ff',
           200: '#e9d5ff',
@@ -27,6 +26,9 @@ const config: Config = {
         },
         // Secondary Dark Purple - #2E1065
         secondary: {
+          DEFAULT: '#2e1065',
+          light: '#7e22ce',
+          dark: '#1a0536',
           50: '#faf5ff',
           100: '#f3e8ff',
           200: '#e9d5ff',
@@ -40,6 +42,9 @@ const config: Config = {
         },
         // Tertiary Brown/Gold - #6D4100
         tertiary: {
+          DEFAULT: '#6d4100',
+          light: '#b45309',
+          dark: '#451a03',
           50: '#fffbeb',
           100: '#fef3c7',
           200: '#fde68a',
@@ -53,6 +58,9 @@ const config: Config = {
         },
         // Neutral Gray - #7C757F
         neutral: {
+          DEFAULT: '#7c757f',
+          light: '#e5e7eb',
+          dark: '#4b5563',
           50: '#f9fafb',
           100: '#f3f4f6',
           200: '#e5e7eb',

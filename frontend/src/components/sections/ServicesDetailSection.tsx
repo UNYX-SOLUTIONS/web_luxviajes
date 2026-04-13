@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import Link from 'next/link';
@@ -53,7 +54,7 @@ export function ServicesDetailSection() {
           {/* Left Side - Sticky */}
           <div className="lg:sticky lg:top-32 lg:self-start h-fit">
             <div className="mb-8">
-              <p className="text-sm font-semibold text-primary-600 uppercase tracking-wide mb-3">
+              <p className="text-sm font-semibold uppercase tracking-wide mb-3 --color-primary:">
                 Nuestros Servicios
               </p>
               <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-6 text-neutral-900">
@@ -61,7 +62,7 @@ export function ServicesDetailSection() {
                 <br />
                 <span className="text-primary-600">para tu viaje perfecto</span>
               </h2>
-              <p className="text-neutral-700 leading-relaxed mb-8">
+              <p className="text-neutral-900 leading-relaxed mb-8">
                 Elevamos cada trayecto a una obra maestra. Disfrute de un acompañamiento
                 personalizado diseñado para los viajeros más exigentes del mundo
               </p>
@@ -96,7 +97,7 @@ export function ServicesDetailSection() {
                   />
 
                   {/* Overlay Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/30 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-neutral-900 via-neutral-900/30 to-transparent" />
 
                   {/* Content */}
                   <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
