@@ -51,7 +51,7 @@ export function ServicesDetailSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Left Side - Sticky */}
-          <div className="lg:sticky lg:top-32 lg:self-start h-fit">
+          <div className="lg:sticky lg:top-32 lg:self-start h-fit text-gray-800">
             <div className="mb-8">
               <p className="text-sm font-semibold text-primary-600 uppercase tracking-wide mb-3">
                 Nuestros Servicios
@@ -61,7 +61,7 @@ export function ServicesDetailSection() {
                 <br />
                 <span className="text-primary-600">para tu viaje perfecto</span>
               </h2>
-              <p className="text-neutral-600 leading-relaxed mb-8">
+              <p className="text-neutral-800 leading-relaxed mb-8">
                 Elevamos cada trayecto a una obra maestra. Disfrute de un acompañamiento
                 personalizado diseñado para los viajeros más exigentes del mundo
               </p>
