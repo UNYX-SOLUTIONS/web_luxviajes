@@ -1,7 +1,7 @@
 'use client';
 
 import { Hero, Button } from '@/components/common';
-import { DestinationCard, PackageCard, ServiceCard, StatsSection } from '@/components/sections';
+import { DestinationCard, PackageCard, ServiceCard, StatsSection, PromotionsMap, ServicesDetailSection } from '@/components/sections';
 import { getDestinations, getPackages, getServices } from '@/services';
 import { useEffect, useState } from 'react';
 import { Destination, Package, Service } from '@/types';
@@ -32,6 +32,12 @@ export default function Home() {
         ctaText="Explorar"
         ctaHref="#destinations"
       />
+
+      {/* Promotions Map Section */}
+      <PromotionsMap />
+
+      {/* Services Detail Section */}
+      <ServicesDetailSection />
 
       {/* Stats Section */}
       <StatsSection />
