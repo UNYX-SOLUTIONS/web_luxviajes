@@ -54,7 +54,7 @@ export function ServicesDetailSection() {
           {/* Left Side - Sticky */}
           <div className="lg:sticky lg:top-32 lg:self-start h-fit">
             <div className="mb-8">
-              <p className="text-sm font-semibold uppercase tracking-wide mb-3 --color-primary:">
+              <p className="text-sm font-semibold uppercase tracking-wide mb-3 text-tertiary-600">
                 Nuestros Servicios
               </p>
               <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-6 text-neutral-900">
@@ -97,7 +97,7 @@ export function ServicesDetailSection() {
                   />
 
                   {/* Overlay Gradient */}
-                  <div className="absolute inset-0 bg-linear-to-t from-neutral-900 via-neutral-900/30 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-b from-neutral-900/90 via-neutral-900/40 to-neutral-900/20" />
 
                   {/* Content */}
                   <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
