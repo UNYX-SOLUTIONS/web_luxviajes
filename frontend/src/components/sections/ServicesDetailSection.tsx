@@ -1,8 +1,6 @@
 'use client';
 
-import { Button } from '@/components/common';
 import Link from 'next/link';
-import { useRef, useEffect, useState } from 'react';
 
 interface ServiceDetail {
   id: string;
@@ -48,38 +46,6 @@ const SERVICES_DETAILS: ServiceDetail[] = [
 ];
 
 export function ServicesDetailSection() {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-
-  useEffect(() => {
-    const checkScroll = () => {
-      if (scrollContainerRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-        setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
-      }
-    };
-
-    const container = scrollContainerRef.current;
-    container?.addEventListener('scroll', checkScroll);
-    window.addEventListener('resize', checkScroll);
-    checkScroll();
-
-    return () => {
-      container?.removeEventListener('scroll', checkScroll);
-      window.removeEventListener('resize', checkScroll);
-    };
-  }, []);
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 400;
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'right' ? scrollAmount : -scrollAmount,
-        behavior: 'smooth',
-      });
-    }
-  };
-
   return (
     <section className="py-16 md:py-20 bg-neutral-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -116,86 +82,57 @@ export function ServicesDetailSection() {
             </Link>
           </div>
 
-          {/* Right Side - Scrollable Cards */}
-          <div className="lg:col-span-2">
-            <div className="relative">
-              {/* Scroll Container */}
-              <div
-                ref={scrollContainerRef}
-                className="flex gap-6 overflow-x-auto pb-6 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              >
-                {SERVICES_DETAILS.map((service) => (
-                  <div
-                    key={service.id}
-                    className="flex-shrink-0 w-full sm:w-96 group cursor-pointer"
-                  >
-                    {/* Card Container */}
-                    <div className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
-                      {/* Background Image */}
-                      <img
-                        src={service.image}
-                        alt={service.label}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+          {/* Right Side - Vertical Cards */}
+          <div className="lg:col-span-2 space-y-8">
+            {SERVICES_DETAILS.map((service, index) => (
+              <div key={service.id}>
+                {/* Card Container */}
+                <div className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 group">
+                  {/* Background Image */}
+                  <img
+                    src={service.image}
+                    alt={service.label}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
 
-                      {/* Overlay Gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/30 to-transparent" />
+                  {/* Overlay Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/30 to-transparent" />
 
-                      {/* Content */}
-                      <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
-                        {/* Title */}
-                        <div>
-                          <h3 className="text-xl font-bold">{service.title}</h3>
-                        </div>
-
-                        {/* Badge */}
-                        <div className="flex justify-end">
-                          <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors">
-                            <span>Solicitar asesoría</span>
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
+                  {/* Content */}
+                  <div className="absolute inset-0 flex flex-col justify-between p-6 text-white">
+                    {/* Title */}
+                    <div>
+                      <h3 className="text-xl font-bold">{service.title}</h3>
                     </div>
 
-                    {/* Description */}
-                    <p className="mt-4 text-sm text-neutral-600 leading-relaxed">
-                      {service.description}
-                    </p>
+                    {/* Badge */}
+                    <div className="flex justify-end">
+                      <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors">
+                        <span>Solicitar asesoría</span>
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                ))}
+                </div>
+
+                {/* Description */}
+                <p className="mt-4 text-neutral-600 leading-relaxed">
+                  {service.description}
+                </p>
+
+                {/* Divider - Hide on last item */}
+                {index < SERVICES_DETAILS.length - 1 && (
+                  <hr className="mt-8 border-neutral-200" />
+                )}
               </div>
-
-              {/* Scroll Navigation Buttons */}
-              <button
-                onClick={() => scroll('left')}
-                className="absolute -left-12 lg:-left-16 top-1/3 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl"
-                aria-label="Scroll left"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-
-              {canScrollRight && (
-                <button
-                  onClick={() => scroll('right')}
-                  className="absolute -right-12 lg:-right-16 top-1/3 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl"
-                  aria-label="Scroll right"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              )}
-            </div>
+            ))}
           </div>
         </div>
       </div>
