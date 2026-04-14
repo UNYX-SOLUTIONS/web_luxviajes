@@ -182,7 +182,7 @@ export default function HelpPage() {
               </Link>
             </article>
 
-            <article className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-primary-100">
+            <article className="rounded-2xl bg-secondary-100 p-8 text-center shadow-sm ring-1 ring-primary-200">
               <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
                 <PhoneIcon className="h-6 w-6 text-primary-700" />
               </div>
@@ -200,7 +200,7 @@ export default function HelpPage() {
               </Link>
             </article>
 
-            <article className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-primary-100">
+            <article className="rounded-2xl bg-secondary-100 p-8 text-center shadow-sm ring-1 ring-primary-200">
               <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
                 <EnvelopeIcon className="h-6 w-6 text-primary-700" />
               </div>
