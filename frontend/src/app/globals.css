@@ -1,0 +1,118 @@
+@config "../../tailwind.config.ts";
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+  
+  /* Lux Viajes Color System */
+  --color-primary: #6b21a8;
+  --color-primary-dark: #581c87;
+  --color-primary-light: #9333ea;
+  
+  --color-secondary: #2e1065;
+  --color-secondary-dark: #1a0536;
+  --color-secondary-light: #7e22ce;
+  
+  --color-tertiary: #6d4100;
+  --color-tertiary-dark: #451a03;
+  --color-tertiary-light: #b45309;
+  
+  --color-neutral: #7c757f;
+  --color-neutral-dark: #4b5563;
+  --color-neutral-light: #e5e7eb;
+  
+  --color-accent-red: #dc2626;
+  --color-accent-green: #10b981;
+  --color-accent-blue: #3b82f6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-manrope);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+    --foreground: #111827;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-manrope), system-ui, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-manrope), -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Scroll Bar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Typography Utilities */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-manrope);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: 3rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+h2 {
+  font-size: 2.25rem;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.875rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+h4 {
+  font-size: 1.5rem;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+p {
+  line-height: 1.6;
+  color: var(--foreground);
+}
+
+/* Selection styling */
+::selection {
+  background-color: var(--color-primary);
+  color: white;
+}
