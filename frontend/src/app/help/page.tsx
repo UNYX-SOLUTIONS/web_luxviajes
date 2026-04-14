@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   DocumentTextIcon,
   CreditCardIcon,
@@ -73,6 +74,50 @@ const faqs = [
 ];
 
 export default function HelpPage() {
+  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+
+  const supportChannels = [
+    {
+      id: "whatsapp",
+      title: "WhatsApp Directo",
+      description: "Mensajeria instantanea con nuestros expertos locales.",
+      icon: ChatBubbleLeftIcon,
+      href: "https://wa.me/593984220600",
+      isExternal: true,
+      bgColor: "bg-secondary-100",
+      bgColorSelected: "bg-primary-700",
+      buttonColor: "bg-tertiary-200 text-tertiary-900 hover:bg-tertiary-100",
+      textColor: "text-neutral-900",
+      buttonText: "Chatear Ahora",
+    },
+    {
+      id: "phone",
+      title: "Linea de Soporte 24/7",
+      description: "Llamanos en cualquier momento, desde cualquier lugar del mundo.",
+      icon: PhoneIcon,
+      href: "tel:+593964220600",
+      isExternal: false,
+      bgColor: "bg-secondary-100",
+      bgColorSelected: "bg-primary-700",
+      buttonColor: "border border-primary-300 text-primary-700 hover:bg-primary-50",
+      textColor: "text-neutral-900",
+      buttonText: "+593 96 422 0600",
+    },
+    {
+      id: "email",
+      title: "Consulta por Email",
+      description: "Envianos una solicitud detallada y te responderemos en menos de 2 horas.",
+      icon: EnvelopeIcon,
+      href: "mailto:info@luxviajes.com",
+      isExternal: false,
+      bgColor: "bg-secondary-100",
+      bgColorSelected: "bg-primary-700",
+      buttonColor: "border border-primary-300 text-primary-700 hover:bg-primary-50",
+      textColor: "text-neutral-900",
+      buttonText: "Enviar Email",
+    },
+  ];
+
   return (
     <>
       <section className="bg-primary-50 py-14 md:py-20">
@@ -165,69 +210,48 @@ export default function HelpPage() {
           </div>
 
           <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
-            <article className="rounded-2xl bg-primary-700 p-8 text-center text-white shadow-lg">
-              <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-600">
-                <ChatBubbleLeftIcon className="h-6 w-6" />
-              </div>
-              <h3 className="text-2xl font-bold">WhatsApp Directo</h3>
-              <p className="mt-2 text-sm text-primary-100">
-                Mensajeria instantanea con nuestros expertos locales.
-              </p>
-              <Link
-                href="https://wa.me/593984220600"
-                target="_blank"
-                className="mt-6 inline-flex rounded-full bg-tertiary-200 px-6 py-2.5 text-sm font-semibold text-tertiary-900 transition hover:bg-tertiary-100"
-              >
-                Chatear Ahora
-              </Link>
-            </article>
+            {supportChannels.map((channel) => {
+              const IconComponent = channel.icon;
+              const isSelected = selectedChannel === channel.id;
 
-            <article className="rounded-2xl bg-secondary-100 p-8 text-center shadow-sm ring-1 ring-primary-200">
-              <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
-                <PhoneIcon className="h-6 w-6 text-primary-700" />
-              </div>
-              <h3 className="text-2xl font-bold text-neutral-900">
-                Linea de Soporte 24/7
-              </h3>
-              <p className="mt-2 text-sm text-neutral-600">
-                Llamanos en cualquier momento, desde cualquier lugar del mundo.
-              </p>
-              <Link
-                href="tel:+593964220600"
-                className="mt-6 inline-flex rounded-full border border-primary-300 px-6 py-2.5 text-sm font-semibold text-primary-700 transition hover:bg-primary-50"
-              >
-                +593 96 422 0600
-              </Link>
-            </article>
-
-            <article className="rounded-2xl bg-secondary-100 p-8 text-center shadow-sm ring-1 ring-primary-200">
-              <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
-                <EnvelopeIcon className="h-6 w-6 text-primary-700" />
-              </div>
-              <h3 className="text-2xl font-bold text-neutral-900">
-                Consulta por Email
-              </h3>
-              <p className="mt-2 text-sm text-neutral-600">
-                Envianos una solicitud detallada y te responderemos en menos de
-                2 horas.
-              </p>
-              <Link
-                href="mailto:info@luxviajes.com"
-                className="mt-6 inline-flex rounded-full border border-primary-300 px-6 py-2.5 text-sm font-semibold text-primary-700 transition hover:bg-primary-50"
-              >
-                Enviar Email
-              </Link>
-            </article>
+              return (
+                <button
+                  key={channel.id}
+                  onClick={() => setSelectedChannel(isSelected ? null : channel.id)}
+                  className={`rounded-2xl p-8 text-center shadow-lg transition-all duration-300 ${
+                    isSelected
+                      ? `${channel.bgColorSelected} text-white ring-2 ring-secondary-700 scale-105`
+                      : `${channel.bgColor} ${channel.textColor} ring-1 ring-primary-200 hover:shadow-2xl hover:scale-102`
+                  }`}
+                >
+                  <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-opacity-20">
+                    <IconComponent className={`h-6 w-6 ${isSelected ? "text-white" : "text-primary-700"}`} />
+                  </div>
+                  <h3 className="text-2xl font-bold">{channel.title}</h3>
+                  <p className={`mt-2 text-sm ${isSelected ? "text-primary-100" : "text-neutral-600"}`}>
+                    {channel.description}
+                  </p>
+                  <Link
+                    href={channel.href}
+                    target={channel.isExternal ? "_blank" : undefined}
+                    onClick={(e) => e.stopPropagation()}
+                    className={`mt-6 inline-flex rounded-full px-6 py-2.5 text-sm font-semibold transition ${channel.buttonColor}`}
+                  >
+                    {channel.buttonText}
+                  </Link>
+                </button>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      <section className="bg-primary-700 py-6 text-center text-white">
+      <section className="bg-primary-700 py-8 md:py-10 text-center text-white">
         <div className="flex items-center justify-center gap-2">
           <ShieldCheckIcon className="h-5 w-5" />
-          <p className="text-sm font-medium">
+          <a className="text-sm font-medium">
             Tranquilidad en cada paso de tu viaje.
-          </p>
+          </a>
         </div>
       </section>
     </>
