@@ -16,11 +16,16 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    unoptimized: process.env.NODE_ENV === 'development',
   },
 
   /* Compresión y optimizaciones */
   compress: true,
   productionBrowserSourceMaps: false,
+  swcMinify: true,
+
+  /* React Strict Mode para desarrollo */
+  reactStrictMode: true,
 
   /* Headers para mejor rendimiento */
   async headers() {
@@ -48,6 +53,10 @@ const nextConfig: NextConfig = {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'self'",
+          },
         ],
       },
     ];
@@ -60,12 +69,17 @@ const nextConfig: NextConfig = {
 
   /* Rewrites */
   async rewrites() {
-    return [];
+    return {
+      beforeFiles: [],
+      afterFiles: [],
+      fallback: [],
+    };
   },
 
-  /* Experimental features */
+  /* Optimizaciones de bundel */
   experimental: {
-    optimizePackageImports: ['@components', '@utils'],
+    optimizePackageImports: ['@components', '@utils', '@lib'],
+    turbopack: process.env.TURBOPACK === 'true' ? {} : undefined,
   },
 };
 

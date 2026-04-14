@@ -34,13 +34,7 @@ export default function Home() {
   return (
     <>
       {/* Hero Section */}
-      <Hero
-        title="MALDIVAS"
-        subtitle="Un amanecer sereno en villas sobre el agua turquesa"
-        backgroundImage="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop"
-        ctaText="Explorar"
-        ctaHref="#destinations"
-      />
+      <Hero ctaText="Explorar" ctaHref="#destinations" />
       {/* Stats Section */}
       <StatsSection />
 
