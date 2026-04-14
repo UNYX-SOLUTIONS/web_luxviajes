@@ -4,50 +4,15 @@ import Image from 'next/image';
 import { Button } from '../common/Button';
 import { cn } from '@/utils/cn';
 
-interface Promotion {
-  id: string;
-  title: string;
-  destination: string;
-  image: string;
-  badge?: string;
-  link?: string;
-}
 
 interface PromotionsMapProps {
   className?: string;
 }
 
-const promotions: Promotion[] = [
-  {
-    id: '1',
-    title: 'Medellín',
-    destination: 'Panamá',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=300&fit=crop',
-    badge: 'PROMO FLASH',
-  },
-  {
-    id: '2',
-    title: 'Colombia',
-    destination: 'Sudamérica',
-    image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=300&h=300&fit=crop',
-  },
-  {
-    id: '3',
-    title: 'Panamá',
-    destination: 'Centroamérica',
-    image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=300&h=300&fit=crop',
-  },
-  {
-    id: '4',
-    title: 'Brasil',
-    destination: 'Sudamérica',
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=300&fit=crop',
-  },
-];
 
 export function PromotionsMap({ className }: PromotionsMapProps) {
   return (
-    <section className={cn('py-16 md:py-24 bg-gradient-to-b from-white to-gray-50', className)}>
+    <section className={cn('py-16 md:py-24 bg-linear-to-b from-white to-gray-50', className)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-12 text-center">
@@ -62,7 +27,7 @@ export function PromotionsMap({ className }: PromotionsMapProps) {
         {/* Map Container */}
         <div className="relative w-full h-auto">
           {/* Map Image - Background */}
-          <div className="relative w-full aspect-video md:aspect-auto md:h-[500px]">
+          <div className="relative w-full aspect-video md:aspect-auto md:h-125">
             <Image
               src="/images/mapa.png"
               alt="Mapa de destinos"
@@ -72,7 +37,7 @@ export function PromotionsMap({ className }: PromotionsMapProps) {
             />
 
             {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent rounded-2xl" />
 
             {/* Promotions Overlays */}
             <div className="absolute inset-0 rounded-2xl overflow-hidden">

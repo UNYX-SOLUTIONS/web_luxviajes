@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
 import { Header, Footer } from '@/components/common';
 import { COMPANY_INFO } from '@/constants';
@@ -15,13 +15,17 @@ export const metadata: Metadata = {
   description: COMPANY_INFO.description,
   keywords: 'viajes, agencia de viajes, paquetes internacionales, turismo',
   authors: [{ name: COMPANY_INFO.name }],
-  viewport: 'width=device-width, initial-scale=1',
   openGraph: {
     type: 'website',
     locale: 'es_ES',
     url: 'https://luxviajes.com',
     siteName: COMPANY_INFO.name,
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
