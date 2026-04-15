@@ -108,7 +108,7 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-white" style={{ clipPath: 'polygon(0 95%, 100% 0, 100% 100%, 0 100%)' }} />
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-white [clip-path:polygon(0_95%,100%_0,100%_100%,0_100%)]" />
       </section>
 
       <section className="bg-white py-16 md:py-20">
