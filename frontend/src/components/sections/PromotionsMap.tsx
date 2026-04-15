@@ -3,14 +3,204 @@
 import Image from "next/image";
 import { Button } from "../common/Button";
 import { cn } from "@/utils/cn";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+
+interface LocationPin {
+  id: string;
+  name: string;
+  label: string;
+  top?: string;
+  bottom?: string;
+  left?: string;
+  right?: string;
+}
 
 interface PromotionsMapProps {
   className?: string;
+  pins?: LocationPin[];
 }
 
-export function PromotionsMap({ className }: PromotionsMapProps) {
+const DEFAULT_PINS: LocationPin[] = [
+  {
+    id: "panama",
+    name: "Panamá",
+    label: "P",
+    top: "86.7%",
+    left: "25%",
+  },
+  {
+    id: "colombia",
+    name: "Colombia",
+    label: "C",
+    top: "84%",
+    left: "33.333%",
+  },
+  {
+    id: "brasil",
+    name: "Brasil",
+    label: "B",
+    top: "78.7%",
+    left: "40%",
+  },
+  {
+    id: "asia",
+    name: "Asia",
+    label: "A",
+    top: "33.333%",
+    left: "75%",
+  },
+];
+
+export function PromotionsMap({
+  className,
+  pins = DEFAULT_PINS,
+}: PromotionsMapProps) {
   const [showPromoDialog, setShowPromoDialog] = useState(false);
+  const [zoom, setZoom] = useState(100);
+  const [panX, setPanX] = useState(0);
+  const [panY, setPanY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const lastCursorPosRef = useRef({ x: 0, y: 0 });
+  const stateRef = useRef({ zoom: 100, panX: 0, panY: 0 });
+
+  const handleZoomIn = () => {
+    const cursorX = lastCursorPosRef.current.x;
+    const cursorY = lastCursorPosRef.current.y;
+    const {
+      zoom: prevZoom,
+      panX: currentPanX,
+      panY: currentPanY,
+    } = stateRef.current;
+
+    // Obtener el punto del mapa que está bajo el cursor (en coordenadas del mapa sin escalar)
+    const mapPointX = (cursorX - currentPanX) / (prevZoom / 100);
+    const mapPointY = (cursorY - currentPanY) / (prevZoom / 100);
+
+    const newZoom = Math.min(prevZoom + 20, 200);
+
+    // Calcular el nuevo pan para que el mismo punto del mapa permanezca bajo el cursor
+    const newPanX = cursorX - mapPointX * (newZoom / 100);
+    const newPanY = cursorY - mapPointY * (newZoom / 100);
+
+    stateRef.current = { zoom: newZoom, panX: newPanX, panY: newPanY };
+    setZoom(newZoom);
+    setPanX(newPanX);
+    setPanY(newPanY);
+  };
+
+  const handleZoomOut = () => {
+    const cursorX = lastCursorPosRef.current.x;
+    const cursorY = lastCursorPosRef.current.y;
+    const {
+      zoom: prevZoom,
+      panX: currentPanX,
+      panY: currentPanY,
+    } = stateRef.current;
+
+    // Obtener el punto del mapa que está bajo el cursor (en coordenadas del mapa sin escalar)
+    const mapPointX = (cursorX - currentPanX) / (prevZoom / 100);
+    const mapPointY = (cursorY - currentPanY) / (prevZoom / 100);
+
+    const newZoom = Math.max(prevZoom - 20, 100);
+
+    // Calcular el nuevo pan para que el mismo punto del mapa permanezca bajo el cursor
+    const newPanX = cursorX - mapPointX * (newZoom / 100);
+    const newPanY = cursorY - mapPointY * (newZoom / 100);
+
+    stateRef.current = { zoom: newZoom, panX: newPanX, panY: newPanY };
+    setZoom(newZoom);
+    setPanX(newPanX);
+    setPanY(newPanY);
+  };
+
+  const handleResetZoom = () => {
+    stateRef.current = { zoom: 100, panX: 0, panY: 0 };
+    setZoom(100);
+    setPanX(0);
+    setPanY(0);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    setIsDragging(true);
+    const { panX: currentPanX, panY: currentPanY } = stateRef.current;
+    setDragStart({
+      x: e.clientX - currentPanX,
+      y: e.clientY - currentPanY,
+    });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (mapContainerRef.current) {
+      const rect = mapContainerRef.current.getBoundingClientRect();
+      const pos = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+      setCursorPos(pos);
+      lastCursorPosRef.current = pos;
+    }
+
+    if (!isDragging) return;
+    const newPanX = e.clientX - dragStart.x;
+    const newPanY = e.clientY - dragStart.y;
+    stateRef.current.panX = newPanX;
+    stateRef.current.panY = newPanY;
+    setPanX(newPanX);
+    setPanY(newPanY);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  useEffect(() => {
+    stateRef.current = { zoom, panX, panY };
+  }, [zoom, panX, panY]);
+
+  useEffect(() => {
+    const container = mapContainerRef.current;
+    if (!container) return;
+
+    const handleWheelEvent = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -20 : 20;
+      const rect = container.getBoundingClientRect();
+      const mouseEvent = e as MouseEvent;
+      const cursorX = mouseEvent.clientX - rect.left;
+      const cursorY = mouseEvent.clientY - rect.top;
+
+      const {
+        zoom: prevZoom,
+        panX: currentPanX,
+        panY: currentPanY,
+      } = stateRef.current;
+
+      // Obtener el punto del mapa que está bajo el cursor (en coordenadas del mapa sin escalar)
+      const mapPointX = (cursorX - currentPanX) / (prevZoom / 100);
+      const mapPointY = (cursorY - currentPanY) / (prevZoom / 100);
+
+      const newZoom = Math.min(Math.max(prevZoom + delta, 100), 200);
+
+      // Calcular el nuevo pan para que el mismo punto del mapa permanezca bajo el cursor
+      const newPanX = cursorX - mapPointX * (newZoom / 100);
+      const newPanY = cursorY - mapPointY * (newZoom / 100);
+
+      stateRef.current = { zoom: newZoom, panX: newPanX, panY: newPanY };
+      setZoom(newZoom);
+      setPanX(newPanX);
+      setPanY(newPanY);
+    };
+
+    container.addEventListener("wheel", handleWheelEvent, { passive: false });
+
+    return () => {
+      container.removeEventListener("wheel", handleWheelEvent);
+    };
+  }, []);
+
   return (
     <section className={cn("bg-linear-to-b from-white to-gray-50", className)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
@@ -26,78 +216,100 @@ export function PromotionsMap({ className }: PromotionsMapProps) {
         </div>
 
         {/* Map Container */}
-        <div className="relative w-full h-auto ">
+        <div className="relative w-full h-auto">
+          {/* Zoom Controls */}
+          <div className="absolute top-4 right-4 z-20 flex gap-2 bg-white rounded-lg shadow-lg p-2">
+            <button
+              onClick={handleZoomIn}
+              className="px-3 py-2 rounded hover:bg-gray-100 font-semibold text-gray-700 transition-colors"
+              title="Aumentar zoom"
+            >
+              +
+            </button>
+            <div className="px-3 py-2 text-gray-700 font-semibold min-w-[60px] text-center">
+              {zoom}%
+            </div>
+            <button
+              onClick={handleZoomOut}
+              className="px-3 py-2 rounded hover:bg-gray-100 font-semibold text-gray-700 transition-colors"
+              title="Disminuir zoom"
+            >
+              −
+            </button>
+            <div className="w-px bg-gray-300"></div>
+            <button
+              onClick={handleResetZoom}
+              className="px-3 py-2 rounded hover:bg-gray-100 font-semibold text-gray-700 transition-colors text-xs"
+              title="Restablecer zoom"
+            >
+              Restablecer
+            </button>
+          </div>
+
           {/* Map Image - Background */}
-          <div className="relative w-full h-auto">
-            <Image
-              src="/images/mapa.png"
-              alt="Mapa de destinos"
-              width={800}
-              height={600}
-              className="w-full h-auto object-contain rounded-2xl"
-              priority
-            />
+          <div
+            ref={mapContainerRef}
+            className="relative w-full h-auto overflow-hidden rounded-2xl cursor-move select-none"
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+          >
+            <div
+              style={{
+                transform: `translate(${panX}px, ${panY}px) scale(${zoom / 100})`,
+                transformOrigin: "0 0",
+                transition: isDragging ? "none" : "transform 0.3s ease-in-out",
+              }}
+            >
+              <Image
+                src="/images/mapa.png"
+                alt="Mapa de destinos"
+                width={800}
+                height={600}
+                className="w-full h-auto object-contain"
+                priority
+                draggable="false"
+              />
 
-            {/* Promotions Overlays */}
-            <div className="absolute inset-0 rounded-2xl overflow-hidden">
-              {/* Location Pins - Panamá */}
-              <div className="absolute bottom-20 left-1/4 z-10">
-                <div
-                  className="flex flex-col items-center cursor-pointer"
-                  onClick={() => setShowPromoDialog(true)}
-                >
-                  <div className="w-8 h-8 md:w-10 md:h-10 bg-purple-600 rounded-full border-4 border-white shadow-lg flex items-center justify-center hover:scale-125 transition-transform">
-                    <span className="text-white text-xs md:text-sm">P</span>
+              {/* Promotions Overlays */}
+              <div className="absolute inset-0 rounded-2xl overflow-hidden">
+                {/* Location Pins */}
+                {pins.map((pin) => (
+                  <div
+                    key={pin.id}
+                    className="absolute z-10"
+                    style={{
+                      top: pin.top,
+                      bottom: pin.bottom,
+                      left: pin.left,
+                      right: pin.right,
+                    }}
+                  >
+                    <div
+                      className="flex flex-col items-center cursor-pointer"
+                      onClick={() => setShowPromoDialog(true)}
+                    >
+                      <svg
+                        className="w-8 h-8 md:w-10 md:h-10 hover:scale-125 transition-transform"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12 2C7.03 2 3 6.03 3 11c0 6 9 13 9 13s9-7 9-13c0-4.97-4.03-9-9-9z"
+                          fill="#9333EA"
+                          stroke="white"
+                          strokeWidth="2"
+                        />
+                        <circle cx="12" cy="11" r="3" fill="white" />
+                      </svg>
+                      <div className="text-white text-xs md:text-sm font-semibold mt-2 bg-black/50 px-2 py-1 rounded whitespace-nowrap">
+                        {pin.name}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-white text-xs md:text-sm font-semibold mt-2 bg-black/50 px-2 py-1 rounded whitespace-nowrap">
-                    Panamá
-                  </div>
-                </div>
-              </div>
-
-              {/* Location Pins - Colombia */}
-              <div className="absolute bottom-24 left-1/3 z-10">
-                <div
-                  className="flex flex-col items-center cursor-pointer"
-                  onClick={() => setShowPromoDialog(true)}
-                >
-                  <div className="w-8 h-8 md:w-10 md:h-10 bg-purple-600 rounded-full border-4 border-white shadow-lg flex items-center justify-center hover:scale-125 transition-transform">
-                    <span className="text-white text-xs md:text-sm">C</span>
-                  </div>
-                  <div className="text-white text-xs md:text-sm font-semibold mt-2 bg-black/50 px-2 py-1 rounded whitespace-nowrap">
-                    Colombia
-                  </div>
-                </div>
-              </div>
-
-              {/* Location Pins - Brasil */}
-              <div className="absolute bottom-32 left-2/5 z-10">
-                <div
-                  className="flex flex-col items-center cursor-pointer"
-                  onClick={() => setShowPromoDialog(true)}
-                >
-                  <div className="w-8 h-8 md:w-10 md:h-10 bg-purple-600 rounded-full border-4 border-white shadow-lg flex items-center justify-center hover:scale-125 transition-transform">
-                    <span className="text-white text-xs md:text-sm">B</span>
-                  </div>
-                  <div className="text-white text-xs md:text-sm font-semibold mt-2 bg-black/50 px-2 py-1 rounded whitespace-nowrap">
-                    Brasil
-                  </div>
-                </div>
-              </div>
-
-              {/* Location Pins - Asia */}
-              <div className="absolute top-1/3 right-1/4 z-10">
-                <div
-                  className="flex flex-col items-center cursor-pointer"
-                  onClick={() => setShowPromoDialog(true)}
-                >
-                  <div className="w-8 h-8 md:w-10 md:h-10 bg-purple-600 rounded-full border-4 border-white shadow-lg flex items-center justify-center hover:scale-125 transition-transform">
-                    <span className="text-white text-xs md:text-sm">A</span>
-                  </div>
-                  <div className="text-white text-xs md:text-sm font-semibold mt-2 bg-black/50 px-2 py-1 rounded whitespace-nowrap">
-                    Asia
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
