@@ -42,7 +42,7 @@ export function Hero({
     },
   ],
   ctaText = "Explorar",
-  ctaHref = "#",
+  ctaHref = "#destinations",
   className,
 }: HeroProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -110,7 +110,7 @@ export function Hero({
       <div className="absolute inset-0 bg-black/40" />
 
       {/* Content - Contains Vertical Selector and Text */}
-      <div className="relative z-10 text-left text-white flex items-center justify-start h-full gap-18 pl-8 md:pl-16">
+      <div className="absolute z-10 text-left text-white flex items-center justify-start h-full gap-18 pl-8 md:pl-16">
         {/* Vertical Selector */}
         <div className="flex flex-col items-center gap-8 h-64 flex-shrink-0">
           <div className="relative w-0.5 h-full bg-white/30 rounded-full">
@@ -143,11 +143,69 @@ export function Hero({
             {cachedSlides[currentImageIndex].subtitle}
           </p>
           <Link href={ctaHref}>
-            <Button size="lg" variant="primary">
+            <Button
+              size="lg"
+              variant="primary"
+              className="flex items-center gap-2"
+            >
               {ctaText}
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
             </Button>
           </Link>
         </div>
+      </div>
+
+      {/* Top Right CTA Buttons - WhatsApp and Contact */}
+      <div className="absolute top-48 right-8 z-20 flex flex-col sm:flex-row items-center gap-3">
+        {/* Contact Button */}
+        <Button
+          size="lg"
+          variant="ghost"
+          className="bg-[#D9D9D9]/40 text-white font-bold !h-12 !py-0 flex items-center justify-center !text-base"
+        >
+          Llámanos +593 96 422 0600
+        </Button>
+
+        {/* WhatsApp Button */}
+        <a
+          href="https://wa.me/593984220600"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-12 h-12 rounded-full bg-[#D9D9D9]/40 hover:bg-[#D9D9D9]/60 transition-colors text-white flex items-center justify-center"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 28 28"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g clip-path="url(#clip0_292_749)">
+              <path
+                d="M0 27.43L1.97 20.09C0.85 18.08 0.27 15.83 0.27 13.55C0.27 6.08 6.34 0 13.81 0C21.28 0 27.36 6.08 27.36 13.55C27.36 21.02 21.28 27.1 13.81 27.1C11.57 27.1 9.35 26.53 7.37 25.46L0 27.43ZM7.74 22.71L8.2 22.99C9.91 24.01 11.84 24.54 13.81 24.54C19.87 24.54 24.8 19.61 24.8 13.55C24.8 7.49 19.87 2.56 13.81 2.56C7.75 2.56 2.83 7.49 2.83 13.54C2.83 15.54 3.39 17.51 4.44 19.24L4.72 19.71L3.62 23.81L7.74 22.71Z"
+                fill="white"
+              />
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M18.85 15.43C18.29 15.1 17.57 14.72 16.91 14.99C16.41 15.2 16.08 15.98 15.76 16.39C15.59 16.6 15.39 16.63 15.14 16.53C13.25 15.78 11.8 14.51 10.75 12.77C10.57 12.5 10.6 12.29 10.82 12.04C11.14 11.67 11.53 11.25 11.62 10.75C11.71 10.25 11.47 9.66999 11.26 9.21999C11 8.64999 10.7 7.83999 10.13 7.51999C9.60002 7.21999 8.91002 7.38999 8.45002 7.76999C7.64002 8.42999 7.25002 9.44999 7.27002 10.47C7.27002 10.76 7.31002 11.05 7.38002 11.33C7.54002 12 7.85002 12.63 8.20002 13.23C8.46002 13.68 8.75002 14.12 9.06002 14.54C10.07 15.91 11.33 17.11 12.79 18C13.52 18.45 14.3 18.84 15.12 19.11C16.03 19.41 16.84 19.72 17.83 19.54C18.86 19.34 19.87 18.71 20.28 17.71C20.4 17.42 20.46 17.09 20.39 16.78C20.25 16.14 19.38 15.75 18.86 15.44L18.85 15.43Z"
+                fill="white"
+              />
+            </g>
+          </svg>
+        </a>
       </div>
 
       {/* Social Media Icons - Bottom Right */}
