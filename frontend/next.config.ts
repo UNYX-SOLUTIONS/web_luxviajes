@@ -22,7 +22,6 @@ const nextConfig: NextConfig = {
   /* Compresión y optimizaciones */
   compress: true,
   productionBrowserSourceMaps: false,
-  swcMinify: true,
 
   /* React Strict Mode para desarrollo */
   reactStrictMode: true,
@@ -79,7 +78,6 @@ const nextConfig: NextConfig = {
   /* Optimizaciones de bundel */
   experimental: {
     optimizePackageImports: ['@components', '@utils', '@lib'],
-    turbopack: process.env.TURBOPACK === 'true' ? {} : undefined,
   },
 };
 

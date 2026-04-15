@@ -88,7 +88,7 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-white [clip-path:polygon(0_45%,100%_0,100%_100%,0_100%)]" />
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-white" style={{ clipPath: 'polygon(0 45%, 100% 0, 100% 100%, 0 100%)' }} />
       </section>
 
       <section className="bg-white py-16 md:py-20">
@@ -100,7 +100,7 @@ export default function ServicesPage() {
                 Cada detalle es orquestado por expertos para asegurar que tu unica preocupacion sea disfrutar el horizonte.
               </p>
             </div>
-            <div className="hidden h-[2px] w-16 bg-tertiary-500 md:block" />
+            <div className="hidden h-0.5 w-16 bg-tertiary-500 md:block" />
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

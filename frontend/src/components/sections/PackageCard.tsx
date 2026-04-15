@@ -39,7 +39,7 @@ export function PackageCard({ package: pkg, className }: PackageCardProps) {
         </div>
       </CardHeader>
 
-      <CardBody className="flex-grow">
+      <CardBody className="grow">
         <p className="text-sm text-gray-600 mb-4">{pkg.description}</p>
         <div className="mb-3">
           <p className="text-xs font-semibold text-gray-700 mb-2">Incluye:</p>
