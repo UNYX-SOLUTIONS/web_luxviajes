@@ -25,8 +25,7 @@ export function Header({ activeLink }: HeaderProps) {
               alt="Lux Viajes Logo"
               width={320}
               height={125}
-              className="h-auto w-auto"
-              style={{ maxHeight: "125px" }}
+              className="h-[125px] w-auto"
               loading="eager"
               priority
             />
