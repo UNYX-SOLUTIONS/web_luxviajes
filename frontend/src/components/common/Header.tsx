@@ -15,7 +15,7 @@ export function Header({ activeLink }: HeaderProps) {
   const pathname = usePathname();
   const currentActiveLink = activeLink || pathname;
   return (
-    <header className="absolute top-0 left-0 right-0 w-full z-[100] bg-primary/70 shadow-sm">
+    <header className="absolute top-0 left-0 right-0 w-full z-100 bg-primary/70 shadow-sm">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-40">
           {/* Logo */}
@@ -25,7 +25,8 @@ export function Header({ activeLink }: HeaderProps) {
               alt="Lux Viajes Logo"
               width={320}
               height={125}
-              className="h-[125px] w-auto"
+              className="h-auto"
+              style={{ maxHeight: "125px", width: "auto" }}
               loading="eager"
               priority
             />

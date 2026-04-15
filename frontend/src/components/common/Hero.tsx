@@ -98,7 +98,7 @@ export function Hero({
         {cachedSlides.map((slide) => (
           <div
             key={slide.image}
-            className="w-full h-full flex-shrink-0 bg-cover bg-center"
+            className="w-full h-full shrink-0 bg-cover bg-center"
             style={{
               backgroundImage: `url(${slide.image})`,
             }}
@@ -112,7 +112,7 @@ export function Hero({
       {/* Content - Contains Vertical Selector and Text */}
       <div className="absolute z-10 text-left text-white flex items-center justify-start h-full gap-18 pl-8 md:pl-16">
         {/* Vertical Selector */}
-        <div className="flex flex-col items-center gap-8 h-64 flex-shrink-0">
+        <div className="flex flex-col items-center gap-8 h-64 shrink-0">
           <div className="relative w-0.5 h-full bg-white/30 rounded-full">
             {cachedSlides.map((_, index) => (
               <button
@@ -139,7 +139,7 @@ export function Hero({
           <div className="text-[2rem] sm:text-[3rem] md:text-[4rem] lg:text-[5rem] xl:text-[6rem] 2xl:text-[6rem] font-bold font-manrope mb-4 leading-none">
             {cachedSlides[currentImageIndex].title}
           </div>
-          <p className="text-lg md:text-xl mb-8 max-w-2xl !text-white">
+          <p className="text-lg md:text-xl mb-8 max-w-2xl text-white!">
             {cachedSlides[currentImageIndex].subtitle}
           </p>
           <Link href={ctaHref}>
@@ -173,7 +173,7 @@ export function Hero({
         <Button
           size="lg"
           variant="ghost"
-          className="bg-[#D9D9D9]/40 text-white font-bold !h-12 !py-0 flex items-center justify-center !text-base"
+          className="bg-[#D9D9D9]/40 text-white font-bold h-12! py-0! flex items-center justify-center text-base!"
         >
           Llámanos +593 96 422 0600
         </Button>
