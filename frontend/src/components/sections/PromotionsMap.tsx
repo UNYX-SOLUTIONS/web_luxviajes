@@ -1,4 +1,5 @@
 "use client";
+"use client";
 
 import Image from "next/image";
 import { Button } from "../common/Button";
@@ -257,11 +258,18 @@ export function PromotionsMap({
   return (
     <section className={cn("bg-linear-to-b from-white to-gray-50", className)}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+    <section className={cn("bg-linear-to-b from-white to-gray-50", className)}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
         {/* Header */}
+        <div className="mb-12 text-left">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#500088]">
         <div className="mb-12 text-left">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#500088]">
             Top Promociones del Mes
           </h2>
+          <p className="text-lg text-gray-600">
+            Cada detalle es realizado por expertos para asegurar que tu única
+            preocupación sea disfrutar del horizonte
           <p className="text-lg text-gray-600">
             Cada detalle es realizado por expertos para asegurar que tu única
             preocupación sea disfrutar del horizonte
@@ -474,6 +482,9 @@ export function PromotionsMap({
           )}
         </div>
 
+        {/* Info Text */}
+        <div className="mt-4 text-center text-sm text-gray-600">
+          <p>Haz clic en los pines para explorar más promociones</p>
         {/* Info Text */}
         <div className="mt-4 text-center text-sm text-gray-600">
           <p>Haz clic en los pines para explorar más promociones</p>
