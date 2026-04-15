@@ -1,7 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
-'use client';
+"use client";
 
-import Link from 'next/link';
+import Link from "next/link";
+import Image from "next/image";
 
 interface ServiceDetail {
   id: string;
@@ -13,48 +13,48 @@ interface ServiceDetail {
 
 const SERVICES_DETAILS: ServiceDetail[] = [
   {
-    id: 'flights',
-    title: 'Boletos Aéreos',
-    label: 'Boletos Aéreos',
-    image: 'https://images.unsplash.com/photo-1436262174933-eb0264dc26e0?w=600&h=400&fit=crop',
+    id: "packages",
+    title: "Paquetes turísticos",
+    label: "Paquetes turísticos",
+    image: "/images/services/packages.png",
     description:
-      'Lorem ipsum dolor sit amet consectetur adipiscing, elit pellentesque ac curae tortor, convallis lacinia viverra.',
+      "Experiencias diseñadas a medida para vivir aventuras inolvidables en los destinos más hermosos del mundo.",
   },
   {
-    id: 'visas',
-    title: 'Visas y turnos',
-    label: 'Visas y turnos',
-    image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=400&fit=crop',
+    id: "visas",
+    title: "Visas y turnos",
+    label: "Visas y turnos",
+    image: "/images/services/visas.png",
     description:
-      'Lorem ipsum dolor sit amet consectetur adipiscing, elit pellentesque ac curae tortor, convallis lacinia viverra.',
+      "Gestión rápida y profesional de tus trámites migratorios sin complicaciones.",
   },
   {
-    id: 'packages',
-    title: 'Paquetes turísticos',
-    label: 'Paquetes turísticos',
-    image: 'https://images.unsplash.com/photo-1488748807830-63789f68bb65?w=600&h=400&fit=crop',
+    id: "flights",
+    title: "Boletos Aéreos",
+    label: "Boletos Aéreos",
+    image: "/images/services/flights.png",
     description:
-      'Lorem ipsum dolor sit amet consectetur adipiscing, elit pellentesque ac curae tortor, convallis lacinia viverra.',
+      "Acceso a los mejores precios y aerolíneas premium para tu viaje perfecto.",
   },
   {
-    id: 'hotels',
-    title: 'Reservas de Hoteles',
-    label: 'Reservas de Hoteles',
-    image: 'https://images.unsplash.com/photo-1455849318169-8c8e32a63808?w=600&h=400&fit=crop',
+    id: "hotels",
+    title: "Reservas de Hoteles",
+    label: "Reservas de Hoteles",
+    image: "/images/services/hotels.png",
     description:
-      'Lorem ipsum dolor sit amet consectetur adipiscing, elit pellentesque ac curae tortor, convallis lacinia viverra.',
+      "Alojamientos de lujo seleccionados en los destinos más deseados del mundo.",
   },
 ];
 
 export function ServicesDetailSection() {
   return (
-    <section className="py-16 md:py-20 bg-neutral-50">
+    <section className="py-16 md:py-20 bg-[#F8F5FA]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Left Side - Sticky */}
           <div className="lg:sticky lg:top-32 lg:self-start h-fit">
             <div className="mb-8">
-              <p className="text-sm font-semibold uppercase tracking-wide mb-3 text-tertiary-600">
+              <p className="text-sm font-semibold uppercase tracking-wide mb-3 text-[#880000]!">
                 Nuestros Servicios
               </p>
               <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-6 text-neutral-900">
@@ -63,12 +63,16 @@ export function ServicesDetailSection() {
                 <span className="text-primary-600">para tu viaje perfecto</span>
               </h2>
               <p className="text-neutral-900 leading-relaxed mb-8">
-                Elevamos cada trayecto a una obra maestra. Disfrute de un acompañamiento
-                personalizado diseñado para los viajeros más exigentes del mundo
+                Elevamos cada trayecto a una obra maestra. Disfrute de un
+                acompañamiento personalizado diseñado para los viajeros más
+                exigentes del mundo
               </p>
             </div>
 
-            <Link href="#all-services" className="inline-flex items-center group">
+            <Link
+              href="#all-services"
+              className="inline-flex items-center group"
+            >
               <span className="text-sm font-semibold text-primary-600 group-hover:text-primary-700 transition">
                 Ver todos
               </span>
@@ -78,7 +82,12 @@ export function ServicesDetailSection() {
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </Link>
           </div>
@@ -90,9 +99,10 @@ export function ServicesDetailSection() {
                 {/* Card Container */}
                 <div className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 group cursor-pointer">
                   {/* Background Image */}
-                  <img
+                  <Image
                     src={service.image}
                     alt={service.label}
+                    fill
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
 
@@ -116,7 +126,12 @@ export function ServicesDetailSection() {
                           stroke="currentColor"
                           viewBox="0 0 24 24"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
                         </svg>
                       </button>
                     </div>
