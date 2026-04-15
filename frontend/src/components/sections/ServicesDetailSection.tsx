@@ -69,10 +69,7 @@ export function ServicesDetailSection() {
               </p>
             </div>
 
-            <Link
-              href="#all-services"
-              className="inline-flex items-center group"
-            >
+            <Link href="services" className="inline-flex items-center group">
               <span className="text-sm font-semibold text-primary-600 group-hover:text-primary-700 transition">
                 Ver todos
               </span>

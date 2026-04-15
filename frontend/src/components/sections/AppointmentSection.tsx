@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 interface TimeSlot {
   id: string;
@@ -8,24 +8,42 @@ interface TimeSlot {
   available: boolean;
 }
 
+interface FormData {
+  nombre: string;
+  apellido: string;
+  telefono: string;
+  correo: string;
+  promociones: boolean;
+}
+
 export function AppointmentSection() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
+    nombre: "",
+    apellido: "",
+    telefono: "",
+    correo: "",
+    promociones: false,
+  });
 
   const timeSlots: TimeSlot[] = [
-    { id: '1', time: '09:00', available: true },
-    { id: '2', time: '10:00', available: true },
-    { id: '3', time: '11:00', available: false },
-    { id: '4', time: '12:00', available: true },
-    { id: '5', time: '14:00', available: true },
-    { id: '6', time: '15:00', available: true },
-    { id: '7', time: '16:00', available: false },
-    { id: '8', time: '17:00', available: true },
+    { id: "1", time: "09:00", available: true },
+    { id: "2", time: "10:00", available: true },
+    { id: "3", time: "11:00", available: false },
+    { id: "4", time: "12:00", available: true },
+    { id: "5", time: "14:00", available: true },
+    { id: "6", time: "15:00", available: true },
+    { id: "7", time: "16:00", available: false },
+    { id: "8", time: "17:00", available: true },
   ];
 
-  const getDaysInMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-  const getFirstDayOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+  const getDaysInMonth = (date: Date) =>
+    new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  const getFirstDayOfMonth = (date: Date) =>
+    new Date(date.getFullYear(), date.getMonth(), 1).getDay();
 
   const generateCalendarDays = () => {
     const daysInMonth = getDaysInMonth(currentMonth);
@@ -37,21 +55,30 @@ export function AppointmentSection() {
     }
 
     for (let i = 1; i <= daysInMonth; i++) {
-      days.push(new Date(currentMonth.getFullYear(), currentMonth.getMonth(), i));
+      days.push(
+        new Date(currentMonth.getFullYear(), currentMonth.getMonth(), i),
+      );
     }
 
     return days;
   };
 
   const calendarDays = generateCalendarDays();
-  const monthName = currentMonth.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+  const monthName = currentMonth.toLocaleString("es-ES", {
+    month: "long",
+    year: "numeric",
+  });
 
   const handlePrevMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1),
+    );
   };
 
   const handleNextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1),
+    );
   };
 
   const isDateDisabled = (date: Date) => {
@@ -71,13 +98,32 @@ export function AppointmentSection() {
     setSelectedTime(time);
   };
 
-  const handleBookAppointment = () => {
+  const handleOpenModal = () => {
     if (selectedDate && selectedTime) {
-      const formattedDate = selectedDate.toLocaleDateString('es-ES');
-      const whatsappMessage = `Hola, me gustaría agendar una cita para el ${formattedDate} a las ${selectedTime}`;
-      const whatsappUrl = `https://wa.me/593984220600?text=${encodeURIComponent(whatsappMessage)}`;
-      window.open(whatsappUrl, '_blank');
+      setShowModal(true);
     }
+  };
+
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = () => {
+    const { nombre, apellido, telefono, correo } = formData;
+    if (!nombre || !apellido || !telefono || !correo) {
+      alert("Por favor completa todos los campos");
+      return;
+    }
+
+    const formattedDate = selectedDate!.toLocaleDateString("es-ES");
+    const whatsappMessage = `Hola, me gustaría agendar una cita para el ${formattedDate} a las ${selectedTime}\n\nDatos:\nNombre: ${nombre} ${apellido}\nTeléfono: ${telefono}\nCorreo: ${correo}\nRecibir promociones: ${formData.promociones ? "Sí" : "No"}`;
+    const whatsappUrl = `https://wa.me/593964220600?text=${encodeURIComponent(whatsappMessage)}`;
+    window.open(whatsappUrl, "_blank");
+    setShowModal(false);
   };
 
   return (
@@ -96,7 +142,7 @@ export function AppointmentSection() {
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Calendar */}
-          <div className="bg-neutral-50 p-6 rounded-2xl shadow-md">
+          <div className="bg-neutral-50 p-6 rounded-2xl shadow-md h-fit max-h-[500px]">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <button
@@ -104,29 +150,56 @@ export function AppointmentSection() {
                   className="p-2 hover:bg-neutral-200 rounded-lg transition"
                   aria-label="Mes anterior"
                 >
-                  <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  <svg
+                    className="w-5 h-5 text-primary-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
                   </svg>
                 </button>
-                <h3 className="text-lg font-semibold text-neutral-900 capitalize">{monthName}</h3>
+                <h3 className="text-lg font-semibold text-neutral-900 capitalize">
+                  {monthName}
+                </h3>
                 <button
                   onClick={handleNextMonth}
                   className="p-2 hover:bg-neutral-200 rounded-lg transition"
                   aria-label="Mes siguiente"
                 >
-                  <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <svg
+                    className="w-5 h-5 text-primary-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </button>
               </div>
 
               {/* Days of week */}
               <div className="grid grid-cols-7 gap-2 mb-2">
-                {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sab'].map((day) => (
-                  <div key={day} className="text-center text-sm font-semibold text-neutral-600">
-                    {day}
-                  </div>
-                ))}
+                {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sab"].map(
+                  (day) => (
+                    <div
+                      key={day}
+                      className="text-center text-sm font-semibold text-neutral-600"
+                    >
+                      {day}
+                    </div>
+                  ),
+                )}
               </div>
 
               {/* Calendar days */}
@@ -138,16 +211,16 @@ export function AppointmentSection() {
                     disabled={!date || isDateDisabled(date)}
                     className={`
                       p-2 rounded-lg text-sm font-medium transition
-                      ${!date ? 'invisible' : ''}
-                      ${date && isDateDisabled(date) ? 'text-neutral-300 cursor-not-allowed' : ''}
+                      ${!date ? "invisible" : ""}
+                      ${date && isDateDisabled(date) ? "text-neutral-300 cursor-not-allowed" : ""}
                       ${
                         selectedDate &&
                         date &&
                         date.toDateString() === selectedDate.toDateString()
-                          ? 'bg-primary-600 text-white'
+                          ? "bg-primary-600 text-white"
                           : date && !isDateDisabled(date)
-                          ? 'bg-neutral-200 hover:bg-primary-200 text-neutral-900'
-                          : ''
+                            ? "bg-neutral-200 hover:bg-primary-200 text-neutral-900"
+                            : ""
                       }
                     `}
                   >
@@ -160,13 +233,13 @@ export function AppointmentSection() {
             {selectedDate && (
               <div className="mt-6 p-4 bg-primary-50 rounded-lg border border-primary-200">
                 <p className="text-sm text-neutral-700">
-                  Fecha seleccionada:{' '}
+                  Fecha seleccionada:{" "}
                   <span className="font-semibold text-primary-900">
-                    {selectedDate.toLocaleDateString('es-ES', {
-                      weekday: 'long',
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
+                    {selectedDate.toLocaleDateString("es-ES", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
                     })}
                   </span>
                 </p>
@@ -175,87 +248,194 @@ export function AppointmentSection() {
           </div>
 
           {/* Time Selection */}
-          <div>
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-neutral-900 mb-4">Selecciona una hora</h3>
+          <div className="flex flex-col h-fit max-h-[500px]">
+            <div className="mb-8 flex flex-col flex-1 overflow-hidden">
+              <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex-shrink-0">
+                Selecciona una hora
+              </h3>
 
               {selectedDate ? (
-                <div className="space-y-3">
+                <div className="space-y-3 overflow-y-auto pr-2">
                   {timeSlots.map((slot) => (
                     <button
                       key={slot.id}
-                      onClick={() => slot.available && handleTimeSelect(slot.time)}
+                      onClick={() =>
+                        slot.available && handleTimeSelect(slot.time)
+                      }
                       disabled={!slot.available}
                       className={`
                         w-full p-4 rounded-lg font-medium transition text-left
                         ${
                           selectedTime === slot.time
-                            ? 'bg-primary-600 text-white shadow-lg'
+                            ? "bg-primary-600 text-white shadow-lg"
                             : slot.available
-                            ? 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200'
-                            : 'bg-neutral-100 text-neutral-400 cursor-not-allowed opacity-50'
+                              ? "bg-neutral-100 text-neutral-900 hover:bg-neutral-200"
+                              : "bg-neutral-100 text-neutral-400 cursor-not-allowed opacity-50"
                         }
                       `}
                     >
                       <div className="flex items-center justify-between">
                         <span>{slot.time}</span>
-                        {!slot.available && <span className="text-xs">No disponible</span>}
+                        {!slot.available && (
+                          <span className="text-xs">No disponible</span>
+                        )}
                       </div>
                     </button>
                   ))}
                 </div>
               ) : (
                 <div className="p-6 bg-neutral-100 rounded-lg text-center">
-                  <p className="text-neutral-600">Selecciona una fecha para ver horarios disponibles</p>
+                  <p className="text-neutral-600">
+                    Selecciona una fecha para ver horarios disponibles
+                  </p>
                 </div>
               )}
             </div>
 
             {/* Booking Summary */}
-            <div className="bg-primary-50 p-6 rounded-2xl border border-primary-200">
-              <h4 className="font-semibold text-neutral-900 mb-4">Resumen de tu cita</h4>
-              <div className="space-y-3 mb-6">
-                <div>
-                  <p className="text-sm text-neutral-600">Fecha</p>
-                  <p className="font-semibold text-neutral-900">
-                    {selectedDate
-                      ? selectedDate.toLocaleDateString('es-ES', {
-                          weekday: 'long',
-                          day: 'numeric',
-                          month: 'long',
-                        })
-                      : 'No seleccionada'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-neutral-600">Hora</p>
-                  <p className="font-semibold text-neutral-900">
-                    {selectedTime || 'No seleccionada'}
-                  </p>
-                </div>
-              </div>
-
+            <div className="bg-primary-50 p-6 rounded-2xl border border-primary-200 flex-shrink-0">
               <button
-                onClick={handleBookAppointment}
+                onClick={handleOpenModal}
                 disabled={!selectedDate || !selectedTime}
                 className={`
                   w-full py-3 rounded-lg font-semibold transition
                   ${
                     selectedDate && selectedTime
-                      ? 'bg-primary-600 hover:bg-primary-700 text-white shadow-lg'
-                      : 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
+                      ? "bg-primary-600 hover:bg-primary-700 text-white shadow-lg"
+                      : "bg-neutral-300 text-neutral-500 cursor-not-allowed"
                   }
                 `}
               >
-                Agendar por WhatsApp
+                Agendar Cita
               </button>
-              <p className="text-xs text-neutral-600 mt-3 text-center">
-                Serás redirigido a WhatsApp para confirmar tu cita
-              </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            {/* Header */}
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold text-neutral-900 mb-2">
+                Completa tu información
+              </h3>
+              <p className="text-neutral-600">
+                Para confirmar tu cita, por favor completa los siguientes datos
+              </p>
+            </div>
+
+            {/* Resumen de cita */}
+            <div className="bg-primary-50 p-4 rounded-lg border border-primary-200 mb-6">
+              <p className="text-sm text-neutral-600 mb-2">
+                Resumen de tu cita:
+              </p>
+              <p className="font-semibold text-neutral-900">
+                {selectedDate?.toLocaleDateString("es-ES", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })}{" "}
+                a las {selectedTime}
+              </p>
+            </div>
+
+            {/* Formulario */}
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Nombre
+                </label>
+                <input
+                  type="text"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleFormChange}
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                  placeholder="Tu nombre"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Apellido
+                </label>
+                <input
+                  type="text"
+                  name="apellido"
+                  value={formData.apellido}
+                  onChange={handleFormChange}
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                  placeholder="Tu apellido"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Teléfono
+                </label>
+                <input
+                  type="tel"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleFormChange}
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                  placeholder="+593 9 8822 0600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Correo
+                </label>
+                <input
+                  type="email"
+                  name="correo"
+                  value={formData.correo}
+                  onChange={handleFormChange}
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                  placeholder="tu@email.com"
+                />
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="promociones"
+                  name="promociones"
+                  checked={formData.promociones}
+                  onChange={handleFormChange}
+                  className="w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-600"
+                />
+                <label
+                  htmlFor="promociones"
+                  className="ml-3 text-sm text-neutral-700"
+                >
+                  Deseo recibir promociones y descuentos en mi correo
+                </label>
+              </div>
+            </div>
+
+            {/* Botones */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="flex-1 py-2 px-4 border border-neutral-300 rounded-lg text-neutral-700 font-medium hover:bg-neutral-50 transition"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="flex-1 py-2 px-4 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition"
+              >
+                Confirmar Cita
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
