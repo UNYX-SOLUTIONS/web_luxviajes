@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
+import { MapPinIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 const contactOptions = [
@@ -276,7 +277,7 @@ export default function ContactPage() {
                     {office.city}
                   </h3>
                   <p className="mt-2 text-sm text-neutral-600">
-                    📍 {office.address}
+                    <MapPinIcon className="inline-block h-5 w-5 mr-2 text-primary-700" /> {office.address}
                   </p>
 
                   <button className="mt-4 w-full rounded-lg bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100">
@@ -289,23 +290,24 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-white pb-0 pt-6 md:pt-10">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-t-3xl bg-primary-700 px-8 py-14 text-center text-white shadow-xl">
-            <div className="pointer-events-none absolute inset-0 opacity-25">
-              <img
-                src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&h=600&fit=crop"
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            </div>
+      <section className="bg-primary-700 pb-0 pt-6 md:pt-10 relative overflow-hidden">
+        <div 
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: 'url(https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&h=600&fit=crop)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="rounded-t-3xl px-8 py-14 text-center text-white">
             <div className="relative">
-              <h3 className="mx-auto max-w-3xl text-5xl font-extrabold leading-tight">
+              <h2 className="mx-auto min-w-md text-xl md:text-5xl font-extrabold leading-tight w-xl">
                 No espere más para vivir la experiencia Luxviajes
-              </h3>
+              </h2>
               <Link
                 href="/packages"
-                className="mt-7 inline-flex rounded-full bg-tertiary-400 px-8 py-3 text-sm font-semibold text-tertiary-950 transition hover:bg-tertiary-300"
+                className="mt-7 inline-flex rounded-full bg-tertiary-500 px-8 py-3 text-sm font-semibold text-tertiary-950 transition hover:bg-tertiary-400 text-tertiary-900 shadow-lg hover:shadow-xl "
               >
                 Comenzar mi Planificación
               </Link>
