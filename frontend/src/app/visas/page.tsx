@@ -35,7 +35,7 @@ const steps = [
 export default function VisasPage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-neutral-900">
+      <section className="relative overflow-hidden bg-neutral-900 h-screen py-32">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=1800&h=900&fit=crop"
