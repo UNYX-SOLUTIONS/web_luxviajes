@@ -1,38 +1,35 @@
+"use client";
+
 /* eslint-disable @next/next/no-img-element */
 import ArrowRightIcon from "@heroicons/react/24/solid/ArrowRightIcon";
 import Link from "next/link";
+import { useState } from "react";
 
 const serviceCards = [
   {
     title: "Boleto Aereo",
-    image:
-      "https://images.unsplash.com/photo-1540339832862-474599807836?w=900&h=600&fit=crop",
+    image: "/images/services/flights.png",
   },
   {
     title: "Paquetes Turisticos",
-    image:
-      "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=900&h=600&fit=crop",
+    image: "/images/services/packages.png",
     large: true,
   },
   {
     title: "Tours Nacionales",
-    image:
-      "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=900&h=600&fit=crop",
+    image: "/images/services/tours.png",
   },
   {
     title: "Seguros de Viaje",
-    image:
-      "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&h=600&fit=crop",
+    image: "/images/services/insurance.png",
   },
   {
     title: "Visas y Turnos",
-    image:
-      "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=900&h=600&fit=crop",
+    image: "/images/services/visas.png",
   },
   {
     title: "Expediciones en Crucero",
-    image:
-      "https://images.unsplash.com/photo-1518544866330-95a2af4899a3?w=1400&h=600&fit=crop",
+    image: "/images/services/cruise.png",
     wide: true,
   },
 ];
@@ -41,36 +38,68 @@ const testimonials = [
   {
     name: "Maria M.",
     text: "Organizaron cada detalle y no tuve que preocuparme por nada.",
-    image:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500&h=500&fit=crop",
+    image: "/images/services/testimonials/maria.png",
   },
   {
     name: "Alejandro M.",
     text: "Luxviajes transformo mis vacaciones familiares en una experiencia perfecta.",
-    image:
-      "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=900&h=700&fit=crop",
+    image: "/images/services/testimonials/alejandro.png",
     featured: true,
   },
   {
     name: "Pedro M.",
     text: "Excelente asesoria para visas y rutas internacionales.",
-    image:
-      "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&h=500&fit=crop",
+    image: "/images/services/testimonials/pedro.png",
+  },
+  {
+    name: "Maria M.",
+    text: "Organizaron cada detalle y no tuve que preocuparme por nada.",
+    image: "/images/services/testimonials/maria.png",
+  },
+  {
+    name: "Alejandro M.",
+    text: "Luxviajes transformo mis vacaciones familiares en una experiencia perfecta.",
+    image: "/images/services/testimonials/alejandro.png",
+    featured: true,
+  },
+  {
+    name: "Pedro M.",
+    text: "Excelente asesoria para visas y rutas internacionales.",
+    image: "/images/services/testimonials/pedro.png",
   },
 ];
 
 export default function ServicesPage() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const getVisibleTestimonials = () => {
+    const indices = [
+      (currentIndex - 1 + testimonials.length) % testimonials.length,
+      currentIndex,
+      (currentIndex + 1) % testimonials.length,
+    ];
+    return indices.map((i) => ({ ...testimonials[i], index: i }));
+  };
+
+  const nextTestimonial = () => {
+    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentIndex(
+      (prev) => (prev - 1 + testimonials.length) % testimonials.length,
+    );
+  };
   return (
     <>
       {" "}
       <section className="relative overflow-hidden bg-neutral-900 h-screen">
         <div className="absolute inset-0">
           <img
-            src="/images/contacts/hero.png"
-            alt="Contáctanos"
+            src="/images/services/hero.png"
+            alt="Servicios"
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-linear-to-r from-primary-950/85 via-primary-900/55 to-primary-900/25" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 py-60 sm:px-6 lg:px-8">
@@ -79,16 +108,16 @@ export default function ServicesPage() {
               Viaje Exclusivo
             </span>
             <h1 className="mt-5 text-5xl font-extrabold leading-tight md:text-7xl sm:pb-2 md:pb-4">
-              Contáctanos
+              Tu Viaje <br /> Nuestra Prioridad
             </h1>
+
             <div className="sm:py-2 md:py-4">
-              <a className="mt-5 text-2xl font-semibold text-primary-100">
-                ¿Tienes alguna pregunta o comentario?
+              <a className="mt-5 text-2xl font-regular text-primary-100">
+                Elevamos tus experiencias de viaje a una obra <br />
+                maestra. Un servicio de guante blanco diseñado <br />
+                para quienes buscan lo extraordinario.
               </a>
               <br />
-              <a className="text-2xl font-semibold text-primary-100">
-                ¡Háznoslo saber!
-              </a>
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -96,9 +125,21 @@ export default function ServicesPage() {
                 href="tel:+593123456789"
                 className="inline-flex rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-primary-700"
               >
-                Llámanos +593123456789{" "}
+                Diseñar Mi Viaje
                 <ArrowRightIcon className="ml-2 h-4 w-4" />
               </Link>
+              <svg
+                width="16"
+                height="20"
+                viewBox="0 0 16 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M6.95 13.55L12.6 7.9L11.175 6.475L6.95 10.7L4.85 8.6L3.425 10.025L6.95 13.55ZM8 20C5.68333 19.4167 3.77083 18.0875 2.2625 16.0125C0.754167 13.9375 0 11.6333 0 9.1V3L8 0L16 3V9.1C16 11.6333 15.2458 13.9375 13.7375 16.0125C12.2292 18.0875 10.3167 19.4167 8 20ZM8 17.9C9.73333 17.35 11.1667 16.25 12.3 14.6C13.4333 12.95 14 11.1167 14 9.1V4.375L8 2.125L2 4.375V9.1C2 11.1167 2.56667 12.95 3.7 14.6C4.83333 16.25 6.26667 17.35 8 17.9Z"
+                  fill="#FFDDBB"
+                />
+              </svg>
               <span className="text-sm text-primary-100">
                 Acompañamiento 24/7
               </span>
@@ -107,62 +148,18 @@ export default function ServicesPage() {
         </div>
 
         <div
-          className="absolute bottom-0 left-0 right-0 h-20 bg-white"
+          className="absolute bottom-0 left-0 right-0 h-60 bg-white"
           style={{ clipPath: "polygon(0 95%, 100% 0, 100% 100%, 0 100%)" }}
-        />
-      </section>
-      <section className="relative overflow-hidden bg-neutral-900">
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1610641818989-c2051b5e2cfd?w=1800&h=900&fit=crop"
-            alt="Servicios de viaje premium"
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-linear-to-r from-primary-950/90 via-primary-900/70 to-primary-900/30" />
-        </div>
-
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="max-w-2xl text-white">
-            <span className="inline-flex rounded-full bg-tertiary-500/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-tertiary-50">
-              Elite Excursives
-            </span>
-            <h1 className="mt-5 text-4xl font-extrabold leading-tight md:text-6xl">
-              Tu Viaje,
-              <br />
-              Nuestra Prioridad
-            </h1>
-            <p className="mt-5 max-w-xl text-base text-primary-100 md:text-lg">
-              Elevamos tus experiencias de viaje a una obra maestra. Un servicio
-              de guante blanco disenado para quienes buscan lo extraordinario.
-            </p>
-
-            <div className="mt-8 flex items-center gap-4">
-              <Link
-                href="/contact"
-                className="inline-flex items-center rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-primary-700"
-              >
-                Disenar Mi Viaje
-              </Link>
-              <span className="text-sm text-primary-100">
-                Acompanamiento 24/7
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div
-          className="absolute bottom-0 left-0 right-0 h-20 bg-white"
-          style={{ clipPath: "polygon(0 45%, 100% 0, 100% 100%, 0 100%)" }}
         />
       </section>
       <section className="bg-white py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-3xl font-bold text-primary-700 md:text-4xl">
+              <h2 className="text-3xl font-bold text-[#661AA3] md:text-4xl">
                 Nuestra Propuesta de Valor
               </h2>
-              <p className="mt-2 max-w-xl text-sm text-neutral-600">
+              <p className="mt-2 max-w-xl text-sm text-[#4C4452]">
                 Cada detalle es orquestado por expertos para asegurar que tu
                 unica preocupacion sea disfrutar el horizonte.
               </p>
@@ -201,51 +198,61 @@ export default function ServicesPage() {
       </section>
       <section className="bg-primary-50 py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold text-accent-red">Testimonios</p>
+          <p className="text-md font-semibold text-[#880000]!">Testimonios</p>
           <h2 className="mt-1 text-4xl font-bold text-neutral-900">
             Historias de Viajeros
           </h2>
 
-          <div className="mt-10 grid grid-cols-1 items-end gap-6 md:grid-cols-3">
-            {testimonials.map((item) => (
-              <article
-                key={item.name}
-                className={[
-                  "relative overflow-hidden rounded-2xl shadow-lg",
-                  item.featured ? "md:scale-105" : "",
-                ].join(" ")}
-              >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className={[
-                    "w-full object-cover",
-                    item.featured ? "h-80" : "h-56",
-                  ].join(" ")}
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-primary-950/70 to-transparent" />
-                <div
-                  className={[
-                    "absolute left-4 right-4 rounded-xl p-4 text-white",
-                    item.featured
-                      ? "bottom-4 bg-primary-700/90"
-                      : "bottom-3 bg-primary-800/85",
-                  ].join(" ")}
+          <div className="mt-10 flex items-center justify-center gap-6">
+            <button
+              onClick={prevTestimonial}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-[#500088] text-white hover:bg-[#661AA3] transition text-xl"
+            >
+              ←
+            </button>
+
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-3 w-full max-w-6xl">
+              {getVisibleTestimonials().map((item, position) => (
+                <article
+                  key={item.name}
+                  className={`relative rounded-2xl shadow-lg transition-all duration-500   ${
+                    position === 1 ? "md:scale-105 h-80" : "md:scale-90 h-56"
+                  }`}
                 >
-                  <p className="text-xs font-semibold uppercase tracking-wider">
-                    {item.name}
-                  </p>
-                  <p className="mt-2 text-sm leading-relaxed">
-                    &quot;{item.text}&quot;
-                  </p>
-                  <p className="mt-2 text-tertiary-300">★★★★★</p>
-                </div>
-              </article>
-            ))}
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className={`w-full object-cover rounded-2xl ${
+                      position === 1 ? "h-80" : "h-56"
+                    }`}
+                  />
+                  <div
+                    className={`absolute rounded-xl p-4 text-white right-4 w-48
+                      ${position === 1 ? "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/95" : "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/85"}
+                    `}
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-wider text-white!">
+                      {item.name}
+                    </p>
+                    <p className="mt-2 text-sm leading-relaxed text-white!">
+                      &quot;{item.text}&quot;
+                    </p>
+                    <p className="mt-2 text-[#F2B929]!">★★★★★</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <button
+              onClick={nextTestimonial}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-[#500088] text-white hover:bg-[#661AA3] transition text-xl"
+            >
+              →
+            </button>
           </div>
         </div>
       </section>
-      <section className="bg-primary-50 pb-16 md:pb-20">
+      <section className="bg-primary-50 pb-16 md:pb-20 py-16 md:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-primary-900 to-primary-700 px-8 py-14 text-center text-white shadow-2xl">
             <div className="pointer-events-none absolute inset-0 opacity-15">
@@ -257,25 +264,57 @@ export default function ServicesPage() {
             </div>
             <div className="relative">
               <h3 className="text-4xl font-extrabold md:text-5xl">
-                Listo para tu proxima historia?
+                ¿Listo para tu próxima historia?
               </h3>
-              <p className="mx-auto mt-3 max-w-2xl text-primary-100">
-                Nuestros asesores estan listos para transformar sus deseos en un
+              <p className="mx-auto mt-3 max-w-2xl text-primary-100!">
+                Nuestros asesores están listos para transformar sus deseos en un
                 itinerario inolvidable.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link
                   href="https://wa.me/593984220600"
                   target="_blank"
-                  className="inline-flex items-center rounded-full bg-accent-green px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-accent-green/90"
+                  className="inline-flex items-center rounded-full bg-[#25D366] px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-accent-green/90"
                 >
-                  WhatsApp Directo
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 28 28"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <g clipPath="url(#clip0_292_749)">
+                      <path
+                        d="M0 27.43L1.97 20.09C0.85 18.08 0.27 15.83 0.27 13.55C0.27 6.08 6.34 0 13.81 0C21.28 0 27.36 6.08 27.36 13.55C27.36 21.02 21.28 27.1 13.81 27.1C11.57 27.1 9.35 26.53 7.37 25.46L0 27.43ZM7.74 22.71L8.2 22.99C9.91 24.01 11.84 24.54 13.81 24.54C19.87 24.54 24.8 19.61 24.8 13.55C24.8 7.49 19.87 2.56 13.81 2.56C7.75 2.56 2.83 7.49 2.83 13.54C2.83 15.54 3.39 17.51 4.44 19.24L4.72 19.71L3.62 23.81L7.74 22.71Z"
+                        fill="currentColor"
+                      />
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M18.85 15.43C18.29 15.1 17.57 14.72 16.91 14.99C16.41 15.2 16.08 15.98 15.76 16.39C15.59 16.6 15.39 16.63 15.14 16.53C13.25 15.78 11.8 14.51 10.75 12.77C10.57 12.5 10.6 12.29 10.82 12.04C11.14 11.67 11.53 11.25 11.62 10.75C11.71 10.25 11.47 9.66999 11.26 9.21999C11 8.64999 10.7 7.83999 10.13 7.51999C9.60002 7.21999 8.91002 7.38999 8.45002 7.76999C7.64002 8.42999 7.25002 9.44999 7.27002 10.47C7.27002 10.76 7.31002 11.05 7.38002 11.33C7.54002 12 7.85002 12.63 8.20002 13.23C8.46002 13.68 8.75002 14.12 9.06002 14.54C10.07 15.91 11.33 17.11 12.79 18C13.52 18.45 14.3 18.84 15.12 19.11C16.03 19.41 16.84 19.72 17.83 19.54C18.86 19.34 19.87 18.71 20.28 17.71C20.4 17.42 20.46 17.09 20.39 16.78C20.25 16.14 19.38 15.75 18.86 15.44L18.85 15.43Z"
+                        fill="currentColor"
+                      />
+                    </g>
+                  </svg>
+                  <span className="ml-2">WhatsApp Directo</span>
                 </Link>
                 <Link
                   href="/contact"
                   className="inline-flex items-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
                 >
-                  Formulario de Contacto
+                  <svg
+                    width="20"
+                    height="16"
+                    viewBox="0 0 20 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2 16C1.45 16 0.979167 15.8042 0.5875 15.4125C0.195833 15.0208 0 14.55 0 14V2C0 1.45 0.195833 0.979167 0.5875 0.5875C0.979167 0.195833 1.45 0 2 0H18C18.55 0 19.0208 0.195833 19.4125 0.5875C19.8042 0.979167 20 1.45 20 2V14C20 14.55 19.8042 15.0208 19.4125 15.4125C19.0208 15.8042 18.55 16 18 16H2ZM10 9L2 4V14H18V4L10 9ZM10 7L18 2H2L10 7ZM2 4V2V4V14V4Z"
+                      fill="#500088"
+                    />
+                  </svg>
+                  <span className="ml-2">Formulario de Contacto</span>
                 </Link>
               </div>
             </div>
