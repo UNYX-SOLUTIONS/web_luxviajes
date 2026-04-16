@@ -39,11 +39,11 @@ export default function VisasPage() {
       <section className="relative overflow-hidden bg-neutral-900 h-screen py-32">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=1800&h=900&fit=crop"
+            src="/images/hero/visas.png"
             alt="Asesoria de visas"
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-linear-to-r from-primary-950/85 via-primary-900/50 to-primary-900/25" />
+          <div className="absolute inset-0 bg-linear-to-r from-primary-950/85 via-neutral-900/50 to-neutral-900/25" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
