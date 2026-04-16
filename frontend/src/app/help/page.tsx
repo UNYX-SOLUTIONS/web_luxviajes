@@ -120,18 +120,18 @@ export default function HelpPage() {
 
   return (
     <>
-      <section className="bg-primary-50 py-14 md:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="bg-primary-50 pb-14 md:py-20 min-h-11/12 flex justify-center">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
           <div className="pointer-events-none absolute inset-0 opacity-20">
             <div className="h-full w-full bg-[radial-gradient(circle_at_top_right,white_0%,transparent_40%)]" />
           </div>
 
-          <div className="relative mx-auto max-w-3xl text-center text-primary-900">
+          <div className="relative mx-auto max-w-3xl text-center text-primary-700! mt-40 mb-3">
             <h1 className="text-4xl font-extrabold leading-tight md:text-6xl">
               Como podemos ayudarte hoy?
             </h1>
 
-            <form className="mx-auto mt-8 max-w-xl">
+            <form className="mx-auto mt-8 max-w-xl w-full">
               <div className="flex items-center rounded-full bg-white px-4 py-3 shadow-lg ring-1 ring-primary-100">
                 <MagnifyingGlassIcon className="mr-3 h-5 w-5 text-primary-700" />
                 <input
@@ -158,9 +158,9 @@ export default function HelpPage() {
                   <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100">
                     <IconComponent  className="h-6 w-6 text-primary-700" />
                   </div>
-                  <h3 className="text-xl font-bold text-neutral-900">
+                  <h5 className="text-xl font-bold text-neutral-900">
                     {topic.title}
-                  </h3>
+                  </h5>
                   <p className="mt-2 text-sm leading-relaxed text-neutral-600">
                     {topic.description}
                   </p>
@@ -220,22 +220,22 @@ export default function HelpPage() {
                   onClick={() => setSelectedChannel(isSelected ? null : channel.id)}
                   className={`rounded-2xl p-8 text-center shadow-lg transition-all duration-300 ${
                     isSelected
-                      ? `${channel.bgColorSelected} text-white ring-2 ring-secondary-700 scale-105`
+                      ? `${channel.bgColorSelected} text-white! ring-2 ring-secondary-700 scale-105`
                       : `${channel.bgColor} ${channel.textColor} ring-1 ring-primary-200 hover:shadow-2xl hover:scale-102`
                   }`}
                 >
                   <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-opacity-20">
-                    <IconComponent className={`h-6 w-6 ${isSelected ? "text-white" : "text-primary-700"}`} />
+                    <IconComponent className={`h-6 w-6 ${isSelected ? "text-white!" : "text-primary-700"}`} />
                   </div>
                   <h3 className="text-2xl font-bold">{channel.title}</h3>
-                  <p className={`mt-2 text-sm ${isSelected ? "text-primary-100" : "text-neutral-600"}`}>
+                  <p className={`mt-2 text-sm ${isSelected ? "text-white!" : "text-neutral-600"}`}>
                     {channel.description}
                   </p>
                   <Link
                     href={channel.href}
                     target={channel.isExternal ? "_blank" : undefined}
                     onClick={(e) => e.stopPropagation()}
-                    className={`mt-6 inline-flex rounded-full px-6 py-2.5 text-sm font-semibold transition ${channel.buttonColor}`}
+                    className={`mt-6 inline-flex rounded-full px-6 py-2.5 text-sm font-semibold transition text-primary-800! ${channel.buttonColor} ${isSelected ? "bg-tertiary-400 border border-tertiary-500! hover:bg-tertiary-300" : "bg-transparent border border-primary-300"}`}
                   >
                     {channel.buttonText}
                   </Link>
@@ -246,10 +246,10 @@ export default function HelpPage() {
         </div>
       </section>
 
-      <section className="bg-primary-700 py-8 md:py-10 text-center text-white">
+      <section className="bg-primary-700 py-8 md:py-10 text-center text-white!">
         <div className="flex items-center justify-center gap-2">
           <ShieldCheckIcon className="h-5 w-5" />
-          <a className="text-sm font-medium">
+          <a className="text-sm font-medium text-white!">
             Tranquilidad en cada paso de tu viaje.
           </a>
         </div>
