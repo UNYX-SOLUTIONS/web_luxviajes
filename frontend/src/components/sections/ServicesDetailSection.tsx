@@ -54,7 +54,7 @@ export function ServicesDetailSection() {
           {/* Left Side - Sticky */}
           <div className="lg:sticky lg:top-32 lg:self-start h-fit">
             <div className="mb-8">
-              <p className="text-sm font-semibold uppercase tracking-wide mb-3 text-[#880000]!">
+              <p className="text-base font-semibold uppercase tracking-wide mb-3 text-[#880000]!">
                 Nuestros Servicios
               </p>
               <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-6 text-neutral-900">

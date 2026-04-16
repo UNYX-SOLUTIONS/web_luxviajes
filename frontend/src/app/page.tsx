@@ -1,6 +1,6 @@
 "use client";
 
-import { Hero, Button } from "@/components/common";
+import { HeroCarousel, Button } from "@/components/common";
 import {
   DestinationCard,
   PackageCard,
@@ -58,7 +58,7 @@ export default function Home() {
     <>
       {/* Hero Section */}
       <div ref={heroRef}>
-        <Hero />
+        <HeroCarousel />
       </div>
       {/* Stats Section - Overlapping Hero and PromotionsMap - Show on interaction */}
       <div

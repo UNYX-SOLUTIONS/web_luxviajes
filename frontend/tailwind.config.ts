@@ -10,19 +10,17 @@ const config: Config = {
       colors: {
         // Primary Purple - #500088
         primary: {
-          DEFAULT: "#2D0D46",
-          light: "#2D0D46",
-          dark: "#2D0D46",
+          DEFAULT: "#500088",
           50: "#f7f0ff",
           100: "#f0e0ff",
           200: "#e1c2ff",
           300: "#d1a3ff",
           400: "#b87fff",
-          500: "#521D69",
-          600: "#47007c",
-          700: "#3d0066",
-          800: "#330055",
-          900: "#290044",
+          500: "#8000cc",
+          600: "#500088",
+          700: "#400068",
+          800: "#300050",
+          900: "#200038",
         },
         // Secondary Dark Purple - #2E1065
         secondary: {

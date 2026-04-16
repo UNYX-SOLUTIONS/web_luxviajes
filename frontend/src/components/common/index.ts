@@ -1,7 +1,7 @@
 // Exportar todos los componentes comunes desde un lugar central
-export { Button } from './Button';
-export { Card, CardHeader, CardBody, CardFooter } from './Card';
-export { StatCard } from './StatCard';
-export { Header } from './Header';
-export { Footer } from './Footer';
-export { Hero } from './Hero';
+export { Button } from "./Button";
+export { Card, CardHeader, CardBody, CardFooter } from "./Card";
+export { StatCard } from "./StatCard";
+export { Header } from "./Header";
+export { Footer } from "./Footer";
+export { HeroCarousel } from "./HeroCarousel";
