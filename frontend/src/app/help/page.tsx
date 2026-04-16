@@ -93,26 +93,30 @@ export default function HelpPage() {
     {
       id: "phone",
       title: "Linea de Soporte 24/7",
-      description: "Llamanos en cualquier momento, desde cualquier lugar del mundo.",
+      description:
+        "Llamanos en cualquier momento, desde cualquier lugar del mundo.",
       icon: PhoneIcon,
       href: "tel:+593964220600",
       isExternal: false,
       bgColor: "bg-secondary-100",
       bgColorSelected: "bg-primary-700",
-      buttonColor: "border border-primary-300 text-primary-700 hover:bg-primary-50",
+      buttonColor:
+        "border border-primary-300 text-primary-700 hover:bg-primary-50",
       textColor: "text-neutral-900",
       buttonText: "+593 96 422 0600",
     },
     {
       id: "email",
       title: "Consulta por Email",
-      description: "Envianos una solicitud detallada y te responderemos en menos de 2 horas.",
+      description:
+        "Envianos una solicitud detallada y te responderemos en menos de 2 horas.",
       icon: EnvelopeIcon,
       href: "mailto:info@luxviajes.com",
       isExternal: false,
       bgColor: "bg-secondary-100",
       bgColorSelected: "bg-primary-700",
-      buttonColor: "border border-primary-300 text-primary-700 hover:bg-primary-50",
+      buttonColor:
+        "border border-primary-300 text-primary-700 hover:bg-primary-50",
       textColor: "text-neutral-900",
       buttonText: "Enviar Email",
     },
@@ -156,7 +160,7 @@ export default function HelpPage() {
                   className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-primary-100"
                 >
                   <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100">
-                    <IconComponent  className="h-6 w-6 text-primary-700" />
+                    <IconComponent className="h-6 w-6 text-primary-700" />
                   </div>
                   <h5 className="text-xl font-bold text-neutral-900">
                     {topic.title}
@@ -217,7 +221,9 @@ export default function HelpPage() {
               return (
                 <button
                   key={channel.id}
-                  onClick={() => setSelectedChannel(isSelected ? null : channel.id)}
+                  onClick={() =>
+                    setSelectedChannel(isSelected ? null : channel.id)
+                  }
                   className={`rounded-2xl p-8 text-center shadow-lg transition-all duration-300 ${
                     isSelected
                       ? `${channel.bgColorSelected} text-white! ring-2 ring-secondary-700 scale-105`
@@ -225,17 +231,21 @@ export default function HelpPage() {
                   }`}
                 >
                   <div className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-opacity-20">
-                    <IconComponent className={`h-6 w-6 ${isSelected ? "text-white!" : "text-primary-700"}`} />
+                    <IconComponent
+                      className={`h-6 w-6 ${isSelected ? "text-white!" : "text-primary-700"}`}
+                    />
                   </div>
                   <h3 className="text-2xl font-bold">{channel.title}</h3>
-                  <p className={`mt-2 text-sm ${isSelected ? "text-white!" : "text-neutral-600"}`}>
+                  <p
+                    className={`mt-2 text-sm ${isSelected ? "text-white!" : "text-neutral-600"}`}
+                  >
                     {channel.description}
                   </p>
                   <Link
                     href={channel.href}
                     target={channel.isExternal ? "_blank" : undefined}
                     onClick={(e) => e.stopPropagation()}
-                    className={`mt-6 inline-flex rounded-full px-6 py-2.5 text-sm font-semibold transition text-primary-800! ${channel.buttonColor} ${isSelected ? "bg-tertiary-400 border border-tertiary-500! hover:bg-tertiary-300" : "bg-transparent border border-primary-300"}`}
+                    className={`mt-6 inline-flex rounded-full px-6 py-2.5 text-sm font-semibold transition text-primary-800! ${channel.buttonColor} ${isSelected ? "bg-tertiary-400 border border-tertiary-500! hover:bg-tertiary-300" : "bg-transparent border border-primary-300 hover:bg-primary-50"}`}
                   >
                     {channel.buttonText}
                   </Link>
