@@ -111,7 +111,7 @@ export function HeroCarousel({
       <div className="absolute inset-0 bg-black/40" />
 
       {/* Content - Contains Vertical Selector and Text */}
-      <div className="absolute z-10 text-left text-white flex items-center justify-start h-full gap-18 pl-8 md:pl-16">
+      <div className="absolute z-10 text-left text-white flex items-center justify-start h-full gap-18 pl-8 md:pl-16 py-10">
         {/* Vertical Selector */}
         <div className="flex flex-col items-center gap-8 h-64 shrink-0">
           <div className="relative w-0.5 h-full bg-white/30 rounded-full">
