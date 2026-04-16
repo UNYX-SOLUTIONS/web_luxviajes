@@ -1,6 +1,12 @@
 "use client";
 
-import { ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  PhoneIcon,
+} from "@heroicons/react/24/solid";
+import { ClockIcon } from "@heroicons/react/24/outline";
 
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
@@ -194,7 +200,10 @@ export default function PackagesPage() {
                     {item.tag}
                   </span>
                   <div className="absolute bottom-3 left-3 right-3 text-white">
-                    <p className="text-xs text-white!">{item.days}</p>
+                    <div className="flex text-center items-center gap-1">
+                      <ClockIcon className="h-3 w-3 inline-block mr-1" />
+                      <p className="text-xs text-white!">{item.days}</p>
+                    </div>
                     <h4 className="font-bold">{item.title}</h4>
                   </div>
                 </div>
@@ -306,7 +315,7 @@ export default function PackagesPage() {
       </section>
 
       <section className="bg-white pb-16 md:pb-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-primary-800 to-primary-700 px-8 py-12 text-white shadow-xl">
             <div className="pointer-events-none absolute inset-0 opacity-30">
               <img
@@ -318,9 +327,9 @@ export default function PackagesPage() {
             <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
               <div>
                 <h3 className="text-5xl font-bold leading-none">
-                  Listo para cruzar fronteras?
+                  ¿Listo para cruzar fronteras?
                 </h3>
-                <p className="mt-4 max-w-2xl text-primary-100">
+                <p className="mt-4 max-w-2xl text-white!">
                   Nuestros asesores expertos estan listos para disenar el viaje
                   de tus suenos. Consultoria personalizada y sin compromiso.
                 </p>
@@ -328,9 +337,10 @@ export default function PackagesPage() {
               <Link
                 href="https://wa.me/593984220600"
                 target="_blank"
-                className="inline-flex rounded-full bg-white px-8 py-3 text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
+                className="inline-flex rounded-full bg-primary-50 px-3 py-3 text-sm font-semibold text-primary-800! transition hover:bg-primary-50 gap-2 items-center"
               >
-                Contactar a un Asesor
+                <PhoneIcon className="h-5 w-5 inline-block" />
+                <p className="text-sm font-semibold text-primary-800!"> Contactar a un Asesor</p>
               </Link>
             </div>
           </div>
