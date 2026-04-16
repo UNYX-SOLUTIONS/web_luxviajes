@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link';
+import { CheckBadgeIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid';
 
 const visaCards = [
   { country: 'Visa Americana', subtitle: 'Turismo, Negocios y Transito', flag: '🇺🇸' },
@@ -77,73 +78,80 @@ export default function VisasPage() {
         </div>
       </section>
 
-      <section className="bg-primary-50 py-16 md:py-20">
+      <section className="bg-neutral-50 py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-4xl font-bold text-neutral-900">Especialistas en Visados Mundiales</h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm text-neutral-600">
+            <h2 className="text-5xl font-bold text-neutral-900">Especialistas en Visados Mundiales</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base text-neutral-600">
               Seleccionamos los destinos mas solicitados para brindarte una experiencia de solicitud optimizada y garantizada.
             </p>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {visaCards.map((item) => (
-              <article key={item.country} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-primary-100">
-                <div className="mb-4 text-3xl">{item.flag}</div>
-                <h3 className="text-lg font-semibold text-neutral-900">{item.country}</h3>
-                <p className="mt-1 text-xs text-neutral-600">{item.subtitle}</p>
+              <article key={item.country} className="flex flex-col rounded-3xl bg-white p-8 shadow-sm ring-1 ring-neutral-200 transition hover:shadow-md">
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 text-4xl">
+                  {item.flag}
+                </div>
+                <h5 className="text-lg font-bold text-neutral-900">{item.country}</h5>
+                <p className="mt-2 mb-6 text-sm text-neutral-600">{item.subtitle}</p>
 
-                <button className="mt-4 w-full rounded-full bg-primary-100 px-4 py-2 text-xs font-semibold text-primary-700 transition hover:bg-primary-200">
-                  Solicitar
-                </button>
-                <p className="mt-2 text-center text-[11px] text-neutral-400">Requisitos</p>
+                <div className="mt-auto">
+                  <button className="w-full rounded-full bg-secondary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 cursor-pointer">
+                    Solicitar
+                  </button>
+                  <a className="mt-4 block text-center text-xs text-neutral-600">
+                    Requisitos
+                  </a>
+                </div>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-primary-50 py-16 md:py-20">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-          <div className="grid grid-cols-2 gap-3">
-            <article className="overflow-hidden rounded-2xl">
-              <img
-                src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=700&h=700&fit=crop"
-                alt="Consultoria"
-                className="h-full w-full object-cover"
-              />
-            </article>
-            <article className="flex min-h-44 items-center justify-center rounded-2xl bg-tertiary-500 text-white">
-              <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0-6l1.96 3.97L18 6.56l-2.82 2.75L15.82 13 12 11l-3.82 2 0.64-3.69L6 6.56l4.04-0.59L12 2z" />
-              </svg>
-            </article>
-            <article className="flex min-h-44 items-center justify-center rounded-2xl bg-primary-700 text-white">
-              <svg className="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6M7 8h10M7 4h10M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </article>
-            <article className="overflow-hidden rounded-2xl">
-              <img
-                src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=700&h=700&fit=crop"
-                alt="Revision de documentos"
-                className="h-full w-full object-cover"
-              />
-            </article>
+      <section className="bg-primary-50 py-16 md:py-24">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-20 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
+              <article className="overflow-hidden rounded-3xl h-80">
+                <img
+                  src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=500&fit=crop"
+                  alt="Consultoria"
+                  className="h-full w-full object-cover"
+                />
+              </article>
+              <article className="flex items-center justify-center rounded-3xl bg-primary-700 text-white h-64">
+                <CheckBadgeIcon className="h-16 w-16" />
+              </article>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <article className="flex items-center justify-center rounded-3xl bg-tertiary-500 text-white h-64">
+                <AdjustmentsHorizontalIcon className="h-16 w-16" />
+              </article>
+              <article className="overflow-hidden rounded-3xl h-80">
+                <img
+                  src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500&h=500&fit=crop"
+                  alt="Revision de documentos"
+                  className="h-full w-full object-cover"
+                />
+              </article>
+            </div>
           </div>
 
           <div>
-            <h2 className="text-4xl font-bold text-neutral-900">Paso a Paso hacia tu Destino</h2>
+            <h3 className="text-5xl font-bold text-neutral-900">Paso a Paso hacia tu Destino</h3>
 
-            <div className="mt-8 space-y-8">
+            <div className="mt-10 space-y-8">
               {steps.map((step) => (
-                <div key={step.id} className="flex gap-4">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-primary-700 ring-1 ring-primary-200">
+                <div key={step.id} className="flex gap-5">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-700 text-sm font-bold text-white">
                     {step.id}
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-neutral-900">{step.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-neutral-600">{step.description}</p>
+                    <h5 className="text-xl font-bold text-neutral-900">{step.title}</h5>
+                    <p className="mt-2 text-sm leading-relaxed text-neutral-600">{step.description}</p>
                   </div>
                 </div>
               ))}
