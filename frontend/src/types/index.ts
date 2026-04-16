@@ -19,7 +19,7 @@ export interface Package {
   image: string;
   duration: number;
   includes: string[];
-  difficulty?: 'easy' | 'moderate' | 'hard';
+  difficulty?: "easy" | "moderate" | "hard";
 }
 
 export interface Service {
@@ -27,6 +27,40 @@ export interface Service {
   title: string;
   description: string;
   icon: string;
+}
+
+export interface Banner {
+  id: number;
+  title: string;
+  subtitle: string;
+  image: string;
+  order?: number;
+  active?: boolean;
+}
+
+export interface RedSocial {
+  id: number;
+  platform: string;
+  url: string;
+}
+
+export interface HomeStats {
+  id: number;
+  frequent_clients: string;
+  years_experience: string;
+  destinations: string;
+  rating: string;
+}
+
+export interface Home {
+  id: number;
+  documentId: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  banners: Banner[];
+  redes: RedSocial[];
+  stats: HomeStats | null;
 }
 
 export interface ContactInfo {
