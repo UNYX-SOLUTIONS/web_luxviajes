@@ -14,11 +14,14 @@ import {
 import { getDestinations, getPackages, getServices } from "@/services";
 import { useEffect, useState, useRef } from "react";
 import { Destination, Package, Service } from "@/types";
+import type { Home } from "@/types";
+import { getHome } from "@/services/strapi";
 
 export default function Home() {
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [packages, setPackages] = useState<Package[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [home, setHome] = useState<Home | null>(null);
   const [showStats, setShowStats] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
@@ -31,6 +34,19 @@ export default function Home() {
         setServices(serv);
       },
     );
+  }, []);
+
+  useEffect(() => {
+    // Cargar objeto home completo desde Strapi
+    console.log("Cargando objeto home desde Strapi...");
+    getHome()
+      .then((homeData) => {
+        if (!homeData) return;
+        setHome(homeData);
+      })
+      .catch(() => {
+        // Mantener datos por defecto si falla la petición
+      });
   }, []);
 
   useEffect(() => {
@@ -58,7 +74,9 @@ export default function Home() {
     <>
       {/* Hero Section */}
       <div ref={heroRef}>
-        <HeroCarousel />
+        <HeroCarousel
+          slides={home?.banners.length ? home.banners : undefined}
+        />
       </div>
       {/* Stats Section - Overlapping Hero and PromotionsMap - Show on interaction */}
       <div

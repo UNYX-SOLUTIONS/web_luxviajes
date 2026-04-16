@@ -96,9 +96,9 @@ export function HeroCarousel({
           transitionDuration: isTransitioning ? "800ms" : "0ms",
         }}
       >
-        {cachedSlides.map((slide) => (
+        {cachedSlides.map((slide, index) => (
           <div
-            key={slide.image}
+            key={`${slide.image || "slide"}-${slide.title}-${index}`}
             className="w-full h-full shrink-0 bg-cover bg-center"
             style={{
               backgroundImage: `url(${slide.image})`,
