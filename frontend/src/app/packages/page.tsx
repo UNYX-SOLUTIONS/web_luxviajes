@@ -251,19 +251,19 @@ export default function PackagesPage() {
                     <h4 className="text-lg font-bold text-neutral-900 line-clamp-2">
                       {item.title}
                     </h4>
-                    <p className="mt-1 text-sm text-primary-700">
+                    <p className="mt-1 text-sm text-primary-700! font-semibold">
                       ● {item.nights}
                     </p>
                   </div>
-                  <ul className="mt-2 space-y-1 text-xs text-neutral-700 flex-shrink-0">
+                  <ul className="mt-2 space-y-3 text-xs text-neutral-700 shrink-0">
                     <li>✈ Vuelo</li>
                     <li>🏨 Hotel</li>
                     <li>🧭 Tours</li>
                     <li>🛡 Asistencia de viaje</li>
                   </ul>
-                  <div className="flex-grow" />
-                  <div className="flex-shrink-0">
-                    <p className="mt-2 text-xs text-tertiary-700">
+                  <div className="grow" />
+                  <div className="shrink-0">
+                    <p className="mt-2 text-xs text-tertiary-700! font-medium text-center">
                       {item.season}
                     </p>
                     <button className="mt-3 w-full rounded-full bg-primary-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-800">
