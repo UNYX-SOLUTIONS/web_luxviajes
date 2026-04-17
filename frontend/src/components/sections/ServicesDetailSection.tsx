@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { ContactDialog } from "../common/contact_dialog";
+import { useState } from "react";
 
 interface ServiceDetail {
   id: string;
@@ -47,6 +49,8 @@ const SERVICES_DETAILS: ServiceDetail[] = [
 ];
 
 export function ServicesDetailSection() {
+  const [showContactDialog, setShowContactDialog] = useState(false);
+
   return (
     <section className="py-16 md:py-20 bg-[#F8F5FA]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -94,7 +98,7 @@ export function ServicesDetailSection() {
             {SERVICES_DETAILS.map((service, index) => (
               <div key={service.id}>
                 {/* Card Container */}
-                <div className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 group cursor-pointer">
+                <div className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300 group">
                   {/* Background Image */}
                   <Image
                     src={service.image}
@@ -115,7 +119,7 @@ export function ServicesDetailSection() {
 
                     {/* Badge Button */}
                     <div className="flex justify-end">
-                      <button className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors shadow-md hover:shadow-lg">
+                      <button onClick={() => setShowContactDialog(true)} className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors shadow-md hover:shadow-lg cursor-pointer">
                         <span>Solicitar asesoría</span>
                         <svg
                           className="w-4 h-4"
@@ -148,6 +152,15 @@ export function ServicesDetailSection() {
             ))}
           </div>
         </div>
+
+        {/* Contact Dialog */}
+        <ContactDialog
+          isOpen={showContactDialog}
+          onClose={() => setShowContactDialog(false)}
+          whatsappNumber="593964220600"
+          phoneNumber="+593964220600"
+          videoCallUrl="/contact"
+        />
       </div>
     </section>
   );

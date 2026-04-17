@@ -4,14 +4,27 @@
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { MapPinIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+import { useState } from "react";
+import { AppointmentDialog } from "@/components/common/appointment_dialog";
 
-const contactOptions = [
+interface ContactOption {
+  title: string;
+  description: string;
+  action: string;
+  href: string;
+  image: string;
+  isVideocall?: boolean;
+  isAgenda?: boolean;
+}
+
+const contactOptions: ContactOption[] = [
   {
     title: "Videollamada",
     description:
       "Puedes contactarnos directamente por una videollamada, estaremos dispuestos a brindarte asesoria.",
     action: "Hacer Videollamada",
     href: "#",
+    isVideocall: true,
     image:
       "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=900&h=600&fit=crop",
   },
@@ -28,7 +41,8 @@ const contactOptions = [
     description:
       "Agenda tu cita con nosotros y te contactaremos inmediatamente.",
     action: "Agendar Cita",
-    href: "/#appointment",
+    href: "#",
+    isAgenda: true,
     image:
       "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&h=600&fit=crop",
   },
@@ -47,27 +61,25 @@ const offices = [
   {
     city: "Guayaquil",
     address: "Edificio X, Oficina Y, Sector Puerto Santa Ana.",
-    image:
-      "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=900&h=600&fit=crop",
+    image: "/images/Contacts/Guayaquil.png",
     mapUrl: "https://maps.app.goo.gl/Jb8QSrh2MjZH4HDz7",
   },
   {
     city: "Quito",
     address: "Av. Amazonas y Eloy Alfaro, Edificio Luxury Trade.",
-    image:
-      "https://images.unsplash.com/photo-1528127269322-539801943592?w=900&h=600&fit=crop",
+    image: "/images/Contacts/Quito.png",
     mapUrl: "https://maps.app.goo.gl/f7gdNvxg5XPnrpB48",
   },
   {
     city: "Cuenca",
     address: "Calle Larga y Borrero, Casa Colonial Lux.",
-    image:
-      "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=900&h=600&fit=crop",
+    image: "/images/Contacts/Cuenca.png",
     mapUrl: "https://maps.app.goo.gl/zdy3WGpCAEsfBBzZ6",
   },
 ];
 
 export default function ContactPage() {
+  const [showAppointmentDialog, setShowAppointmentDialog] = useState(false);
   return (
     <>
       <section className="relative overflow-hidden bg-neutral-900 h-screen">
@@ -146,15 +158,24 @@ export default function ContactPage() {
                   <p className="mt-3 grow text-sm leading-relaxed text-neutral-600">
                     {option.description}
                   </p>
-                  <Link
-                    href={option.href}
-                    target={
-                      option.href.startsWith("https://") ? "_blank" : undefined
-                    }
-                    className="mt-6 mb-8 inline-flex w-full items-center justify-center rounded-full bg-neutral-100 px-4 py-3 text-sm font-bold text-primary-700 transition hover:bg-primary-800 hover:text-white duration-200"
-                  >
-                    {option.action}
-                  </Link>
+                  {(option.isVideocall || option.isAgenda) ? (
+                    <button
+                      onClick={() => setShowAppointmentDialog(true)}
+                      className="mt-6 mb-8 inline-flex w-full items-center justify-center rounded-full bg-neutral-100 px-4 py-3 text-sm font-bold text-primary-700 transition hover:bg-primary-800 hover:text-white duration-200"
+                    >
+                      {option.action}
+                    </button>
+                  ) : (
+                    <Link
+                      href={option.href}
+                      target={
+                        option.href.startsWith("https://") ? "_blank" : undefined
+                      }
+                      className="mt-6 mb-8 inline-flex w-full items-center justify-center rounded-full bg-neutral-100 px-4 py-3 text-sm font-bold text-primary-700 transition hover:bg-primary-800 hover:text-white duration-200"
+                    >
+                      {option.action}
+                    </Link>
+                  )}
                 </div>
               </article>
             ))}
@@ -162,7 +183,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-primary-50 py-14 md:py-16">
+      <section id="contact-form" className="bg-primary-50 py-14 md:py-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div className="column">
             <a
@@ -334,6 +355,11 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
+
+      <AppointmentDialog
+        isOpen={showAppointmentDialog}
+        onClose={() => setShowAppointmentDialog(false)}
+      />
     </>
   );
 }

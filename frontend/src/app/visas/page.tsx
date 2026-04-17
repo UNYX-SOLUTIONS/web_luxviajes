@@ -3,7 +3,8 @@
 
 import Link from 'next/link';
 import { CheckBadgeIcon, AdjustmentsHorizontalIcon, EnvelopeIcon, XMarkIcon } from '@heroicons/react/24/solid';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { ContactDialog } from '@/components/common/contact_dialog';
 
 const visaCards = [
   { country: 'Visa Americana', subtitle: 'Turismo, Negocios y Transito', flag: '🇺🇸' },
@@ -169,6 +170,7 @@ const steps = [
 export default function VisasPage() {
   const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
   const [showRequirementsDialog, setShowRequirementsDialog] = useState(false);
+  const [showContactDialog, setShowContactDialog] = useState(false);
 
   const handleShowRequirements = (country: string) => {
     setSelectedVisa(country);
@@ -179,6 +181,29 @@ export default function VisasPage() {
     setShowRequirementsDialog(false);
     setSelectedVisa(null);
   };
+
+  // Controlar scroll del body cuando el dialog de requisitos está abierto
+  useEffect(() => {
+    if (showRequirementsDialog) {
+      // Calcular el ancho de la scrollbar
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      
+      // Aplicar nuevos estilos
+      document.body.style.overflow = 'hidden';
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      
+      // Cleanup
+      return () => {
+        document.body.style.overflow = 'unset';
+        document.body.style.paddingRight = 'unset';
+      };
+    } else {
+      document.body.style.overflow = 'unset';
+      document.body.style.paddingRight = 'unset';
+    }
+  }, [showRequirementsDialog]);
   return (
     <>
       <section className="relative overflow-hidden bg-neutral-900 h-screen py-32">
@@ -206,12 +231,12 @@ export default function VisasPage() {
             </h5>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link
-                href="/contact"
+              <button
+                onClick={() => setShowContactDialog(true)}
                 className="inline-flex rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-primary-700"
               >
                 Iniciar Asesoria
-              </Link>
+              </button>
               <Link
                 href="/packages"
                 className="inline-flex rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
@@ -242,7 +267,10 @@ export default function VisasPage() {
                 <p className="mt-2 mb-6 text-sm text-neutral-600">{item.subtitle}</p>
 
                 <div className="mt-auto">
-                  <button className="w-full rounded-full bg-secondary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 cursor-pointer">
+                  <button
+                    onClick={() => setShowContactDialog(true)}
+                    className="w-full rounded-full bg-secondary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 cursor-pointer"
+                  >
                     Solicitar
                   </button>
                   <button 
@@ -368,17 +396,17 @@ export default function VisasPage() {
             </p>
 
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link
-                href="/contact"
+              <button
+                onClick={() => setShowContactDialog(true)}
                 className="inline-flex rounded-full bg-white px-8 py-3 text-sm font-bold text-primary-800 transition hover:bg-primary-50"
               >
                 Hablar con un Especialista
-              </Link>
+              </button>
               <Link
-                href="tel:+593964220600"
+                href="/packages"
                 className="inline-flex rounded-full border border-white/30 bg-white/10 px-8 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
               >
-                +1 800 LUXVIAJES
+                Ver Paquetes
               </Link>
             </div>
           </div>
@@ -417,8 +445,8 @@ export default function VisasPage() {
 
       {/* Requirements Dialog */}
       {showRequirementsDialog && selectedVisa && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 border border-neutral-300 rounded-3xl">
-          <div className="relative w-full max-w-2xl rounded-3xl bg-white shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
+          <div className="relative w-full max-w-2xl rounded-3xl bg-white shadow-2xl flex flex-col max-h-[90vh] z-[1000]">
             {/* Header */}
             <div className="shrink-0 border-b border-neutral-200 bg-white px-8 py-6">
               <button
@@ -442,7 +470,7 @@ export default function VisasPage() {
             </div>
 
             {/* Dialog Content - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-8 md:p-10">
+            <div className="flex-1 overflow-hidden p-8 md:p-10">
               {/* Quick Info */}
               <div className="mb-8 grid grid-cols-2 gap-4">
                 <div className="rounded-lg bg-primary-50 p-4">
@@ -475,12 +503,12 @@ export default function VisasPage() {
 
             {/* CTA Buttons - Fixed at bottom */}
             <div className="shrink-0 border-t border-neutral-200 bg-white px-8 py-6 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/contact"
+              <button
+                onClick={() => setShowContactDialog(true)}
                 className="flex-1 rounded-full bg-primary-700 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-primary-800"
               >
                 Iniciar Trámite
-              </Link>
+              </button>
               <button
                 onClick={handleCloseDialog}
                 className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
@@ -491,6 +519,11 @@ export default function VisasPage() {
           </div>
         </div>
       )}
+
+      <ContactDialog
+        isOpen={showContactDialog}
+        onClose={() => setShowContactDialog(false)}
+      />
     </>
   );
 }

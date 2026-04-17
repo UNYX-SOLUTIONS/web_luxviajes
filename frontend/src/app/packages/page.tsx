@@ -11,6 +11,7 @@ import { ClockIcon } from "@heroicons/react/24/outline";
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { useState } from "react";
+import { ContactDialog } from "@/components/common/contact_dialog";
 
 const premiumPackages = [
   {
@@ -101,6 +102,7 @@ const themeParks = [
 
 export default function PackagesPage() {
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [showContactDialog, setShowContactDialog] = useState(false);
   const itemsPerView = 4;
   const maxIndex = Math.max(0, premiumPackages.length - itemsPerView);
 
@@ -275,7 +277,10 @@ export default function PackagesPage() {
                     <p className="mt-2 text-xs text-tertiary-700! font-medium text-center">
                       {item.season}
                     </p>
-                    <button className="mt-3 w-full rounded-full bg-primary-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-800">
+                    <button
+                      onClick={() => setShowContactDialog(true)}
+                      className="mt-3 w-full rounded-full bg-primary-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-800"
+                    >
                       Cotizar
                     </button>
                   </div>
@@ -334,14 +339,13 @@ export default function PackagesPage() {
                   de tus suenos. Consultoria personalizada y sin compromiso.
                 </p>
               </div>
-              <Link
-                href="https://wa.me/593964220600"
-                target="_blank"
+              <button
+                onClick={() => setShowContactDialog(true)}
                 className="inline-flex rounded-full bg-primary-50 px-3 py-3 text-sm font-semibold text-primary-800! transition hover:bg-primary-50 gap-2 items-center"
               >
                 <PhoneIcon className="h-5 w-5 inline-block" />
                 <p className="text-sm font-semibold text-primary-800!"> Contactar a un Asesor</p>
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -370,6 +374,11 @@ export default function PackagesPage() {
           </form>
         </div>
       </section>
+
+      <ContactDialog
+        isOpen={showContactDialog}
+        onClose={() => setShowContactDialog(false)}
+      />
     </>
   );
 }
