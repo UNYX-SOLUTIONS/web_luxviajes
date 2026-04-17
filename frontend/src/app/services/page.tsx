@@ -299,7 +299,7 @@ export default function ServicesPage() {
                   <span className="ml-2">WhatsApp Directo</span>
                 </Link>
                 <Link
-                  href="/contact"
+                  href="/contact#contact-form"
                   className="inline-flex items-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
                 >
                   <svg

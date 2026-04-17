@@ -1,8 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
+'use client';
+
 import { Button } from "@/components/common/Button";
 import { Hero } from "@/components/common/Hero";
+import { ContactDialog } from "@/components/common/contact_dialog";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 const highlights = [
   {
@@ -156,13 +160,16 @@ const teamByOffice = [
 ];
 
 export default function AboutPage() {
+  const [showContactDialog, setShowContactDialog] = useState(false);
+
   return (
     <>
       <Hero
         title="Más que una agencia, somos tu aliado de viaje"
         subtitle="Creamos experiencias, no solo viajes."
         ctaText="Planifica tu viaje"
-        ctaHref="/contact"
+        ctaHref="#"
+        onClick={() => setShowContactDialog(true)}
       />
       <section className="bg-neutral-50 relative">
         {/* Quiénes somos */}
@@ -268,13 +275,13 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="rounded-2xl bg-white/10! px-6 py-5 min-h-[100px] flex flex-col justify-center">
+            <div className="rounded-2xl bg-white/10! px-6 py-5 min-h-25 flex flex-col justify-center">
               <p className="text-4xl font-extrabold text-[#FFDDBB]!">+16</p>
               <p className="mt-1 text-xs uppercase tracking-wider text-white!">
                 Expertos en el equipo
               </p>
             </div>
-            <div className="rounded-2xl bg-white/10! px-6 py-5 min-h-[100px] flex flex-col justify-center">
+            <div className="rounded-2xl bg-white/10! px-6 py-5 min-h-25 flex flex-col justify-center">
               <p className="text-4xl font-extrabold text-[#FFDDBB]!">3</p>
               <p className="mt-1 text-xs uppercase tracking-wider text-white!">
                 Ciudades (Gye, Uio, Cue)
@@ -371,13 +378,12 @@ export default function AboutPage() {
               Hablemos hoy mismo.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-              <Link
-                href="https://wa.me/593964220600"
-                target="_blank"
+              <button
+                onClick={() => setShowContactDialog(true)}
                 className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
               >
                 Hablar con un asesor
-              </Link>
+              </button>
               <Link
                 href="/services"
                 className="inline-flex items-center justify-center rounded-full border border-primary-300 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
@@ -387,6 +393,14 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
+
+        <ContactDialog
+          isOpen={showContactDialog}
+          onClose={() => setShowContactDialog(false)}
+          whatsappNumber="593964220600"
+          phoneNumber="+593964220600"
+          videoCallUrl="/contact"
+        />
       </section>
     </>
   );

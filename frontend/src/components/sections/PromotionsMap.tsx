@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Button } from "../common/Button";
+import { ContactDialog } from "../common/contact_dialog";
 import { cn } from "@/utils/cn";
 import { useState, useRef, useEffect } from "react";
 
@@ -69,6 +70,7 @@ export function PromotionsMap({
   pins = DEFAULT_PINS,
 }: PromotionsMapProps) {
   const [showPromoDialog, setShowPromoDialog] = useState(false);
+  const [showContactDialog, setShowContactDialog] = useState(false);
   const [selectedPin, setSelectedPin] = useState<LocationPin | null>(null);
   const [dialogPosition, setDialogPosition] = useState({
     top: 0,
@@ -437,6 +439,15 @@ export function PromotionsMap({
             </div>
           </div>
 
+          {/* Contact Dialog */}
+          <ContactDialog
+            isOpen={showContactDialog}
+            onClose={() => setShowContactDialog(false)}
+            whatsappNumber="593964220600"
+            phoneNumber="+593964220600"
+            videoCallUrl="/contact"
+          />
+
           {/* Promo Dialog */}
           {showPromoDialog && (
             <div
@@ -473,9 +484,8 @@ export function PromotionsMap({
                       size="sm"
                       className="w-full justify-center bg-white text-primary! !hover:bg-primary hover:text-white"
                       onClick={() => {
-                        if (selectedPin?.mapUrl) {
-                          window.open(selectedPin.mapUrl, '_blank');
-                        }
+                        setShowPromoDialog(false);
+                        setShowContactDialog(true);
                       }}
                     >
                       Ver más →

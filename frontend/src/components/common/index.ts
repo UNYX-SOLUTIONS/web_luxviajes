@@ -5,3 +5,4 @@ export { StatCard } from "./StatCard";
 export { Header } from "./Header";
 export { Footer } from "./Footer";
 export { HeroCarousel } from "./HeroCarousel";
+export { ContactDialog } from "./contact_dialog";

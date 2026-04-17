@@ -9,6 +9,7 @@ interface HeroProps {
   subtitle?: string;
   ctaText?: string;
   ctaHref?: string;
+  onClick?: () => void;
 }
 
 export function Hero({
@@ -16,6 +17,7 @@ export function Hero({
   subtitle,
   ctaText,
   ctaHref = "#",
+  onClick,
 }: HeroProps = {}) {
   return (
     <section className="relative min-h-screen overflow-hidden">
@@ -42,8 +44,9 @@ export function Hero({
           <p className="text-lg md:text-xl mb-8 max-w-2xl text-white!">
             {subtitle}
           </p>
-          <Link href={ctaHref}>
+          {onClick ? (
             <Button
+              onClick={onClick}
               size="lg"
               variant="primary"
               className="flex items-center gap-2"
@@ -63,7 +66,30 @@ export function Hero({
                 />
               </svg>
             </Button>
-          </Link>
+          ) : (
+            <Link href={ctaHref}>
+              <Button
+                size="lg"
+                variant="primary"
+                className="flex items-center gap-2"
+              >
+                {ctaText}
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </section>
