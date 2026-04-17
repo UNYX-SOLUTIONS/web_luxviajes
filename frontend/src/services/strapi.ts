@@ -1,6 +1,8 @@
 import { Banner, Home, HomeStats, RedSocial } from "@/types";
 
+// const BASE_URL = "https://cms.agencialuxviajes.com/api/";
 const BASE_URL = "http://localhost:1337/api/";
+const CMS_ORIGIN = new URL(BASE_URL).origin;
 
 interface StrapiResponse<T> {
   data: T;
@@ -13,9 +15,31 @@ interface HomeData {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  Banner: Array<Omit<Banner, "image"> & { image?: string }>;
   Redes: RedSocial[];
   Stats: HomeStats;
+}
+
+interface StrapiImageFormat {
+  url?: string;
+}
+
+interface StrapiImage {
+  url?: string;
+  formats?: {
+    large?: StrapiImageFormat;
+    medium?: StrapiImageFormat;
+    small?: StrapiImageFormat;
+    thumbnail?: StrapiImageFormat;
+  };
+}
+
+interface BannerWithImageData extends Omit<Banner, "image"> {
+  image?: StrapiImage | string | null;
+}
+
+interface HomeBannerData {
+  id: number;
+  Banner: BannerWithImageData[];
 }
 
 let homeCachePromise: Promise<Home | null> | null = null;
@@ -39,12 +63,39 @@ export async function getHomeData(): Promise<HomeData | null> {
   return res?.data ?? null;
 }
 
-function mapHomeDataToHome(homeData: HomeData): Home {
-  const banners: Banner[] = (homeData.Banner ?? []).map((banner) => ({
-    ...banner,
-    image: banner.image ?? "",
-  }));
+export async function getHomeBannerData(): Promise<HomeBannerData | null> {
+  const res = await getStrapiData<StrapiResponse<HomeBannerData>>(
+    "home?populate[Banner][populate]=image",
+  );
+  return res?.data ?? null;
+}
 
+function getBannerImageUrl(image?: StrapiImage | string | null): string {
+  if (!image) return "";
+  if (typeof image === "string") {
+    return image.startsWith("http") ? image : `${CMS_ORIGIN}${image}`;
+  }
+
+  const imageUrl =
+    image.formats?.large?.url ??
+    image.formats?.medium?.url ??
+    image.formats?.small?.url ??
+    image.formats?.thumbnail?.url ??
+    image.url ??
+    "";
+
+  if (!imageUrl) return "";
+  return imageUrl.startsWith("http") ? imageUrl : `${CMS_ORIGIN}${imageUrl}`;
+}
+
+function mapBannerDataToBanners(bannerData: HomeBannerData | null): Banner[] {
+  return (bannerData?.Banner ?? []).map((banner) => ({
+    ...banner,
+    image: getBannerImageUrl(banner.image),
+  }));
+}
+
+function mapHomeDataToHome(homeData: HomeData, banners: Banner[]): Home {
   return {
     id: homeData.id,
     documentId: homeData.documentId,
@@ -59,10 +110,15 @@ function mapHomeDataToHome(homeData: HomeData): Home {
 
 export async function getHome(): Promise<Home | null> {
   if (!homeCachePromise) {
-    homeCachePromise = getHomeData().then((homeData) => {
-      if (!homeData) return null;
-      return mapHomeDataToHome(homeData);
-    });
+    homeCachePromise = Promise.all([getHomeData(), getHomeBannerData()]).then(
+      ([homeData, homeBannerData]) => {
+        if (!homeData) return null;
+        return mapHomeDataToHome(
+          homeData,
+          mapBannerDataToBanners(homeBannerData),
+        );
+      },
+    );
   }
 
   return homeCachePromise;
