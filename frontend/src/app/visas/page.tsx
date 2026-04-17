@@ -240,7 +240,7 @@ export default function VisasPage() {
       <section className="bg-white pb-16 md:pb-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-[120px_1fr]">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center text-primary-500 md:mx-0 md:h-24 md:w-24">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center text-primary-700 md:mx-0 md:h-24 md:w-24">
               <EnvelopeIcon className="h-16 w-16" />
             </div>
 
