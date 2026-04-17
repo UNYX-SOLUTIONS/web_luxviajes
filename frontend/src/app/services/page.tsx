@@ -4,6 +4,8 @@
 import ArrowRightIcon from "@heroicons/react/24/solid/ArrowRightIcon";
 import Link from "next/link";
 import { useState } from "react";
+import { ContactDialog } from "@/components/common/contact_dialog";
+import ArrowLeftIcon from "@heroicons/react/24/outline/ArrowLeftIcon";
 
 const serviceCards = [
   {
@@ -71,6 +73,7 @@ const testimonials = [
 
 export default function ServicesPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showContactDialog, setShowContactDialog] = useState(false);
 
   const getVisibleTestimonials = () => {
     const indices = [
@@ -121,13 +124,13 @@ export default function ServicesPage() {
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link
-                href="tel:+593123456789"
+              <button
+                onClick={() => setShowContactDialog(true)}
                 className="inline-flex rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-primary-700"
               >
                 Diseñar Mi Viaje
                 <ArrowRightIcon className="ml-2 h-4 w-4" />
-              </Link>
+              </button>
               <svg
                 width="16"
                 height="20"
@@ -206,9 +209,9 @@ export default function ServicesPage() {
           <div className="mt-10 flex items-center justify-center gap-6">
             <button
               onClick={prevTestimonial}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-[#500088] text-white hover:bg-[#661AA3] transition text-xl"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#500088] text-white hover:bg-[#661AA3] transition text-xl p-2"
             >
-              ←
+              <ArrowLeftIcon className="h-4 w-4" />
             </button>
 
             <div className="grid grid-cols-1 gap-10 md:grid-cols-3 w-full max-w-6xl">
@@ -245,9 +248,9 @@ export default function ServicesPage() {
 
             <button
               onClick={nextTestimonial}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-[#500088] text-white hover:bg-[#661AA3] transition text-xl"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#500088] text-white hover:bg-[#661AA3] transition text-xl p-2"
             >
-              →
+              <ArrowRightIcon className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -321,6 +324,10 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
+      <ContactDialog
+        isOpen={showContactDialog}
+        onClose={() => setShowContactDialog(false)}
+      />
     </>
   );
 }

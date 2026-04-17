@@ -28,17 +28,31 @@ export function ContactDialog({
     }, 200);
   };
 
-  // Deshabilitar scroll cuando el dialog está abierto
+  // Deshabilitar scroll cuando el dialog está abierto y prevenir scroll jump
   useEffect(() => {
     if (isOpen) {
+      // Calcular el ancho de la scrollbar
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      
+      // Guardar estilos originales
+      const originalOverflow = document.body.style.overflow;
+      const originalPaddingRight = document.body.style.paddingRight;
+      
+      // Aplicar nuevos estilos
       document.body.style.overflow = 'hidden';
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      
+      // Cleanup
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.paddingRight = originalPaddingRight;
+      };
     } else {
       document.body.style.overflow = 'unset';
+      document.body.style.paddingRight = 'unset';
     }
-
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [isOpen]);
 
   if (!isOpen) return null;

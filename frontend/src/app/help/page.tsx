@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { ContactDialog } from "@/components/common/contact_dialog";
 import {
   DocumentTextIcon,
   CreditCardIcon,
@@ -75,6 +76,18 @@ const faqs = [
 
 export default function HelpPage() {
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+  const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
+  const [showContactDialog, setShowContactDialog] = useState(false);
+
+  const toggleFlip = (title: string) => {
+    const newFlipped = new Set(flippedCards);
+    if (newFlipped.has(title)) {
+      newFlipped.delete(title);
+    } else {
+      newFlipped.add(title);
+    }
+    setFlippedCards(newFlipped);
+  };
 
   const supportChannels = [
     {
@@ -154,21 +167,65 @@ export default function HelpPage() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {helpTopics.map((topic) => {
               const IconComponent = topic.icon;
+              const isFlipped = flippedCards.has(topic.title);
               return (
-                <article
+                <button
                   key={topic.title}
-                  className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-primary-100"
+                  onClick={() => toggleFlip(topic.title)}
+                  className="h-48 cursor-pointer"
+                  style={{
+                    perspective: "1000px",
+                  }}
                 >
-                  <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100">
-                    <IconComponent className="h-6 w-6 text-primary-700" />
+                  <div
+                    className="relative w-full h-full transition-transform duration-500"
+                    style={{
+                      transformStyle: "preserve-3d",
+                      transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                    }}
+                  >
+                    {/* Front of card */}
+                    <article
+                      className="absolute w-full h-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-primary-100 flex flex-col items-start justify-start"
+                      style={{
+                        backfaceVisibility: "hidden",
+                      }}
+                    >
+                      <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-100">
+                        <IconComponent className="h-6 w-6 text-primary-700" />
+                      </div>
+                      <h5 className="text-xl font-bold text-neutral-900">
+                        {topic.title}
+                      </h5>
+                      <p className="mt-2 text-xs text-neutral-500 italic">
+                        Click para más info
+                      </p>
+                    </article>
+
+                    {/* Back of card */}
+                    <div
+                      className="absolute w-full h-full rounded-2xl bg-primary-700 p-6 shadow-sm ring-1 ring-primary-600 flex flex-col items-center justify-between"
+                      style={{
+                        backfaceVisibility: "hidden",
+                        transform: "rotateY(180deg)",
+                      }}
+                    >
+                      <p className="text-sm leading-relaxed text-white text-center">
+                        {topic.description}
+                      </p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowContactDialog(true);
+                          toggleFlip(topic.title);
+                        }}
+                        className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-tertiary-500 px-4 py-2.5 text-sm font-bold text-tertiary-950 transition hover:bg-tertiary-400"
+                      >
+                        Consultar
+                      </button>
+                    </div>
                   </div>
-                  <h5 className="text-xl font-bold text-neutral-900">
-                    {topic.title}
-                  </h5>
-                  <p className="mt-2 text-sm leading-relaxed text-neutral-600">
-                    {topic.description}
-                  </p>
-                </article>
+                </button>
               );
             })}
           </div>
@@ -264,6 +321,11 @@ export default function HelpPage() {
           </a>
         </div>
       </section>
+
+      <ContactDialog
+        isOpen={showContactDialog}
+        onClose={() => setShowContactDialog(false)}
+      />
     </>
   );
 }

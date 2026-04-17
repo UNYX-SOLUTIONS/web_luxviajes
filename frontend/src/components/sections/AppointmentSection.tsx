@@ -127,7 +127,7 @@ export function AppointmentSection() {
   };
 
   return (
-    <section className="py-16 md:py-20 bg-white">
+    <section id="Agendar-Cita" className="py-16 md:py-20 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-12 text-center">
