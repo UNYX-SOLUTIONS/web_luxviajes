@@ -1,4 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
+'use client';
+
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { MapPinIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -17,7 +19,7 @@ const contactOptions = [
     title: "WhatsApp",
     description: "Puedes contactarnos por WhatsApp a la hora que gustes.",
     action: "WhatsApp Directo",
-    href: "https://wa.me/593984220600",
+    href: "https://wa.me/593964220600",
     image:
       "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=900&h=600&fit=crop",
   },
@@ -47,18 +49,21 @@ const offices = [
     address: "Edificio X, Oficina Y, Sector Puerto Santa Ana.",
     image:
       "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=900&h=600&fit=crop",
+    mapUrl: "https://maps.app.goo.gl/Jb8QSrh2MjZH4HDz7",
   },
   {
     city: "Quito",
     address: "Av. Amazonas y Eloy Alfaro, Edificio Luxury Trade.",
     image:
       "https://images.unsplash.com/photo-1528127269322-539801943592?w=900&h=600&fit=crop",
+    mapUrl: "https://maps.app.goo.gl/f7gdNvxg5XPnrpB48",
   },
   {
     city: "Cuenca",
     address: "Calle Larga y Borrero, Casa Colonial Lux.",
     image:
       "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=900&h=600&fit=crop",
+    mapUrl: "https://maps.app.goo.gl/zdy3WGpCAEsfBBzZ6",
   },
 ];
 
@@ -290,7 +295,10 @@ export default function ContactPage() {
                     {office.address}
                   </p>
 
-                  <button className="mt-4 w-full rounded-lg bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100">
+                  <button 
+                    onClick={() => window.open(office.mapUrl, '_blank')}
+                    className="mt-4 w-full rounded-lg bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100"
+                  >
                     VER MAPA
                   </button>
                 </div>

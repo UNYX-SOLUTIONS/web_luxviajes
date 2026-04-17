@@ -13,6 +13,7 @@ interface LocationPin {
   bottom?: string;
   left?: string;
   right?: string;
+  mapUrl?: string;
 }
 
 interface PromotionsMapProps {
@@ -27,6 +28,7 @@ const DEFAULT_PINS: LocationPin[] = [
     label: "P",
     top: "61.3%",
     left: "23.5%",
+    mapUrl: "https://www.google.com/maps/place/Panama",
   },
   {
     id: "colombia",
@@ -34,6 +36,7 @@ const DEFAULT_PINS: LocationPin[] = [
     label: "C",
     top: "63%",
     left: "25%",
+    mapUrl: "https://www.google.com/maps/place/Colombia",
   },
   {
     id: "brasil",
@@ -41,6 +44,7 @@ const DEFAULT_PINS: LocationPin[] = [
     label: "B",
     top: "71%",
     left: "32%",
+    mapUrl: "https://www.google.com/maps/place/Brazil",
   },
   {
     id: "china",
@@ -48,6 +52,7 @@ const DEFAULT_PINS: LocationPin[] = [
     label: "C",
     top: "45%",
     left: "77%",
+    mapUrl: "https://www.google.com/maps/place/China",
   },
   {
     id: "test",
@@ -55,6 +60,7 @@ const DEFAULT_PINS: LocationPin[] = [
     label: "T",
     top: "20%",
     left: "90%",
+    mapUrl: "https://www.google.com/maps",
   },
 ];
 
@@ -63,6 +69,7 @@ export function PromotionsMap({
   pins = DEFAULT_PINS,
 }: PromotionsMapProps) {
   const [showPromoDialog, setShowPromoDialog] = useState(false);
+  const [selectedPin, setSelectedPin] = useState<LocationPin | null>(null);
   const [dialogPosition, setDialogPosition] = useState({
     top: 0,
     left: 0,
@@ -365,6 +372,7 @@ export function PromotionsMap({
                     <div
                       className="flex flex-col items-center cursor-pointer relative"
                       onClick={() => {
+                        setSelectedPin(pin);
                         const mapRect =
                           mapContainerRef.current?.getBoundingClientRect();
                         const mapTop = mapRect?.top || 0;
@@ -464,6 +472,11 @@ export function PromotionsMap({
                       variant="ghost"
                       size="sm"
                       className="w-full justify-center bg-white text-primary! !hover:bg-primary hover:text-white"
+                      onClick={() => {
+                        if (selectedPin?.mapUrl) {
+                          window.open(selectedPin.mapUrl, '_blank');
+                        }
+                      }}
                     >
                       Ver más →
                     </Button>

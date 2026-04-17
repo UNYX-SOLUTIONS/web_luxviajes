@@ -1,6 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
+'use client';
+
 import Link from 'next/link';
-import { CheckBadgeIcon, AdjustmentsHorizontalIcon, EnvelopeIcon } from '@heroicons/react/24/solid';
+import { CheckBadgeIcon, AdjustmentsHorizontalIcon, EnvelopeIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { useState } from 'react';
 
 const visaCards = [
   { country: 'Visa Americana', subtitle: 'Turismo, Negocios y Transito', flag: '🇺🇸' },
@@ -14,6 +17,136 @@ const visaCards = [
   { country: 'Visado de Estudios Largos', subtitle: 'Programas + 1 ano', flag: '🇺🇸' },
   { country: 'Visados de Estudios Cortos', subtitle: 'Cursos y diplomados', flag: '🇪🇺' },
 ];
+
+const visaRequirements = {
+  'Visa Americana': {
+    duration: '10 años',
+    processing: '10-15 días',
+    requirements: [
+      'Pasaporte válido por mínimo 6 meses',
+      'Formulario DS-160 completado',
+      'Foto digital según especificaciones',
+      'Comprobante de pago de la tarifa',
+      'Comprobante de cita consular',
+      'Documentos que demuestren vínculos con Ecuador',
+      'Comprobante de solvencia económica',
+      'Itinerario del viaje',
+    ],
+  },
+  'Schengen': {
+    duration: '3 años',
+    processing: '15-20 días',
+    requirements: [
+      'Pasaporte válido por mínimo 3 meses después del viaje',
+      'Formulario de solicitud completado',
+      'Fotografía del tamaño correcto',
+      'Seguro de viaje Schengen',
+      'Comprobante de medios económicos',
+      'Reserva de hotel o carta de invitación',
+      'Reserva de vuelos',
+      'Comprobante de solvencia laboral',
+    ],
+  },
+  'Mexico': {
+    duration: '6 años',
+    processing: '3-5 días',
+    requirements: [
+      'Pasaporte válido',
+      'Forma TM180 completada',
+      'Comprobante de pago',
+      'Fotografía digital',
+      'Comprobante de estancia económica',
+      'Comprobante de domicilio',
+    ],
+  },
+  'Canada': {
+    duration: '10 años',
+    processing: '4-6 semanas',
+    requirements: [
+      'Pasaporte válido por mínimo 6 meses',
+      'Confirmación de residencia',
+      'Comprobante de medios económicos',
+      'Carta de empleador',
+      'Documentos de propósito de viaje',
+      'Antecedentes penales limpios',
+      'Examen médico (si aplica)',
+    ],
+  },
+  'Reino Unido (UK)': {
+    duration: '2-10 años',
+    processing: '3-4 semanas',
+    requirements: [
+      'Pasaporte válido',
+      'Comprobante de fondos económicos',
+      'Comprobante de alojamiento',
+      'Confirmación de viaje',
+      'Carta de empleador',
+      'Extractos bancarios de los últimos 6 meses',
+      'Documentos que muestren vínculos con Ecuador',
+    ],
+  },
+  'Costa Rica': {
+    duration: 'Exento para ecuatorianos',
+    processing: 'Inmediato',
+    requirements: [
+      'Pasaporte válido',
+      'Comprobante de fondos',
+      'Boleto de retorno',
+      'Dirección en Costa Rica',
+    ],
+  },
+  'Japon': {
+    duration: '90 días',
+    processing: '4-7 días',
+    requirements: [
+      'Pasaporte válido por mínimo 6 meses',
+      'Formulario completado',
+      'Fotografía 4x6 cm',
+      'Comprobante de estancia económica',
+      'Itinerario de viaje',
+      'Carta de empleador',
+      'Comprobantes de vivienda',
+    ],
+  },
+  'Australia': {
+    duration: '1-3 años',
+    processing: '1-3 semanas',
+    requirements: [
+      'Pasaporte válido',
+      'Comprobante de fondos',
+      'Comprobante laboral',
+      'Comprobante de domicilio',
+      'Antecedentes penales',
+      'Examen médico requerido',
+      'Información de contacto de emergencia',
+    ],
+  },
+  'Visado de Estudios Largos': {
+    duration: 'Según programa',
+    processing: '2-3 meses',
+    requirements: [
+      'Carta de aceptación de la universidad',
+      'Comprobante de fondos suficientes',
+      'Pasaporte válido',
+      'Certificado de antecedentes penales',
+      'Examen médico',
+      'Seguro de salud estudiantil',
+      'Comprobante de solvencia económica de patrocinador',
+    ],
+  },
+  'Visados de Estudios Cortos': {
+    duration: '3-6 meses',
+    processing: '7-15 días',
+    requirements: [
+      'Carta de inscripción de la escuela',
+      'Comprobante de pagos de cursos',
+      'Pasaporte válido',
+      'Comprobante de fondos',
+      'Comprobante de domicilio',
+      'Seguro de viaje',
+    ],
+  },
+};
 
 const steps = [
   {
@@ -34,6 +167,18 @@ const steps = [
 ];
 
 export default function VisasPage() {
+  const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
+  const [showRequirementsDialog, setShowRequirementsDialog] = useState(false);
+
+  const handleShowRequirements = (country: string) => {
+    setSelectedVisa(country);
+    setShowRequirementsDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setShowRequirementsDialog(false);
+    setSelectedVisa(null);
+  };
   return (
     <>
       <section className="relative overflow-hidden bg-neutral-900 h-screen py-32">
@@ -100,9 +245,12 @@ export default function VisasPage() {
                   <button className="w-full rounded-full bg-secondary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 cursor-pointer">
                     Solicitar
                   </button>
-                  <a className="mt-4 block text-center text-xs text-neutral-600">
+                  <button 
+                    onClick={() => handleShowRequirements(item.country)}
+                    className="mt-4 block w-full text-center text-xs text-neutral-600 hover:text-primary-700 transition cursor-pointer"
+                  >
                     Requisitos
-                  </a>
+                  </button>
                 </div>
               </article>
             ))}
@@ -227,7 +375,7 @@ export default function VisasPage() {
                 Hablar con un Especialista
               </Link>
               <Link
-                href="tel:+593984220600"
+                href="tel:+593964220600"
                 className="inline-flex rounded-full border border-white/30 bg-white/10 px-8 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
               >
                 +1 800 LUXVIAJES
@@ -240,7 +388,7 @@ export default function VisasPage() {
       <section className="bg-white pb-16 md:pb-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-[120px_1fr]">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center text-primary-500 md:mx-0 md:h-24 md:w-24">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center text-primary-700 md:mx-0 md:h-24 md:w-24">
               <EnvelopeIcon className="h-16 w-16" />
             </div>
 
@@ -266,6 +414,83 @@ export default function VisasPage() {
           </div>
         </div>
       </section>
+
+      {/* Requirements Dialog */}
+      {showRequirementsDialog && selectedVisa && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 border border-neutral-300 rounded-3xl">
+          <div className="relative w-full max-w-2xl rounded-3xl bg-white shadow-2xl flex flex-col max-h-[90vh]">
+            {/* Header */}
+            <div className="shrink-0 border-b border-neutral-200 bg-white px-8 py-6">
+              <button
+                onClick={handleCloseDialog}
+                className="absolute right-6 top-6 rounded-full bg-neutral-100 p-2 hover:bg-neutral-200 transition"
+              >
+                <XMarkIcon className="h-6 w-6 text-neutral-700" />
+              </button>
+              
+              <div className="flex items-center gap-4 pr-10">
+                <span className="text-5xl">
+                  {visaCards.find(v => v.country === selectedVisa)?.flag}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-3xl font-bold text-neutral-900 truncate">{selectedVisa}</h2>
+                  <p className="text-sm text-neutral-600 mt-1 truncate">
+                    {visaCards.find(v => v.country === selectedVisa)?.subtitle}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Dialog Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-8 md:p-10">
+              {/* Quick Info */}
+              <div className="mb-8 grid grid-cols-2 gap-4">
+                <div className="rounded-lg bg-primary-50 p-4">
+                  <p className="text-xs font-semibold text-primary-700 uppercase tracking-wider">Validez</p>
+                  <p className="mt-2 text-lg font-bold text-neutral-900">
+                    {visaRequirements[selectedVisa as keyof typeof visaRequirements]?.duration}
+                  </p>
+                </div>
+                <div className="rounded-lg bg-tertiary-50 p-4">
+                  <p className="text-xs font-semibold text-tertiary-700 uppercase tracking-wider">Procesamiento</p>
+                  <p className="mt-2 text-lg font-bold text-neutral-900">
+                    {visaRequirements[selectedVisa as keyof typeof visaRequirements]?.processing}
+                  </p>
+                </div>
+              </div>
+
+              {/* Requirements List */}
+              <div>
+                <h3 className="text-xl font-bold text-neutral-900 mb-4">Requisitos Necesarios</h3>
+                <ul className="space-y-3">
+                  {visaRequirements[selectedVisa as keyof typeof visaRequirements]?.requirements.map((req, idx) => (
+                    <li key={idx} className="flex gap-3">
+                      <CheckBadgeIcon className="h-5 w-5 shrink-0 text-primary-700 mt-0.5" />
+                      <span className="text-sm text-neutral-700">{req}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* CTA Buttons - Fixed at bottom */}
+            <div className="shrink-0 border-t border-neutral-200 bg-white px-8 py-6 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/contact"
+                className="flex-1 rounded-full bg-primary-700 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-primary-800"
+              >
+                Iniciar Trámite
+              </Link>
+              <button
+                onClick={handleCloseDialog}
+                className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

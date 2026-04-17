@@ -272,7 +272,7 @@ export default function ServicesPage() {
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link
-                  href="https://wa.me/593984220600"
+                  href="https://wa.me/593964220600"
                   target="_blank"
                   className="inline-flex items-center rounded-full bg-[#25D366] px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-accent-green/90"
                 >
