@@ -130,7 +130,7 @@ export function ContactDialog({
 
           {/* Header */}
           <div className="border-b border-neutral-200 px-6 pt-6 pb-4">
-            <h2 className="text-2xl font-bold text-neutral-900">¿Cómo prefieres contactarnos?</h2>
+            <h4 className="text-2xl font-bold text-neutral-900">¿Cómo prefieres contactarnos?</h4>
             <p className="mt-2 text-sm text-neutral-600">
               Elige la opción que mejor se adapte a ti
             </p>
@@ -156,7 +156,7 @@ export function ContactDialog({
 
                     {/* Content */}
                     <div className="flex-1 text-left">
-                      <h3 className="font-bold text-neutral-900">{option.title}</h3>
+                      <h5 className="font-bold text-neutral-900">{option.title}</h5>
                       <p className="text-sm text-neutral-600">{option.description}</p>
                     </div>
 
