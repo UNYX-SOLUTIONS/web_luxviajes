@@ -372,7 +372,7 @@ export default function AboutPage() {
             </p>
             <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
               <Link
-                href="https://wa.me/593984220600"
+                href="https://wa.me/593964220600"
                 target="_blank"
                 className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
               >

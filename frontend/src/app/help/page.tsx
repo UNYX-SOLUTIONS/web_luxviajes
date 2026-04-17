@@ -82,7 +82,7 @@ export default function HelpPage() {
       title: "WhatsApp Directo",
       description: "Mensajeria instantanea con nuestros expertos locales.",
       icon: ChatBubbleLeftIcon,
-      href: "https://wa.me/593984220600",
+      href: "https://wa.me/593964220600",
       isExternal: true,
       bgColor: "bg-secondary-100",
       bgColorSelected: "bg-primary-700",

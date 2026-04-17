@@ -335,7 +335,7 @@ export default function PackagesPage() {
                 </p>
               </div>
               <Link
-                href="https://wa.me/593984220600"
+                href="https://wa.me/593964220600"
                 target="_blank"
                 className="inline-flex rounded-full bg-primary-50 px-3 py-3 text-sm font-semibold text-primary-800! transition hover:bg-primary-50 gap-2 items-center"
               >
