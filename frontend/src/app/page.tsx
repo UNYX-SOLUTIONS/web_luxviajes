@@ -1,55 +1,44 @@
-"use client";
+﻿"use client";
 
-import { HeroCarousel, Button } from "@/components/common";
+import { HeroCarousel } from "@/components/common";
 import {
-  DestinationCard,
-  PackageCard,
-  ServiceCard,
   StatsSection,
   PromotionsMap,
   ServicesDetailSection,
   AppointmentSection,
   CTASection,
 } from "@/components/sections";
-import { getDestinations, getPackages, getServices } from "@/services";
-import { useEffect, useState, useRef } from "react";
-import { Destination, Package, Service } from "@/types";
-import type { Home } from "@/types";
-import { getHome } from "@/services/strapi";
+import { useEffect, useRef, useState } from "react";
+
+const HERO_BANNERS = [
+  {
+    image: "/images/hero/banner1.png",
+    title: "MALDIVAS",
+    subtitle: "Un amanecer sereno en villas sobre el agua turquesa",
+  },
+  {
+    image: "/images/hero/banner2.png",
+    title: "ITALIA",
+    subtitle: "Una vista clásica y lujosa de la Costa Amalfitana",
+  },
+  {
+    image: "/images/hero/banner3.png",
+    title: "JAPÓN",
+    subtitle: "Un jardín zen otoñal que transmite una paz absoluta",
+  },
+  {
+    image: "/images/hero/banner4.png",
+    title: "TAILANDIA",
+    subtitle: "Un paisaje de aventura y felicidad en aguas cristalinas",
+  },
+];
 
 export default function Home() {
-  const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [packages, setPackages] = useState<Package[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
-  const [home, setHome] = useState<Home | null>(null);
   const [showStats, setShowStats] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Cargar datos
-    Promise.all([getDestinations(), getPackages(), getServices()]).then(
-      ([dest, pkg, serv]) => {
-        setDestinations(dest);
-        setPackages(pkg);
-        setServices(serv);
-      },
-    );
-  }, []);
-
-  useEffect(() => {
-    // Cargar objeto home completo desde Strapi
-    console.log("Cargando objeto home desde Strapi...");
-    getHome()
-      .then((homeData) => {
-        if (!homeData) return;
-        setHome(homeData);
-      })
-      .catch(() => {
-        // Mantener datos por defecto si falla la petición
-      });
-  }, []);
-
-  useEffect(() => {
+    const heroElement = heroRef.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
         // Si menos del 90% del Hero es visible, mostrar stats
@@ -59,13 +48,13 @@ export default function Home() {
       { threshold: [0.9] },
     );
 
-    if (heroRef.current) {
-      observer.observe(heroRef.current);
+    if (heroElement) {
+      observer.observe(heroElement);
     }
 
     return () => {
-      if (heroRef.current) {
-        observer.unobserve(heroRef.current);
+      if (heroElement) {
+        observer.unobserve(heroElement);
       }
     };
   }, []);
@@ -74,10 +63,9 @@ export default function Home() {
     <>
       {/* Hero Section */}
       <div ref={heroRef}>
-        <HeroCarousel
-          slides={home?.banners.length ? home.banners : undefined}
-        />
+        <HeroCarousel slides={HERO_BANNERS} />
       </div>
+
       {/* Stats Section - Overlapping Hero and PromotionsMap - Show on interaction */}
       <div
         className={`relative z-10 transition-opacity duration-500 ${showStats ? "opacity-100" : "opacity-0 pointer-events-none"}`}
