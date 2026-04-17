@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface TimeSlot {
   id: string;
@@ -13,19 +13,39 @@ interface FormData {
   apellido: string;
   telefono: string;
   correo: string;
+  servicio: string;
+  mensaje: string;
   promociones: boolean;
 }
+
+interface AppointmentWebhookPayload {
+  name: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  service: string;
+  appointment_date: string;
+  message: string;
+  receivePromotion: boolean;
+  source: "web";
+}
+
+const APPOINTMENT_WEBHOOK_URL =
+  "https://flow.agencialuxviajes.com/webhook-test/de1e3a16-857f-48ec-a863-3eaf2aed41cc";
 
 export function AppointmentSection() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     nombre: "",
     apellido: "",
     telefono: "",
     correo: "",
+    servicio: "",
+    mensaje: "",
     promociones: false,
   });
 
@@ -104,26 +124,100 @@ export function AppointmentSection() {
     }
   };
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
+  const handleCloseModal = () => setShowModal(false);
+
+  useEffect(() => {
+    if (showModal) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showModal]);
+
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    const nextValue =
+      e.target instanceof HTMLInputElement && e.target.type === "checkbox"
+        ? e.target.checked
+        : value;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: nextValue,
     }));
   };
 
-  const handleSubmit = () => {
-    const { nombre, apellido, telefono, correo } = formData;
-    if (!nombre || !apellido || !telefono || !correo) {
+  const formatAppointmentDate = (date: Date, time: string) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${day}/${month}/${year} ${time}`;
+  };
+
+  const handleSubmit = async () => {
+    const { nombre, apellido, telefono, correo, servicio, mensaje } = formData;
+    if (!nombre || !apellido || !telefono || !correo || !servicio || !mensaje) {
       alert("Por favor completa todos los campos");
       return;
     }
 
-    const formattedDate = selectedDate!.toLocaleDateString("es-ES");
-    const whatsappMessage = `Hola, me gustaría agendar una cita para el ${formattedDate} a las ${selectedTime}\n\nDatos:\nNombre: ${nombre} ${apellido}\nTeléfono: ${telefono}\nCorreo: ${correo}\nRecibir promociones: ${formData.promociones ? "Sí" : "No"}`;
-    const whatsappUrl = `https://wa.me/593964220600?text=${encodeURIComponent(whatsappMessage)}`;
-    window.open(whatsappUrl, "_blank");
-    setShowModal(false);
+    if (!selectedDate || !selectedTime) {
+      alert("Selecciona fecha y hora para la cita");
+      return;
+    }
+
+    if (!APPOINTMENT_WEBHOOK_URL) {
+      alert("Falta configurar NEXT_PUBLIC_APPOINTMENT_WEBHOOK_URL");
+      return;
+    }
+
+    const payload: AppointmentWebhookPayload = {
+      name: nombre,
+      lastName: apellido,
+      email: correo,
+      phone: telefono,
+      service: servicio,
+      appointment_date: formatAppointmentDate(selectedDate, selectedTime),
+      message: mensaje,
+      receivePromotion: formData.promociones,
+      source: "web",
+    };
+
+    try {
+      setIsSubmitting(true);
+      const response = await fetch(APPOINTMENT_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook respondio con estado ${response.status}`);
+      }
+
+      alert("Cita enviada correctamente");
+      setShowModal(false);
+      setFormData({
+        nombre: "",
+        apellido: "",
+        telefono: "",
+        correo: "",
+        servicio: "",
+        mensaje: "",
+        promociones: false,
+      });
+    } catch (error) {
+      console.error("Error al enviar cita al webhook:", error);
+      alert("No se pudo enviar la cita. Intenta nuevamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -142,7 +236,7 @@ export function AppointmentSection() {
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Calendar */}
-          <div className="bg-neutral-50 p-6 rounded-2xl shadow-md h-fit max-h-[500px]">
+          <div className="bg-neutral-50 p-6 rounded-2xl shadow-md h-fit max-h-125">
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <button
@@ -248,9 +342,9 @@ export function AppointmentSection() {
           </div>
 
           {/* Time Selection */}
-          <div className="flex flex-col h-fit max-h-[500px]">
+          <div className="flex flex-col h-fit max-h-125">
             <div className="mb-8 flex flex-col flex-1 overflow-hidden">
-              <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex-shrink-0">
+              <h3 className="text-lg font-semibold text-neutral-900 mb-4 shrink-0">
                 Selecciona una hora
               </h3>
 
@@ -293,7 +387,7 @@ export function AppointmentSection() {
             </div>
 
             {/* Booking Summary */}
-            <div className="bg-primary-50 p-6 rounded-2xl border border-primary-200 flex-shrink-0">
+            <div className="bg-primary-50 p-6 rounded-2xl border border-primary-200 shrink-0">
               <button
                 onClick={handleOpenModal}
                 disabled={!selectedDate || !selectedTime}
@@ -316,19 +410,41 @@ export function AppointmentSection() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            {/* Header */}
-            <div className="mb-6">
-              <h3 className="text-2xl font-bold text-neutral-900 mb-2">
-                Completa tu información
-              </h3>
-              <p className="text-neutral-600">
-                Para confirmar tu cita, por favor completa los siguientes datos
-              </p>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full flex flex-col max-h-[70vh]">
+            {/* Header - fijo */}
+            <div className="px-6 pt-6 shrink-0 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-2xl font-bold text-neutral-900 mb-2">
+                  Completa tu información
+                </h3>
+                <p className="text-neutral-600">
+                  Para confirmar tu cita, por favor completa los siguientes
+                  datos
+                </p>
+              </div>
+              <button
+                onClick={handleCloseModal}
+                className="shrink-0 p-1 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition"
+                aria-label="Cerrar"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             </div>
 
-            {/* Resumen de cita */}
-            <div className="bg-primary-50 p-4 rounded-lg border border-primary-200 mb-6">
+            {/* Resumen de cita - fijo */}
+            <div className="mx-6 mt-4 shrink-0 bg-primary-50 p-4 rounded-lg border border-primary-200">
               <p className="text-sm text-neutral-600 mb-2">
                 Resumen de tu cita:
               </p>
@@ -342,95 +458,133 @@ export function AppointmentSection() {
               </p>
             </div>
 
-            {/* Formulario */}
-            <div className="space-y-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Nombre
-                </label>
-                <input
-                  type="text"
-                  name="nombre"
-                  value={formData.nombre}
-                  onChange={handleFormChange}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                  placeholder="Tu nombre"
-                />
-              </div>
+            {/* Formulario - scrolleable */}
+            <div className="overflow-y-auto flex-1 px-6 mt-4">
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Nombre
+                  </label>
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                    placeholder="Tu nombre"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Apellido
-                </label>
-                <input
-                  type="text"
-                  name="apellido"
-                  value={formData.apellido}
-                  onChange={handleFormChange}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                  placeholder="Tu apellido"
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Apellido
+                  </label>
+                  <input
+                    type="text"
+                    name="apellido"
+                    value={formData.apellido}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                    placeholder="Tu apellido"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Teléfono
-                </label>
-                <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleFormChange}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                  placeholder="+593 9 8822 0600"
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Teléfono
+                  </label>
+                  <input
+                    type="tel"
+                    name="telefono"
+                    value={formData.telefono}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                    placeholder="+593 9 8822 0600"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Correo
-                </label>
-                <input
-                  type="email"
-                  name="correo"
-                  value={formData.correo}
-                  onChange={handleFormChange}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                  placeholder="tu@email.com"
-                />
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Correo
+                  </label>
+                  <input
+                    type="email"
+                    name="correo"
+                    value={formData.correo}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                    placeholder="tu@email.com"
+                  />
+                </div>
 
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="promociones"
-                  name="promociones"
-                  checked={formData.promociones}
-                  onChange={handleFormChange}
-                  className="w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-600"
-                />
-                <label
-                  htmlFor="promociones"
-                  className="ml-3 text-sm text-neutral-700"
-                >
-                  Deseo recibir promociones y descuentos en mi correo
-                </label>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Servicio
+                  </label>
+                  <input
+                    type="text"
+                    name="servicio"
+                    value={formData.servicio}
+                    onChange={handleFormChange}
+                    maxLength={20}
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                    placeholder="Asesoría de visa"
+                  />
+                  <p className="text-xs text-neutral-400 text-right mt-1">
+                    {formData.servicio.length}/20
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Mensaje
+                  </label>
+                  <textarea
+                    name="mensaje"
+                    value={formData.mensaje}
+                    onChange={handleFormChange}
+                    maxLength={100}
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600 min-h-24"
+                    placeholder="Quiero información para aplicar con mi familia"
+                  />
+                  <p className="text-xs text-neutral-400 text-right mt-1">
+                    {formData.mensaje.length}/100
+                  </p>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="promociones"
+                    name="promociones"
+                    checked={formData.promociones}
+                    onChange={handleFormChange}
+                    className="w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-600"
+                  />
+                  <label
+                    htmlFor="promociones"
+                    className="ml-3 text-sm text-neutral-700"
+                  >
+                    Deseo recibir promociones y descuentos en mi correo
+                  </label>
+                </div>
               </div>
             </div>
 
-            {/* Botones */}
-            <div className="flex gap-3">
+            {/* Botones - fijos abajo */}
+            <div className="px-6 py-4 shrink-0 border-t border-neutral-100 flex gap-3">
               <button
-                onClick={() => setShowModal(false)}
+                onClick={handleCloseModal}
                 className="flex-1 py-2 px-4 border border-neutral-300 rounded-lg text-neutral-700 font-medium hover:bg-neutral-50 transition"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSubmit}
-                className="flex-1 py-2 px-4 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition"
+                disabled={isSubmitting}
+                className="flex-1 py-2 px-4 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Confirmar Cita
+                {isSubmitting ? "Enviando..." : "Confirmar Cita"}
               </button>
             </div>
           </div>
