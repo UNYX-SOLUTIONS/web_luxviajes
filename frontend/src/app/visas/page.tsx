@@ -417,10 +417,10 @@ export default function VisasPage() {
 
       {/* Requirements Dialog */}
       {showRequirementsDialog && selectedVisa && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 border border-neutral-300 rounded-3xl">
+          <div className="relative w-full max-w-2xl rounded-3xl bg-white shadow-2xl flex flex-col max-h-[90vh]">
             {/* Header */}
-            <div className="sticky top-0 z-10 border-b border-neutral-200 bg-white px-8 py-6 rounded-t-3xl">
+            <div className="shrink-0 border-b border-neutral-200 bg-white px-8 py-6">
               <button
                 onClick={handleCloseDialog}
                 className="absolute right-6 top-6 rounded-full bg-neutral-100 p-2 hover:bg-neutral-200 transition"
@@ -428,21 +428,21 @@ export default function VisasPage() {
                 <XMarkIcon className="h-6 w-6 text-neutral-700" />
               </button>
               
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 pr-10">
                 <span className="text-5xl">
                   {visaCards.find(v => v.country === selectedVisa)?.flag}
                 </span>
-                <div>
-                  <h2 className="text-3xl font-bold text-neutral-900">{selectedVisa}</h2>
-                  <p className="text-sm text-neutral-600 mt-1">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-3xl font-bold text-neutral-900 truncate">{selectedVisa}</h2>
+                  <p className="text-sm text-neutral-600 mt-1 truncate">
                     {visaCards.find(v => v.country === selectedVisa)?.subtitle}
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Dialog Content */}
-            <div className="p-8 md:p-10">
+            {/* Dialog Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-8 md:p-10">
               {/* Quick Info */}
               <div className="mb-8 grid grid-cols-2 gap-4">
                 <div className="rounded-lg bg-primary-50 p-4">
@@ -471,22 +471,22 @@ export default function VisasPage() {
                   ))}
                 </ul>
               </div>
+            </div>
 
-              {/* CTA Buttons */}
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href="/contact"
-                  className="flex-1 rounded-full bg-primary-700 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-primary-800"
-                >
-                  Iniciar Trámite
-                </Link>
-                <button
-                  onClick={handleCloseDialog}
-                  className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
-                >
-                  Cerrar
-                </button>
-              </div>
+            {/* CTA Buttons - Fixed at bottom */}
+            <div className="shrink-0 border-t border-neutral-200 bg-white px-8 py-6 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/contact"
+                className="flex-1 rounded-full bg-primary-700 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-primary-800"
+              >
+                Iniciar Trámite
+              </Link>
+              <button
+                onClick={handleCloseDialog}
+                className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
+              >
+                Cerrar
+              </button>
             </div>
           </div>
         </div>
