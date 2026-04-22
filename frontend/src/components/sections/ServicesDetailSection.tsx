@@ -24,8 +24,8 @@ const SERVICES_DETAILS: ServiceDetail[] = [
   },
   {
     id: "visas",
-    title: "Visas y turnos",
-    label: "Visas y turnos",
+    title: "Visas y Pasaportes",
+    label: "Visas y Pasaportes",
     image: "/images/services/visas.png",
     description:
       "Gestión rápida y profesional de tus trámites migratorios sin complicaciones.",

@@ -5,6 +5,8 @@ import { Button } from "../common/Button";
 import { ContactDialog } from "../common/contact_dialog";
 import { cn } from "@/utils/cn";
 import { useState, useRef, useEffect } from "react";
+import ArrowRightIcon from "@heroicons/react/24/solid/ArrowRightIcon";
+import { PhoneArrowUpRightIcon } from "@heroicons/react/24/solid";
 
 interface LocationPin {
   id: string;
@@ -70,6 +72,7 @@ export function PromotionsMap({
   pins = DEFAULT_PINS,
 }: PromotionsMapProps) {
   const [showPromoDialog, setShowPromoDialog] = useState(false);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [selectedPin, setSelectedPin] = useState<LocationPin | null>(null);
   const [dialogPosition, setDialogPosition] = useState({
@@ -82,7 +85,6 @@ export function PromotionsMap({
   const [panY, setPanY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [visibleMapWidth, setVisibleMapWidth] = useState(800);
   const [visibleMapHeight, setVisibleMapHeight] = useState(600);
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -162,7 +164,6 @@ export function PromotionsMap({
         x: e.clientX - rect.left,
         y: e.clientY - rect.top,
       };
-      setCursorPos(pos);
       lastCursorPosRef.current = pos;
     }
 
@@ -250,9 +251,9 @@ export function PromotionsMap({
     };
   }, []);
 
-  // Bloquear scroll cuando el dialog está abierto
+  // Bloquear scroll cuando los diálogos están abiertos
   useEffect(() => {
-    if (showPromoDialog) {
+    if (showPromoDialog || showDetailsDialog) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -261,7 +262,7 @@ export function PromotionsMap({
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [showPromoDialog]);
+  }, [showPromoDialog, showDetailsDialog]);
 
   return (
     <section className={cn("bg-linear-to-b from-white to-gray-50", className)}>
@@ -288,7 +289,7 @@ export function PromotionsMap({
             >
               +
             </button>
-            <div className="px-3 py-2 text-gray-700 font-semibold min-w-[60px] text-center">
+            <div className="px-3 py-2 text-gray-700 font-semibold min-w-15 text-center">
               {zoom}%
             </div>
             <button
@@ -384,12 +385,8 @@ export function PromotionsMap({
                         const threshold = 0.3;
                         const nearTop =
                           screenTop < visibleMapHeight * threshold;
-                        const nearBottom =
-                          screenTop > visibleMapHeight * (1 - threshold);
                         const nearRight =
                           screenLeft > visibleMapWidth * (1 - threshold);
-                        const nearLeft =
-                          screenLeft < visibleMapWidth * threshold;
 
                         let dialogTop = mapTop + screenTop - 40;
                         let dialogLeft = mapLeft + screenLeft + 20;
@@ -448,6 +445,125 @@ export function PromotionsMap({
             videoCallUrl="/contact"
           />
 
+          {/* Travel Details Dialog */}
+          {showDetailsDialog && selectedPin && (
+            <div
+              className="fixed inset-0 z-50 p-4 bg-black/50 flex items-center justify-center"
+              onClick={() => setShowDetailsDialog(false)}
+            >
+              <div
+                className="bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header con imagen */}
+                <div className="relative h-80 w-full overflow-hidden bg-linear-to-br from-purple-600 to-purple-800">
+                  <button
+                    onClick={() => setShowDetailsDialog(false)}
+                    className="absolute top-4 right-4 z-10 bg-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-gray-100 text-lg font-bold"
+                  >
+                    ✕
+                  </button>
+
+                  <Image
+                    src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=400&fit=crop"
+                    alt={selectedPin.name}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/80 to-transparent p-6">
+                    <h2 className="text-3xl font-bold text-white">{selectedPin.name}</h2>
+                    <p className="text-purple-100 mt-2">Viaje exclusivo - Promoción especial</p>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 md:p-8">
+                  {/* Price and Duration */}
+                  <div className="grid grid-cols-2 gap-4 mb-6 pb-6 border-b">
+                    <div>
+                      <p className="text-sm text-gray-600 font-semibold">PRECIO DESDE</p>
+                      <p className="text-2xl font-bold text-purple-600 mt-1">$1,250</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 font-semibold">DURACIÓN</p>
+                      <p className="text-2xl font-bold text-purple-600 mt-1">5 días</p>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Descripción del viaje</h3>
+                    <p className="text-gray-700 leading-relaxed mb-4">
+                      Disfruta de una experiencia inolvidable en {selectedPin.name}. Este paquete incluye
+                      alojamiento en hoteles de lujo, visitas guiadas a los lugares más emblemáticos y
+                      actividades especiales diseñadas para que vivas cada momento al máximo.
+                    </p>
+                  </div>
+
+                  {/* Includes */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Incluye</h3>
+                    <ul className="space-y-2">
+                      <li className="flex items-center gap-2 text-gray-700">
+                        <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
+                        Vuelos internacionales
+                      </li>
+                      <li className="flex items-center gap-2 text-gray-700">
+                        <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
+                        Alojamiento 5 noches
+                      </li>
+                      <li className="flex items-center gap-2 text-gray-700">
+                        <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
+                        Tours guiados
+                      </li>
+                      <li className="flex items-center gap-2 text-gray-700">
+                        <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
+                        Desayunos y cenas incluidas
+                      </li>
+                      <li className="flex items-center gap-2 text-gray-700">
+                        <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
+                        Seguros de viaje
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Highlights */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Destacados</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-purple-50 p-3 rounded-lg">
+                        <p className="text-sm font-semibold text-purple-600">⭐ Mejor Relación Precio-Calidad</p>
+                      </div>
+                      <div className="bg-purple-50 p-3 rounded-lg">
+                        <p className="text-sm font-semibold text-purple-600">🏆 Oferta Limitada</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CTA Buttons */}
+                  <div className="flex gap-3 pt-4 border-t">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setShowDetailsDialog(false)}
+                    >
+                      Volver
+                    </Button>
+                    <Button
+                      className="flex flex-1 items-center justify-center bg-purple-600 hover:bg-purple-700 text-white"
+                      onClick={() => {
+                        setShowDetailsDialog(false);
+                        setShowContactDialog(true);
+                      }}
+                    >
+                      Reservar Ahora <PhoneArrowUpRightIcon className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Promo Dialog */}
           {showPromoDialog && (
             <div
@@ -464,7 +580,7 @@ export function PromotionsMap({
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Badge con imagen de fondo y botón */}
-                <div className="relative h-70 w-50 overflow-hidden bg-gradient-to-br from-purple-600 to-purple-800 flex flex-col justify-end">
+                <div className="relative h-70 w-50 overflow-hidden bg-linear-to-br from-purple-600 to-purple-800 flex flex-col justify-end">
                   <button
                     onClick={() => setShowPromoDialog(false)}
                     className="absolute top-3 right-3 z-10 bg-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100"
@@ -482,13 +598,13 @@ export function PromotionsMap({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="w-full justify-center bg-white text-primary! !hover:bg-primary hover:text-white"
+                      className="w-full flex gap-2 justify-center items-center bg-white text-primary! !hover:bg-primary hover:text-white"
                       onClick={() => {
                         setShowPromoDialog(false);
-                        setShowContactDialog(true);
+                        setShowDetailsDialog(true);
                       }}
                     >
-                      Ver más →
+                      Ver más <ArrowRightIcon className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>

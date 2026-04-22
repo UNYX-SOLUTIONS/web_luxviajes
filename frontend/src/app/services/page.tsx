@@ -26,7 +26,7 @@ const serviceCards = [
     image: "/images/services/insurance.png",
   },
   {
-    title: "Visas y Turnos",
+    title: "Visas y Pasaportes",
     image: "/images/services/visas.png",
   },
   {

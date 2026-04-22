@@ -403,6 +403,15 @@ export function AppointmentSection() {
                 Agendar Cita
               </button>
             </div>
+            {/* Boton de "No quieres esperar?" */}
+            <div className="mt-4 bg-neutral-50 p-6 rounded-2xl border border-neutral-200 shrink-0">
+              <button
+                onClick={() => setShowModal(true)}
+                className="w-full py-3 rounded-lg border border-primary-600 text-primary-600 font-semibold hover:bg-primary-50 transition"
+              >
+                ¿No quieres esperar?<br />Agenda una asesoría en vivo y en 10 min te contactamos
+              </button>
+            </div>
           </div>
         </div>
       </div>

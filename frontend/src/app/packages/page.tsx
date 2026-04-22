@@ -157,7 +157,71 @@ export default function PackagesPage() {
 
       <section className="bg-neutral-50 py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 flex items-end justify-between gap-4">
+          <div className="mb-7 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <p className="text-sm text-accent-red">
+                Escapa, Explora, Disfruta
+              </p>
+              <h2 className="mt-1 text-4xl font-bold text-primary-700">
+                Top Destinos Soñados
+              </h2>
+            </div>
+            <Link
+              href="/contact"
+              className="text-sm font-semibold text-primary-700 transition hover:text-primary-800"
+            >
+              Ver mas destinos populares →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {dreamDestinations.map((item) => (
+              <article
+                key={item.title}
+                className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-primary-100 flex flex-col h-full"
+              >
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="h-40 w-full object-cover shrink-0"
+                />
+                <div className="p-4 flex flex-col h-full">
+                  <div className="shrink-0">
+                    <h4 className="text-lg font-bold text-neutral-900 line-clamp-2">
+                      {item.title}
+                    </h4>
+                    <p className="mt-1 text-sm text-primary-700! font-semibold">
+                      ● {item.nights}
+                    </p>
+                  </div>
+                  <ul className="mt-2 space-y-3 text-xs text-neutral-700 shrink-0">
+                    <li>✈ Vuelo</li>
+                    <li>🏨 Hotel</li>
+                    <li>🧭 Tours</li>
+                    <li>🛡 Asistencia de viaje</li>
+                  </ul>
+                  <div className="grow" />
+                  <div className="shrink-0">
+                    <p className="mt-2 text-xs text-tertiary-700! font-medium text-center">
+                      {item.season}
+                    </p>
+                    <button
+                      onClick={() => setShowContactDialog(true)}
+                      className="mt-3 w-full rounded-full bg-primary-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-800"
+                    >
+                      Cotizar
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-neutral-100 py-16 md:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 flex items-start justify-between gap-4">
             <div>
               <h2 className="text-4xl font-bold text-primary-700 mb-2">
                 Paquetes Premium
@@ -227,71 +291,7 @@ export default function PackagesPage() {
         </div>
       </section>
 
-      <section className="bg-primary-50 py-16 md:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-7 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
-            <div>
-              <p className="text-sm text-accent-red">
-                Escapa, Explora, Disfruta
-              </p>
-              <h2 className="mt-1 text-4xl font-bold text-primary-700">
-                Top Destinos Sonados
-              </h2>
-            </div>
-            <Link
-              href="/contact"
-              className="text-sm font-semibold text-primary-700 transition hover:text-primary-800"
-            >
-              Ver mas destinos populares →
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {dreamDestinations.map((item) => (
-              <article
-                key={item.title}
-                className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-primary-100 flex flex-col h-full"
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="h-40 w-full object-cover shrink-0"
-                />
-                <div className="p-4 flex flex-col h-full">
-                  <div className="shrink-0">
-                    <h4 className="text-lg font-bold text-neutral-900 line-clamp-2">
-                      {item.title}
-                    </h4>
-                    <p className="mt-1 text-sm text-primary-700! font-semibold">
-                      ● {item.nights}
-                    </p>
-                  </div>
-                  <ul className="mt-2 space-y-3 text-xs text-neutral-700 shrink-0">
-                    <li>✈ Vuelo</li>
-                    <li>🏨 Hotel</li>
-                    <li>🧭 Tours</li>
-                    <li>🛡 Asistencia de viaje</li>
-                  </ul>
-                  <div className="grow" />
-                  <div className="shrink-0">
-                    <p className="mt-2 text-xs text-tertiary-700! font-medium text-center">
-                      {item.season}
-                    </p>
-                    <button
-                      onClick={() => setShowContactDialog(true)}
-                      className="mt-3 w-full rounded-full bg-primary-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-800"
-                    >
-                      Cotizar
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white py-16 md:py-20">
+      <section className="bg-neutral-50 py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-5xl font-bold text-neutral-900">
             Parques Tematicos
@@ -319,7 +319,7 @@ export default function PackagesPage() {
         </div>
       </section>
 
-      <section className="bg-white pb-16 md:pb-20">
+      <section className="bg-neutral-50 pb-16 md:pb-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-primary-800 to-primary-700 px-8 py-12 text-white shadow-xl">
             <div className="pointer-events-none absolute inset-0 opacity-30">
@@ -344,7 +344,10 @@ export default function PackagesPage() {
                 className="inline-flex rounded-full bg-primary-50 px-3 py-3 text-sm font-semibold text-primary-800! transition hover:bg-primary-50 gap-2 items-center"
               >
                 <PhoneIcon className="h-5 w-5 inline-block" />
-                <p className="text-sm font-semibold text-primary-800!"> Contactar a un Asesor</p>
+                <p className="text-sm font-semibold text-primary-800!">
+                  {" "}
+                  Contactar a un Asesor
+                </p>
               </button>
             </div>
           </div>

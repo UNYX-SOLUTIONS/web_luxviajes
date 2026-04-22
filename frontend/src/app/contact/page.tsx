@@ -37,7 +37,7 @@ const contactOptions: ContactOption[] = [
       "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=900&h=600&fit=crop",
   },
   {
-    title: "Agenda tu cita",
+    title: "Agenda tu cita Online",
     description:
       "Agenda tu cita con nosotros y te contactaremos inmediatamente.",
     action: "Agendar Cita",
