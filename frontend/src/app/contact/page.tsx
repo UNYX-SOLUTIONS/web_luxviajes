@@ -19,9 +19,9 @@ interface ContactOption {
 
 const contactOptions: ContactOption[] = [
   {
-    title: "Videollamada",
+    title: "Videollamada al Instante",
     description:
-      "Puedes contactarnos directamente por una videollamada, estaremos dispuestos a brindarte asesoria.",
+      "¿No quieres esperar? Agenda una videollamada inmediata con uno de nuestros asesores y resuelve todas tus dudas al instante.",
     action: "Hacer Videollamada",
     href: "#",
     isVideocall: true,
@@ -30,7 +30,7 @@ const contactOptions: ContactOption[] = [
   },
   {
     title: "WhatsApp",
-    description: "Puedes contactarnos por WhatsApp a la hora que gustes.",
+    description: "¿Prefieres escribir? Contáctanos directamente por WhatsApp y recibe atención personalizada en tiempo real.",
     action: "WhatsApp Directo",
     href: "https://wa.me/593964220600",
     image:
@@ -39,7 +39,7 @@ const contactOptions: ContactOption[] = [
   {
     title: "Agenda tu cita Online",
     description:
-      "Agenda tu cita con nosotros y te contactaremos inmediatamente.",
+      "¿Quieres una atención más personalizada? Agenda una cita online con uno de nuestros expertos y planifica tu viaje de ensueño con asesoría dedicada.",
     action: "Agendar Cita",
     href: "#",
     isAgenda: true,
@@ -49,7 +49,7 @@ const contactOptions: ContactOption[] = [
   {
     title: "Asesoria en Oficinas",
     description:
-      "Puedes venir a nuestra oficina y ser atendido directamente por nuestros asesores.",
+      "¿Prefieres una atención cara a cara? Visítanos en nuestras oficinas ubicadas en las principales ciudades del país y recibe asesoría personalizada de nuestros expertos en viajes.",
     action: "Ver Ubicaciones",
     href: "#offices",
     image:
