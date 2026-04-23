@@ -80,6 +80,14 @@ const offices = [
 
 export default function ContactPage() {
   const [showAppointmentDialog, setShowAppointmentDialog] = useState(false);
+
+  const handleScrollToOffices = () => {
+    const officesSection = document.getElementById('offices');
+    if (officesSection) {
+      officesSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <>
       <section className="relative overflow-hidden bg-neutral-900 h-screen">
@@ -161,6 +169,13 @@ export default function ContactPage() {
                   {(option.isVideocall || option.isAgenda) ? (
                     <button
                       onClick={() => setShowAppointmentDialog(true)}
+                      className="mt-6 mb-8 inline-flex w-full items-center justify-center rounded-full bg-neutral-100 px-4 py-3 text-sm font-bold text-primary-700 transition hover:bg-primary-800 hover:text-white duration-200"
+                    >
+                      {option.action}
+                    </button>
+                  ) : option.href === "#offices" ? (
+                    <button
+                      onClick={handleScrollToOffices}
                       className="mt-6 mb-8 inline-flex w-full items-center justify-center rounded-full bg-neutral-100 px-4 py-3 text-sm font-bold text-primary-700 transition hover:bg-primary-800 hover:text-white duration-200"
                     >
                       {option.action}

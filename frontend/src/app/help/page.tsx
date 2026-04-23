@@ -169,7 +169,7 @@ export default function HelpPage() {
               const IconComponent = topic.icon;
               const isFlipped = flippedCards.has(topic.title);
               return (
-                <button
+                <div
                   key={topic.title}
                   onClick={() => toggleFlip(topic.title)}
                   className="h-48 cursor-pointer"
@@ -210,7 +210,7 @@ export default function HelpPage() {
                         transform: "rotateY(180deg)",
                       }}
                     >
-                      <p className="text-sm leading-relaxed text-white text-center">
+                      <p className="text-sm leading-relaxed text-white! text-center">
                         {topic.description}
                       </p>
                       <button
@@ -225,7 +225,7 @@ export default function HelpPage() {
                       </button>
                     </div>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -249,7 +249,7 @@ export default function HelpPage() {
                   {faq.question}
                   <ChevronDownIcon className="h-5 w-5 text-primary-700 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
-                <p className="px-5 pb-5 text-sm leading-relaxed text-neutral-600">
+                <p className="px-5 pb-5 text-sm leading-relaxed text-neutral-600!">
                   {faq.answer}
                 </p>
               </details>

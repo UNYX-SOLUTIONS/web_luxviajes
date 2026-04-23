@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { HeroCarousel } from "@/components/common";
+import { ContactDialog, HeroCarousel } from "@/components/common";
 import {
   StatsSection,
   PromotionsMap,
@@ -9,6 +9,8 @@ import {
   CTASection,
 } from "@/components/sections";
 import { useEffect, useRef, useState } from "react";
+import { DreamDestinationsSection } from "./packages/components";
+import { dreamDestinations } from "./packages/data/packages-data";
 
 const HERO_BANNERS = [
   {
@@ -36,6 +38,7 @@ const HERO_BANNERS = [
 export default function Home() {
   const [showStats, setShowStats] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const [showContactDialog, setShowContactDialog] = useState(false);
 
   useEffect(() => {
     const heroElement = heroRef.current;
@@ -73,8 +76,14 @@ export default function Home() {
         <StatsSection />
       </div>
 
-      {/* Promotions Map Section */}
-      <PromotionsMap />
+      {/* Dream Destinations Section */}
+      <DreamDestinationsSection
+        destinations={dreamDestinations}
+        onCotizar={() => setShowContactDialog(true)}
+      />
+
+      {/* Promotions Map Section 
+      <PromotionsMap />*/}
 
       {/* Services Detail Section */}
       <ServicesDetailSection />
@@ -84,6 +93,12 @@ export default function Home() {
 
       {/* CTA Section */}
       <CTASection />
+
+      {/* Contact Dialog */}
+      <ContactDialog
+        isOpen={showContactDialog}
+        onClose={() => setShowContactDialog(false)}
+      />
     </>
   );
 }
