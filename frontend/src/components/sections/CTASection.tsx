@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export function CTASection() {
   return (
-    <section className="py-16 md:py-20 bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-700">
+    <section className="py-16 md:py-20 bg-linear-to-r from-primary-600 via-primary-700 to-secondary-700">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 text-white leading-tight">
           ¿Listo para tu próxima aventura?

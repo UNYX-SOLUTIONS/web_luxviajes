@@ -190,7 +190,7 @@ export function HeroCarousel({
 
         <form className="mx-auto w-full">
           <div className="flex items-center rounded-full px-6 py-4 shadow-lg bg-[#D9D9D9]/40 backdrop-blur-sm focus-within:ring-1 focus-within:ring-neutral-200 transition-all">
-            <MagnifyingGlassIcon className="mr-4 h-6 w-6 text-neutral-50 flex-shrink-0" />
+            <MagnifyingGlassIcon className="mr-4 h-6 w-6 text-neutral-50 shrink-0" />
             <input
               type="text"
               placeholder="Déjanos tus dudas o consultas..."
