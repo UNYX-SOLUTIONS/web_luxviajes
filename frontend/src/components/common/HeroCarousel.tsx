@@ -169,18 +169,18 @@ export function HeroCarousel({
         </div>
       </div>
 
-      <div className="absolute mx-auto max-w-3xl text-center text-primary-700! mt-40 mb-3 bottom-20 right-20 z-20">
-        <h1 className="text-4xl font-extrabold leading-tight md:text-6xl">
+      <div className="absolute mx-auto max-w-3xl text-start mt-40 mb-3 bottom-30 right-40 z-20">
+        <h3 className="text-xl font-extrabold leading-tight md:text-6xl text-white!">
           ¿Cómo podemos ayudarte hoy?
-        </h1>
+        </h3>
 
         <form className="mx-auto mt-8 max-w-xl w-full">
-          <div className="flex items-center rounded-full bg-white px-4 py-3 shadow-lg ring-1 ring-primary-100">
-            <MagnifyingGlassIcon className="mr-3 h-5 w-5 text-primary-700" />
+          <div className="flex items-center rounded-full px-4 py-3 shadow-lg  bg-[#D9D9D9]/40 backdrop-blur-sm focus-within:ring-1 focus-within:ring-neutral-200 transition-all">
+            <MagnifyingGlassIcon className="mr-3 h-5 w-5 text-neutral-50" />
             <input
               type="text"
               placeholder="Busca articulos, itinerarios o soporte..."
-              className="w-full bg-transparent text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
+              className="w-full text-sm text-neutral-50 outline-none placeholder:text-neutral-50"
             />
           </div>
         </form>
