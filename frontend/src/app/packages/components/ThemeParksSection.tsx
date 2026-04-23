@@ -10,6 +10,7 @@ interface ThemeParksSectionProps {
   parks: ThemePark[];
 }
 
+{/* Seccion de Parks*/}
 export const ThemeParksSection: FC<ThemeParksSectionProps> = ({ parks }) => {
   return (
     <section className="bg-neutral-50 py-16 md:py-20">
