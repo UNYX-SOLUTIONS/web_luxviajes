@@ -145,7 +145,7 @@ export default function HelpPage() {
 
           <div className="relative mx-auto max-w-3xl text-center text-primary-700! mt-40 mb-3">
             <h1 className="text-4xl font-extrabold leading-tight md:text-6xl">
-              Como podemos ayudarte hoy?
+              ¿Cómo podemos ayudarte hoy?
             </h1>
 
             <form className="mx-auto mt-8 max-w-xl w-full">

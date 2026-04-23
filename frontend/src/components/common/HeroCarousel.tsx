@@ -5,6 +5,7 @@ import { Button } from "./Button";
 import { cn } from "@/utils/cn";
 import { trackWhatsAppClick, trackPhoneClick } from "@/lib/analytics";
 import { useState, useEffect, useMemo, useCallback } from "react";
+import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
 
 interface BannerSlide {
   image: string;
@@ -166,6 +167,23 @@ export function HeroCarousel({
             </Button>
           </Link>
         </div>
+      </div>
+
+      <div className="absolute mx-auto max-w-3xl text-center text-primary-700! mt-40 mb-3 bottom-20 right-20 z-20">
+        <h1 className="text-4xl font-extrabold leading-tight md:text-6xl">
+          ¿Cómo podemos ayudarte hoy?
+        </h1>
+
+        <form className="mx-auto mt-8 max-w-xl w-full">
+          <div className="flex items-center rounded-full bg-white px-4 py-3 shadow-lg ring-1 ring-primary-100">
+            <MagnifyingGlassIcon className="mr-3 h-5 w-5 text-primary-700" />
+            <input
+              type="text"
+              placeholder="Busca articulos, itinerarios o soporte..."
+              className="w-full bg-transparent text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
+            />
+          </div>
+        </form>
       </div>
 
       {/* Top Right CTA Buttons - WhatsApp and Contact */}
