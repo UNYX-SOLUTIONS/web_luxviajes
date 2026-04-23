@@ -49,6 +49,15 @@ export function HeroCarousel({
 }: HeroCarouselProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showSearchForm, setShowSearchForm] = useState(false);
+
+  // Mostrar el formulario de búsqueda después de 2 segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSearchForm(true);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Cachear los slides con useMemo
   const cachedSlides = useMemo(() => slides, [slides]);
@@ -169,18 +178,23 @@ export function HeroCarousel({
         </div>
       </div>
 
-      <div className="absolute mx-auto max-w-3xl text-start mt-40 mb-3 bottom-30 right-40 z-20">
-        <h3 className="text-xl font-extrabold leading-tight md:text-6xl text-white!">
+      <div
+        className={cn(
+          "absolute left-1/2 -translate-x-1/2 max-w-4xl text-center bottom-24 z-20 w-full px-4 transition-opacity duration-1000",
+          showSearchForm ? "opacity-100" : "opacity-0",
+        )}
+      >
+        <h3 className="text-2xl font-extrabold leading-tight md:text-7xl text-white! mb-6">
           ¿Cómo podemos ayudarte hoy?
         </h3>
 
-        <form className="mx-auto mt-8 max-w-xl w-full">
-          <div className="flex items-center rounded-full px-4 py-3 shadow-lg  bg-[#D9D9D9]/40 backdrop-blur-sm focus-within:ring-1 focus-within:ring-neutral-200 transition-all">
-            <MagnifyingGlassIcon className="mr-3 h-5 w-5 text-neutral-50" />
+        <form className="mx-auto w-full">
+          <div className="flex items-center rounded-full px-6 py-4 shadow-lg bg-[#D9D9D9]/40 backdrop-blur-sm focus-within:ring-1 focus-within:ring-neutral-200 transition-all">
+            <MagnifyingGlassIcon className="mr-4 h-6 w-6 text-neutral-50 flex-shrink-0" />
             <input
               type="text"
-              placeholder="Busca articulos, itinerarios o soporte..."
-              className="w-full text-sm text-neutral-50 outline-none placeholder:text-neutral-50"
+              placeholder="Déjanos tus dudas o consultas..."
+              className="w-full text-base md:text-lg text-neutral-50 outline-none placeholder:text-neutral-50"
             />
           </div>
         </form>
