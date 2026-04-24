@@ -116,6 +116,30 @@ export const premiumPackages: PremiumPackage[] = [
       "🛡 Seguro de viaje"
     ]
   },
+   {
+    tag: "Seleccion del concierge",
+    title: "Latinoamérica Esencial",
+    days: "15 Dias",
+    price: "6,400",
+    image:
+      "https://images.unsplash.com/photo-1528164344705-47542687000d?w=900&h=1200&fit=crop",
+    description: "Milenios de historia y cultura en un viaje transformador",
+    duration: "15 días / 14 noches",
+    highlights: [
+      "Templos de Tailandia",
+      "Grandes templos de Camboya",
+      "Ho Chi Minh en Vietnam",
+      "Crucero Halong Bay"
+    ],
+    included: [
+      "✈ Vuelos internacionales",
+      "🏨 Alojamiento boutique",
+      "🍽 Comidas auténticas locales",
+      "🎫 Tours con guías expertos",
+      "🚢 Crucero incluido",
+      "🛡 Seguro de viaje"
+    ]
+  },
 ];
 
 export const dreamDestinations: DreamDestination[] = [
@@ -172,6 +196,91 @@ export const dreamDestinations: DreamDestination[] = [
   },
   {
     title: "Cartagena + Panama",
+    nights: "7 dias, 6 noches",
+    season: "Disponible de Julio a Noviembre",
+    image:
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&h=600&fit=crop",
+    description: "Lo mejor de dos países: historia, playas y el icónico Canal de Panamá",
+    duration: "7 días / 6 noches",
+    price: "2,100",
+    included: [
+      "✈ Vuelos aéreos",
+      "🏨 Hoteles 4 estrellas",
+      "🍽 Desayunos, comidas y cenas",
+      "🧭 Tours guiados completos",
+      "🛡 Asistencia de viaje"
+    ]
+  },
+  {
+    title: "Guayaquil + Galápagos",
+    nights: "7 dias, 6 noches",
+    season: "Disponible de Julio a Noviembre",
+    image:
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&h=600&fit=crop",
+    description: "Lo mejor de dos países: historia, playas y el icónico Canal de Panamá",
+    duration: "7 días / 6 noches",
+    price: "2,100",
+    included: [
+      "✈ Vuelos aéreos",
+      "🏨 Hoteles 4 estrellas",
+      "🍽 Desayunos, comidas y cenas",
+      "🧭 Tours guiados completos",
+      "🛡 Asistencia de viaje"
+    ]
+  },
+  {
+    title: "Panama + Costa Rica",
+    nights: "7 dias, 6 noches",
+    season: "Disponible de Julio a Noviembre",
+    image:
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&h=600&fit=crop",
+    description: "Lo mejor de dos países: historia, playas y el icónico Canal de Panamá",
+    duration: "7 días / 6 noches",
+    price: "2,100",
+    included: [
+      "✈ Vuelos aéreos",
+      "🏨 Hoteles 4 estrellas",
+      "🍽 Desayunos, comidas y cenas",
+      "🧭 Tours guiados completos",
+      "🛡 Asistencia de viaje"
+    ]
+  },
+  {
+    title: "New York + Miami",
+    nights: "7 dias, 6 noches",
+    season: "Disponible de Julio a Noviembre",
+    image:
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&h=600&fit=crop",
+    description: "Lo mejor de dos países: historia, playas y el icónico Canal de Panamá",
+    duration: "7 días / 6 noches",
+    price: "2,100",
+    included: [
+      "✈ Vuelos aéreos",
+      "🏨 Hoteles 4 estrellas",
+      "🍽 Desayunos, comidas y cenas",
+      "🧭 Tours guiados completos",
+      "🛡 Asistencia de viaje"
+    ]
+  },
+  {
+    title: "España + Portugal",
+    nights: "7 dias, 6 noches",
+    season: "Disponible de Julio a Noviembre",
+    image:
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&h=600&fit=crop",
+    description: "Lo mejor de dos países: historia, playas y el icónico Canal de Panamá",
+    duration: "7 días / 6 noches",
+    price: "2,100",
+    included: [
+      "✈ Vuelos aéreos",
+      "🏨 Hoteles 4 estrellas",
+      "🍽 Desayunos, comidas y cenas",
+      "🧭 Tours guiados completos",
+      "🛡 Asistencia de viaje"
+    ]
+  },
+  {
+    title: "Los Angeles + Las Vegas",
     nights: "7 dias, 6 noches",
     season: "Disponible de Julio a Noviembre",
     image:

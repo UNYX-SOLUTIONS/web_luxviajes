@@ -20,7 +20,7 @@ export function Header({ activeLink }: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 w-full z-50 bg-[#2D0D46]/95 shadow-sm">
       <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20 md:h-40">
+        <div className="flex justify-between items-center h-20 md:h-32">
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <div className="relative w-45 h-17.5 md:w-55 md:h-15 lg:w-65 lg:h-25">

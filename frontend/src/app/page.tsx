@@ -108,6 +108,8 @@ export default function Home() {
       <DreamDestinationsSection
         destinations={dreamDestinations}
         onDetalles={(destination) => handleOpenDetails(destination)}
+        maxCards={4}
+        showScrollControls={false}
       />
 
       {/* Promotions Map Section 
