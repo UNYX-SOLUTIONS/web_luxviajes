@@ -34,7 +34,7 @@ export const DreamDestinationsSection: FC<DreamDestinationsSectionProps> = ({
             </h2>
           </div>
           <Link
-            href="/contact"
+            href="/packages"
             className="text-sm font-semibold text-primary-700 transition hover:text-primary-800"
           >
             Ver mas destinos populares →

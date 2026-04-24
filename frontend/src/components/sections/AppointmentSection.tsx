@@ -409,7 +409,7 @@ export function AppointmentSection() {
                 onClick={() => setShowModal(true)}
                 className="w-full py-3 rounded-lg border border-primary-600 text-primary-600 font-semibold hover:bg-primary-50 transition"
               >
-                ¿No quieres esperar?<br />Agenda una asesoría en vivo y en 10 min te contactamos
+                ¿No quieres esperar? Agenda una asesoría<br />en vivo y en 10 minutos te contactamos
               </button>
             </div>
           </div>

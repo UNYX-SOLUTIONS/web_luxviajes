@@ -55,7 +55,7 @@ export function HeroCarousel({
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSearchForm(true);
-    }, 2000);
+    }, 100);
     return () => clearTimeout(timer);
   }, []);
 
@@ -180,12 +180,12 @@ export function HeroCarousel({
 
       <div
         className={cn(
-          "absolute left-1/2 -translate-x-1/2 max-w-4xl text-center bottom-24 z-20 w-full px-4 transition-opacity duration-1000",
+          "absolute left-1/2 -translate-x-1/2 max-w-4xl text-center bottom-24 z-20 w-full px-4  duration-1000",
           showSearchForm ? "opacity-100" : "opacity-0",
         )}
       >
         <h3 className="text-2xl font-extrabold leading-tight md:text-7xl text-white! mb-6">
-          ¿Cómo podemos ayudarte hoy?
+          Consulta tus dudas o personaliza tu viaje ideal con nosotros
         </h3>
 
         <form className="mx-auto w-full">
