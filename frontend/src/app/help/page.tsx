@@ -25,15 +25,15 @@ const helpTopics = [
     icon: DocumentTextIcon,
   },
   {
-    title: "Pagos y Facturacion",
+    title: "Politicas de Agencia",
     description:
-      "Gestion de facturas, estado de reembolsos y metodos de pago seguros.",
+      "Informacion sobre nuestras politicas de reserva, precios y condiciones.",
     icon: CreditCardIcon,
   },
   {
-    title: "Cancelaciones y Cambios",
+    title: "Politicas de Viaje",
     description:
-      "Opciones de reserva flexible, reprogramacion de viajes y terminos de cancelacion.",
+      "Requisitos de entrada, restricciones de viaje y recomendaciones para destinos específicos.",
     icon: CalendarDaysIcon,
   },
   {
