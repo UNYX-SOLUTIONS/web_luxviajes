@@ -25,15 +25,15 @@ const helpTopics = [
     icon: DocumentTextIcon,
   },
   {
-    title: "Pagos y Facturacion",
+    title: "Politicas de Agencia",
     description:
-      "Gestion de facturas, estado de reembolsos y metodos de pago seguros.",
+      "Informacion sobre nuestras politicas de reserva, precios y condiciones.",
     icon: CreditCardIcon,
   },
   {
-    title: "Cancelaciones y Cambios",
+    title: "Politicas de Viaje",
     description:
-      "Opciones de reserva flexible, reprogramacion de viajes y terminos de cancelacion.",
+      "Requisitos de entrada, restricciones de viaje y recomendaciones para destinos específicos.",
     icon: CalendarDaysIcon,
   },
   {
@@ -137,24 +137,24 @@ export default function HelpPage() {
 
   return (
     <>
-      <section className="bg-primary-50 pb-14 md:py-20 min-h-11/12 flex justify-center">
+      <section className="bg-secondary-50 pb-14 md:py-20 min-h-11/12 flex justify-center">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full">
           <div className="pointer-events-none absolute inset-0 opacity-20">
             <div className="h-full w-full bg-[radial-gradient(circle_at_top_right,white_0%,transparent_40%)]" />
           </div>
 
-          <div className="relative mx-auto max-w-3xl text-center text-primary-700! mt-40 mb-3">
+          <div className="relative mx-auto max-w-3xl text-center text-neutral-900! mt-40 mb-3">
             <h1 className="text-4xl font-extrabold leading-tight md:text-6xl">
               ¿Cómo podemos ayudarte hoy?
             </h1>
 
             <form className="mx-auto mt-8 max-w-xl w-full">
-              <div className="flex items-center rounded-full bg-white px-4 py-3 shadow-lg ring-1 ring-primary-100">
-                <MagnifyingGlassIcon className="mr-3 h-5 w-5 text-primary-700" />
+              <div className="flex items-center rounded-full bg-white px-4 py-3 shadow-lg ring-1 ring-neutral-300 focus-within:ring-1 focus-within:ring-primary-500">
+                <MagnifyingGlassIcon className="mr-3 h-5 w-5 text-neutral-700" />
                 <input
                   type="text"
                   placeholder="Busca articulos, itinerarios o soporte..."
-                  className="w-full bg-transparent text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
+                  className="w-full bg-transparent text-sm text-neutral-800! outline-none placeholder:text-neutral-400"
                 />
               </div>
             </form>
@@ -162,7 +162,7 @@ export default function HelpPage() {
         </div>
       </section>
 
-      <section className="bg-primary-50 pb-14 md:pb-20">
+      <section className="bg-secondary-50 pb-14 md:pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {helpTopics.map((topic) => {
@@ -181,12 +181,14 @@ export default function HelpPage() {
                     className="relative w-full h-full transition-transform duration-500"
                     style={{
                       transformStyle: "preserve-3d",
-                      transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                      transform: isFlipped
+                        ? "rotateY(180deg)"
+                        : "rotateY(0deg)",
                     }}
                   >
                     {/* Front of card */}
                     <article
-                      className="absolute w-full h-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-primary-100 flex flex-col items-start justify-start"
+                      className="absolute w-full h-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 flex flex-col items-start justify-start"
                       style={{
                         backfaceVisibility: "hidden",
                       }}
@@ -231,8 +233,7 @@ export default function HelpPage() {
           </div>
         </div>
       </section>
-
-      <section className="bg-secondary-100 py-16 md:py-20 lg:py-24">
+      <section className="bg-neutral-50 py-16 md:py-20 lg:py-24">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-center text-2xl font-bold text-neutral-900">
             Preguntas Frecuentes
@@ -242,7 +243,7 @@ export default function HelpPage() {
             {faqs.map((faq, index) => (
               <details
                 key={faq.question}
-                className="group overflow-hidden rounded-2xl bg-white ring-1 ring-primary-100"
+                className="group overflow-hidden rounded-2xl bg-white ring-1 ring-neutral-200"
                 open={index === 0}
               >
                 <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-left text-sm font-semibold text-neutral-900">
@@ -258,7 +259,7 @@ export default function HelpPage() {
         </div>
       </section>
 
-      <section className="bg-primary-50 py-16 md:py-20">
+      <section className="bg-white py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-5xl font-bold text-neutral-900">
@@ -313,14 +314,46 @@ export default function HelpPage() {
         </div>
       </section>
 
-      <section className="bg-primary-700 py-8 md:py-10 text-center text-white!">
+      <section className="bg-neutral-50 py-8 md:py-10 text-center text-neutral-900!">
+        <div className="flex items-center justify-center gap-2">
+          <ShieldCheckIcon className="h-5 w-5" />
+          <a className="text-sm font-medium text-neutral-900!">
+            Tranquilidad en cada paso de tu viaje.
+          </a>
+        </div>
+      </section>
+
+      {/* Seccion de trabaje con nosotros */}
+      <section className="bg-white py-16 md:py-20">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl bg-linear-to-r from-primary-800 to-primary-700 px-8 py-14 text-center shadow-2xl">
+            <h3 className="text-4xl font-extrabold text-white">
+              ¿Quieres ser parte de nuestro equipo?
+            </h3>
+            <p className="mt-4 text-lg text-white!">
+              Estamos buscando talentos apasionados para unirse a nuestra
+              familia
+              <br />y ayudar a crear experiencias de viaje inolvidables.
+            </p>
+            {/* Boton que envia a correo */}
+            <a
+              href="mailto:agencia@luxviajes.com"
+              className="mt-6 inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50"
+            >
+              Haznos llegar tu CV
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/*  <section className="bg-primary-700 py-8 md:py-10 text-center text-white!">
         <div className="flex items-center justify-center gap-2">
           <ShieldCheckIcon className="h-5 w-5" />
           <a className="text-sm font-medium text-white!">
             Tranquilidad en cada paso de tu viaje.
           </a>
         </div>
-      </section>
+      </section> */}
 
       <ContactDialog
         isOpen={showContactDialog}

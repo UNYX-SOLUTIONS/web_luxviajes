@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { Button } from "@/components/common/Button";
 import { Hero } from "@/components/common/Hero";
 import { ContactDialog } from "@/components/common/contact_dialog";
 import Image from "next/image";
@@ -107,7 +106,7 @@ const values = [
 
 const teamByOffice = [
   {
-    office: "Sede Samborondón (Matriz)",
+    office: "Sede Guayas Samborondón",
     members: [
       {
         name: "Rommy Lapo",
@@ -157,6 +156,19 @@ const teamByOffice = [
       },
     ],
   },
+  {
+    office: "Sede Guayaquil",
+    members: [
+      {
+        name: "Ashley Chavez",
+        photo: "/images/team/ashley.png",
+      },
+      {
+        name: "Stephany Victores",
+        photo: "/images/team/stephany.png",
+      },
+    ],
+  },
 ];
 
 export default function AboutPage() {
@@ -171,7 +183,7 @@ export default function AboutPage() {
         ctaHref="#"
         onClick={() => setShowContactDialog(true)}
       />
-      <section className="bg-neutral-50 relative">
+      <section className="bg-white relative">
         {/* Quiénes somos */}
         <div className="min-h-[80vh] flex py-16 md:py-24">
           <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8 w-full">
@@ -226,7 +238,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-[#F5EBF6] py-14 text-white">
+      <section className="bg-neutral-100 py-14 text-white">
         {/* Por qué elegirnos */}
         <div className="py-16 md:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -291,7 +303,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-[#FFF7FE] py-16">
+      <section className="bg-white py-16">
         <div className="mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
           <p className="text-md font-bold uppercase tracking-wider text-[#4E2D00]!">
             Nuestros valores
@@ -320,7 +332,7 @@ export default function AboutPage() {
       </section>
 
       <section className="bg-primary-50 py-16 md:py-20">
-        <div className="mx-auto max-w-7xl rounded-t-3xl bg-primary-50 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl rounded-t-3xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h3 className="text-4xl font-bold text-neutral-900">
               Conoce a tus cómplices
@@ -367,7 +379,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-neutral-100 py-16 md:py-20">
+      <section className="bg-white py-16 md:py-20">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl bg-linear-to-r from-primary-800 to-primary-700 px-8 py-14 text-center shadow-2xl">
             <h3 className="text-4xl font-extrabold text-white">

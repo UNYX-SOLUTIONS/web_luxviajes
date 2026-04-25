@@ -58,6 +58,8 @@ export default function PackagesPage() {
       <DreamDestinationsSection
         destinations={dreamDestinations}
         onDetalles={(destination) => handleOpenDetails(destination)}
+        maxCards={8}
+        showScrollControls={true}
       />
 
       <PremiumPackagesSection

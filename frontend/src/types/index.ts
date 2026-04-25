@@ -52,6 +52,11 @@ export interface HomeStats {
   rating: string;
 }
 
+export interface StatCard {
+  label: string;
+  value: string;
+}
+
 export interface Home {
   id: number;
   documentId: string;
@@ -60,7 +65,7 @@ export interface Home {
   publishedAt: string;
   banners: Banner[];
   redes: RedSocial[];
-  stats: HomeStats | null;
+  stats?: StatCard[] | null;
 }
 
 export interface ContactInfo {

@@ -1,8 +1,9 @@
-import { Banner, Home, HomeStats, RedSocial } from "@/types";
+import { Banner, Home, StatCard, RedSocial } from "@/types";
 
-// const BASE_URL = "https://cms.agencialuxviajes.com/api/";
-const BASE_URL = "http://localhost:1337/api/";
-const CMS_ORIGIN = new URL(BASE_URL).origin;
+// Usar la URL de Strapi desde variables de entorno
+const STRAPI_URL = "https://cms.agencialuxviajes.com";
+const BASE_URL = `${STRAPI_URL}/api`;
+const CMS_ORIGIN = new URL(STRAPI_URL).origin;
 
 interface StrapiResponse<T> {
   data: T;
@@ -16,7 +17,10 @@ interface HomeData {
   updatedAt: string;
   publishedAt: string;
   Redes: RedSocial[];
-  Stats: HomeStats;
+  clientesFrecuentes?: string;
+  experiencia?: string;
+  destinos?: string;
+  valoracion?: string;
 }
 
 interface StrapiImageFormat {
@@ -70,6 +74,11 @@ export async function getHomeBannerData(): Promise<HomeBannerData | null> {
   return res?.data ?? null;
 }
 
+export async function getBanners(): Promise<Banner[]> {
+  const bannerData = await getHomeBannerData();
+  return mapBannerDataToBanners(bannerData);
+}
+
 function getBannerImageUrl(image?: StrapiImage | string | null): string {
   if (!image) return "";
   if (typeof image === "string") {
@@ -95,6 +104,27 @@ function mapBannerDataToBanners(bannerData: HomeBannerData | null): Banner[] {
   }));
 }
 
+function transformStats(homeData: HomeData): StatCard[] {
+  return [
+    {
+      label: "Clientes Frecuentes",
+      value: homeData.clientesFrecuentes || "10M+",
+    },
+    {
+      label: "Años de experiencia",
+      value: homeData.experiencia || "07+",
+    },
+    {
+      label: "Destinos",
+      value: homeData.destinos || "1K",
+    },
+    {
+      label: "Valoración",
+      value: homeData.valoracion || "5.0",
+    },
+  ];
+}
+
 function mapHomeDataToHome(homeData: HomeData, banners: Banner[]): Home {
   return {
     id: homeData.id,
@@ -104,7 +134,7 @@ function mapHomeDataToHome(homeData: HomeData, banners: Banner[]): Home {
     publishedAt: homeData.publishedAt,
     banners,
     redes: homeData.Redes ?? [],
-    stats: homeData.Stats ?? null,
+    stats: transformStats(homeData),
   };
 }
 

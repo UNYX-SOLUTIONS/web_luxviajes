@@ -409,7 +409,7 @@ export function AppointmentSection() {
                 onClick={() => setShowModal(true)}
                 className="w-full py-3 rounded-lg border border-primary-600 text-primary-600 font-semibold hover:bg-primary-50 transition"
               >
-                ¿No quieres esperar?<br />Agenda una asesoría en vivo y en 10 min te contactamos
+                ¿No quieres esperar? Agenda una asesoría<br />en vivo y en 10 minutos te contactamos
               </button>
             </div>
           </div>
@@ -544,7 +544,7 @@ export function AppointmentSection() {
                   </p>
                 </div>
 
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Mensaje
                   </label>
@@ -559,7 +559,7 @@ export function AppointmentSection() {
                   <p className="text-xs text-neutral-400 text-right mt-1">
                     {formData.mensaje.length}/100
                   </p>
-                </div>
+                </div> */}
 
                 <div className="flex items-center">
                   <input

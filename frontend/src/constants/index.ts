@@ -1,41 +1,42 @@
 // Constantes de la aplicación
 
 export const COMPANY_INFO = {
-  name: 'Lux Viajes',
-  tagline: 'Agencia de Viajes Premium',
-  description: 'Experiencias de viaje inolvidables a destinos internacionales',
-  phone: '+593 98 422 0600',
-  whatsapp: '+593 98 422 0600',
-  email: 'info@luxviajes.com',
+  name: "Lux Viajes",
+  tagline: "Agencia de Viajes Premium",
+  description: "Experiencias de viaje inolvidables a destinos internacionales",
+  phone: "+593 98 422 0600",
+  whatsapp: "+593 98 422 0600",
+  email: "info@luxviajes.com",
 } as const;
 
 export const NAVIGATION_LINKS = [
-  { label: 'Inicio', href: '/' },
-  { label: 'Nosotros', href: '/about' },
-  { label: 'Servicios', href: '/services' },
-  { label: 'Paquetes Internacionales', href: '/packages' },
-  { label: 'Visas', href: '/visas' },
-  { label: 'Contáctanos', href: '/contact' },
-  { label: 'Ayuda', href: '/help' },
+  { label: "Inicio", href: "/" },
+  { label: "Nosotros", href: "/about" },
+  { label: "Servicios", href: "/services" },
+  { label: "Paquetes Internacionales", href: "/packages" },
+  { label: "Visas", href: "/visas" },
+  { label: "Contáctanos", href: "/contact" },
+  { label: "Ayuda", href: "/help" },
 ] as const;
 
 export const STATS = [
-  { label: 'Clientes Frecuentes', value: '10M+' },
-  { label: 'Años de experiencia', value: '07+' },
-  { label: 'Destinos', value: '1K' },
-  { label: 'Valoración', value: '5.0' },
+  { label: "Clientes Frecuentes", value: "10M+" },
+  { label: "Años de experiencia", value: "07+" },
+  { label: "Destinos", value: "1K" },
+  { label: "Valoración", value: "5.0" },
 ] as const;
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://cms.agencialuxviajes.com/api";
 
 export const ROUTES = {
-  home: '/',
-  about: '/about',
-  services: '/services',
-  packages: '/packages',
-  visas: '/visas',
-  contact: '/contact',
-  help: '/help',
+  home: "/",
+  about: "/about",
+  services: "/services",
+  packages: "/packages",
+  visas: "/visas",
+  contact: "/contact",
+  help: "/help",
 } as const;
 
 export const CACHE_DURATION = {

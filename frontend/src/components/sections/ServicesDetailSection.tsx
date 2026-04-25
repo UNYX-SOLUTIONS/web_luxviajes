@@ -78,7 +78,7 @@ export function ServicesDetailSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Left Side - Sticky */}
-          <div className="lg:sticky lg:top-32 lg:self-start h-fit">
+          <div className="lg:sticky lg:top-36 lg:self-start h-fit">
             <div className="mb-8">
               <p
                 className={`text-base font-semibold uppercase tracking-wide mb-3 text-[#880000]! motion-safe:transition-all motion-safe:duration-1200 motion-safe:ease-out ${

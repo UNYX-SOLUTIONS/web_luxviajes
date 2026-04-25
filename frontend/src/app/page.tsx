@@ -10,30 +10,11 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { XMarkIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { DreamDestinationsSection } from "./packages/components";
-import { dreamDestinations, type DreamDestination } from "./packages/data/packages-data";
-
-const HERO_BANNERS = [
-  {
-    image: "/images/hero/banner1.png",
-    title: "MALDIVAS",
-    subtitle: "Un amanecer sereno en villas sobre el agua turquesa",
-  },
-  {
-    image: "/images/hero/banner2.png",
-    title: "ITALIA",
-    subtitle: "Una vista clásica y lujosa de la Costa Amalfitana",
-  },
-  {
-    image: "/images/hero/banner3.png",
-    title: "JAPÓN",
-    subtitle: "Un jardín zen otoñal que transmite una paz absoluta",
-  },
-  {
-    image: "/images/hero/banner4.png",
-    title: "TAILANDIA",
-    subtitle: "Un paisaje de aventura y felicidad en aguas cristalinas",
-  },
-];
+import {
+  dreamDestinations,
+  type DreamDestination,
+} from "./packages/data/packages-data";
+import { useHomeData } from "@/hooks";
 
 interface PackageDetails {
   title: string;
@@ -45,11 +26,17 @@ interface PackageDetails {
 }
 
 export default function Home() {
+  const { data: homeData, loading, error } = useHomeData();
   const [showStats, setShowStats] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState<PackageDetails | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<PackageDetails | null>(
+    null,
+  );
+
+  // Usar banners de la API o fallback a datos locales
+  const heroSlides = homeData?.banners || [];
 
   const handleOpenDetails = (pkg: DreamDestination) => {
     const packageDetails: PackageDetails = {
@@ -94,20 +81,46 @@ export default function Home() {
     <>
       {/* Hero Section */}
       <div ref={heroRef}>
-        <HeroCarousel slides={HERO_BANNERS} />
+        {loading ? (
+          <div className="w-full h-screen flex items-center justify-center bg-gradient-to-b from-primary-900 to-primary-800">
+            <div className="text-center text-white">
+              <div className="mb-4 flex justify-center">
+                <div className="h-12 w-12 border-4 border-primary-200 border-t-white rounded-full animate-spin"></div>
+              </div>
+              <p className="text-lg">Cargando experiencias...</p>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="w-full h-screen flex items-center justify-center bg-gradient-to-b from-primary-900 to-primary-800">
+            <div className="text-center text-white">
+              <p className="text-lg mb-2">Error al cargar los datos</p>
+              <p className="text-sm opacity-75">Por favor, recarga la página</p>
+            </div>
+          </div>
+        ) : heroSlides.length > 0 ? (
+          <HeroCarousel slides={heroSlides} />
+        ) : (
+          <div className="w-full h-screen flex items-center justify-center bg-gradient-to-b from-primary-900 to-primary-800">
+            <div className="text-center text-white">
+              <p className="text-lg">Sin banners disponibles</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Stats Section - Overlapping Hero and PromotionsMap - Show on interaction */}
       <div
         className={`relative z-10 transition-opacity duration-500 ${showStats ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       >
-        <StatsSection />
+        <StatsSection stats={homeData?.stats} />
       </div>
 
       {/* Dream Destinations Section */}
       <DreamDestinationsSection
         destinations={dreamDestinations}
         onDetalles={(destination) => handleOpenDetails(destination)}
+        maxCards={4}
+        showScrollControls={false}
       />
 
       {/* Promotions Map Section 

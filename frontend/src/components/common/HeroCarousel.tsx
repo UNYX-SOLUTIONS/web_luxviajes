@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "./Button";
 import { cn } from "@/utils/cn";
 import { trackWhatsAppClick, trackPhoneClick } from "@/lib/analytics";
@@ -55,20 +56,15 @@ export function HeroCarousel({
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSearchForm(true);
-    }, 2000);
+    }, 100);
     return () => clearTimeout(timer);
   }, []);
 
   // Cachear los slides con useMemo
   const cachedSlides = useMemo(() => slides, [slides]);
 
-  // Precargar imágenes en segundo plano
-  useEffect(() => {
-    cachedSlides.forEach((slide) => {
-      const img = new Image();
-      img.src = slide.image;
-    });
-  }, [cachedSlides]);
+  // El componente Image de Next.js ya cachea automáticamente
+  // No necesitamos precargar manualmente
 
   // Auto-rotate carousel
   useEffect(() => {
@@ -109,11 +105,18 @@ export function HeroCarousel({
         {cachedSlides.map((slide, index) => (
           <div
             key={`${slide.image || "slide"}-${slide.title}-${index}`}
-            className="w-full h-full shrink-0 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${slide.image})`,
-            }}
-          />
+            className="relative w-full h-full shrink-0"
+          >
+            <Image
+              src={slide.image}
+              alt={slide.title}
+              fill
+              className="object-cover"
+              priority={index === 0}
+              quality={85}
+              sizes="100vw"
+            />
+          </div>
         ))}
       </div>
 
@@ -180,17 +183,17 @@ export function HeroCarousel({
 
       <div
         className={cn(
-          "absolute left-1/2 -translate-x-1/2 max-w-4xl text-center bottom-24 z-20 w-full px-4 transition-opacity duration-1000",
+          "absolute left-1/2 -translate-x-1/2 max-w-4xl text-center bottom-24 z-20 w-full px-4  duration-1000",
           showSearchForm ? "opacity-100" : "opacity-0",
         )}
       >
         <h3 className="text-2xl font-extrabold leading-tight md:text-7xl text-white! mb-6">
-          ¿Cómo podemos ayudarte hoy?
+          Consulta tus dudas o personaliza tu viaje ideal con nosotros
         </h3>
 
         <form className="mx-auto w-full">
           <div className="flex items-center rounded-full px-6 py-4 shadow-lg bg-[#D9D9D9]/40 backdrop-blur-sm focus-within:ring-1 focus-within:ring-neutral-200 transition-all">
-            <MagnifyingGlassIcon className="mr-4 h-6 w-6 text-neutral-50 flex-shrink-0" />
+            <MagnifyingGlassIcon className="mr-4 h-6 w-6 text-neutral-50 shrink-0" />
             <input
               type="text"
               placeholder="Déjanos tus dudas o consultas..."
