@@ -277,3 +277,50 @@ export interface Paquete {
   updatedAt: string;
   publishedAt: string;
 }
+
+// Contact / Contacto types
+export interface Direccion {
+  id: number;
+  documentId: string;
+  ciudad: string;
+  direccion: string;
+  url: string;
+  imagen?: string; // URL completa de la imagen
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface Contact {
+  id: number;
+  documentId: string;
+  heroTitulo?: string;
+  heroSubtitulo?: string;
+  heroImagen?: string; // URL completa de la imagen
+  direcciones?: Direccion[];
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+// Help / Ayuda types
+export interface PreguntaFrecuente {
+  id: number;
+  documentId: string;
+  titulo: string;
+  descripcion: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface Help {
+  id: number;
+  documentId: string;
+  pdfPoliticasAgencia?: string; // URL completa del PDF
+  pdfPoliticasViaje?: string; // URL completa del PDF
+  preguntasFrecuentes?: PreguntaFrecuente[];
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
