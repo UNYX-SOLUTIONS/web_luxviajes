@@ -7,6 +7,7 @@ import { cn } from "@/utils/cn";
 import { trackWhatsAppClick, trackPhoneClick } from "@/lib/analytics";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
+import { useRedSocial } from "@/hooks";
 
 interface BannerSlide {
   image: string;
@@ -48,6 +49,7 @@ export function HeroCarousel({
   ctaHref = "packages",
   className,
 }: HeroCarouselProps) {
+  const { data: redes } = useRedSocial();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showSearchForm, setShowSearchForm] = useState(false);
@@ -209,18 +211,20 @@ export function HeroCarousel({
         <button
           onClick={() => {
             trackPhoneClick();
-            window.location.href = "tel:+593964220600";
+            const phoneNumber = redes?.llamada || "+593964220600";
+            window.location.href = `tel:${phoneNumber}`;
           }}
           className="bg-[#D9D9D9]/40 text-white font-bold h-12 py-0 flex items-center justify-center text-base px-6 rounded-full hover:bg-white hover:text-[#500088] transition-all"
         >
-          Llámanos +593 96 422 0600
+          Llámanos {redes?.llamada || "+593 96 422 0600"}
         </button>
 
         {/* WhatsApp Button */}
         <button
           onClick={() => {
             trackWhatsAppClick();
-            window.open("https://wa.me/593964220600", "_blank");
+            const whatsappNumber = redes?.whatsapp?.replace(/[^0-9]/g, '') || "593964220600";
+            window.open(`https://wa.me/${whatsappNumber}`, "_blank");
           }}
           className="w-12 h-12 rounded-full bg-[#D9D9D9]/40 hover:bg-white transition-all text-white hover:text-[#500088] flex items-center justify-center"
         >
@@ -250,7 +254,7 @@ export function HeroCarousel({
       {/* Social Media Icons - Bottom Right */}
       <div className="absolute bottom-8 right-8 z-20 flex flex-col items-center gap-4">
         <Link
-          href="https://www.instagram.com/luxviajes.ec"
+          href={redes?.instagram || "https://www.instagram.com/luxviajes.ec"}
           target="_blank"
           rel="noopener noreferrer"
           className="w-10 h-10 rounded-full bg-[#D9D9D9]/40 flex items-center justify-center hover:bg-white transition-all text-white hover:text-[#500088]"
@@ -260,7 +264,7 @@ export function HeroCarousel({
           </svg>
         </Link>
         <Link
-          href="https://www.facebook.com/luxviajes.ec"
+          href={redes?.facebook || "https://www.facebook.com/luxviajes.ec"}
           target="_blank"
           rel="noopener noreferrer"
           className="w-10 h-10 rounded-full bg-[#D9D9D9]/40 flex items-center justify-center hover:bg-white transition-all text-white hover:text-[#500088]"
@@ -270,7 +274,7 @@ export function HeroCarousel({
           </svg>
         </Link>
         <Link
-          href="https://www.tiktok.com/@luxviajes.ec"
+          href={redes?.tiktok || "https://www.tiktok.com/@luxviajes.ec"}
           target="_blank"
           rel="noopener noreferrer"
           className="w-10 h-10 rounded-full bg-[#D9D9D9]/40 flex items-center justify-center hover:bg-white transition-all text-white hover:text-[#500088]"
@@ -283,7 +287,7 @@ export function HeroCarousel({
           </svg>
         </Link>
         <Link
-          href="https://www.youtube.com/@LuxViajesPodcast"
+          href={redes?.youtube || "https://www.youtube.com/@LuxViajesPodcast"}
           target="_blank"
           rel="noopener noreferrer"
           className="w-10 h-10 rounded-full bg-[#D9D9D9]/40 flex items-center justify-center hover:bg-white transition-all text-white hover:text-[#500088]"

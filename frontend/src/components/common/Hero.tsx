@@ -10,6 +10,7 @@ interface HeroProps {
   ctaText?: string;
   ctaHref?: string;
   onClick?: () => void;
+  heroImage?: string;
 }
 
 export function Hero({
@@ -18,13 +19,14 @@ export function Hero({
   ctaText,
   ctaHref = "#",
   onClick,
+  heroImage,
 }: HeroProps = {}) {
   return (
     <section className="relative min-h-screen overflow-hidden">
       {/* Image Background */}
       <div className="absolute inset-0">
         <Image
-          src="/images/hero/about.png"
+          src={heroImage || "/images/hero/about.png"}
           alt="Equipo Lux Viajes"
           fill
           priority

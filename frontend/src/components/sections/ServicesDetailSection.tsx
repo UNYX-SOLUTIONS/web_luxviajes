@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ContactDialog } from "../common/contact_dialog";
 import { useEffect, useRef, useState } from "react";
+import { useRedSocial } from "@/hooks";
 
 interface ServiceDetail {
   id: string;
@@ -48,10 +49,44 @@ const SERVICES_DETAILS: ServiceDetail[] = [
   },
 ];
 
-export function ServicesDetailSection() {
+interface ServicesDetailSectionProps {
+  services?: ServiceDetail[];
+  serviciosTitulo?: string;
+  serviciosDescripcion?: string;
+}
+
+/**
+ * Parsea texto con formato markdown-like:
+ * - *texto* se convierte en <span className="text-primary-600">texto</span>
+ * - Soporta saltos de línea
+ */
+function parseStyledText(text: string): string {
+  if (!text) return '';
+  
+  // Reemplazar *texto* con span coloreado
+  let parsed = text.replace(
+    /\*([^*]+)\*/g,
+    '<span class="text-primary-600">$1</span>'
+  );
+  
+  // Convertir \n en <br />
+  parsed = parsed.replace(/\n/g, '<br />');
+  
+  return parsed;
+}
+
+export function ServicesDetailSection({ 
+  services, 
+  serviciosTitulo, 
+  serviciosDescripcion 
+}: ServicesDetailSectionProps = {}) {
+  const { data: redes } = useRedSocial();
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
+
+  // Usar servicios de props o fallback a datos por defecto
+  const displayServices = services && services.length > 0 ? services : SERVICES_DETAILS;
 
   useEffect(() => {
     const sectionElement = sectionRef.current;
@@ -97,11 +132,12 @@ export function ServicesDetailSection() {
                     : "opacity-0 translate-y-38"
                 }`}
                 style={{ transitionDelay: "450ms" }}
-              >
-                Todo lo que necesitas
-                <br />
-                <span className="text-primary-600">para tu viaje perfecto</span>
-              </h2>
+                dangerouslySetInnerHTML={{
+                  __html: parseStyledText(
+                    serviciosTitulo || "Todo lo que necesitas<br />*para tu viaje perfecto*"
+                  )
+                }}
+              />
               <p
                 className={`text-neutral-900 leading-relaxed mb-8 motion-safe:transition-all motion-safe:duration-1600 motion-safe:ease-out ${
                   isVisible
@@ -109,11 +145,12 @@ export function ServicesDetailSection() {
                     : "opacity-0 translate-y-35"
                 }`}
                 style={{ transitionDelay: "380ms" }}
-              >
-                Elevamos cada trayecto a una obra maestra. Disfrute de un
-                acompañamiento personalizado diseñado para los viajeros más
-                exigentes del mundo
-              </p>
+                dangerouslySetInnerHTML={{
+                  __html: parseStyledText(
+                    serviciosDescripcion || "Elevamos cada trayecto a una obra maestra. Disfrute de un acompañamiento personalizado diseñado para los viajeros más exigentes del mundo"
+                  )
+                }}
+              />
             </div>
 
             <Link
@@ -144,7 +181,7 @@ export function ServicesDetailSection() {
 
           {/* Right Side - Vertical Cards */}
           <div className="lg:col-span-2 space-y-8">
-            {SERVICES_DETAILS.map((service, index) => (
+            {displayServices.map((service, index) => (
               <div
                 key={service.id}
               >
@@ -196,7 +233,7 @@ export function ServicesDetailSection() {
                 </p>
 
                 {/* Divider - Hide on last item */}
-                {index < SERVICES_DETAILS.length - 1 && (
+                {index < displayServices.length - 1 && (
                   <hr className="mt-8 border-neutral-300" />
                 )}
               </div>
@@ -208,8 +245,8 @@ export function ServicesDetailSection() {
         <ContactDialog
           isOpen={showContactDialog}
           onClose={() => setShowContactDialog(false)}
-          whatsappNumber="593964220600"
-          phoneNumber="+593964220600"
+          whatsappNumber={redes?.whatsapp.replace(/[^0-9]/g, '') || "593964220600"}
+          phoneNumber={redes?.llamada || "+593964220600"}
           videoCallUrl="/contact"
         />
       </div>

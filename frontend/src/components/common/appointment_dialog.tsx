@@ -2,6 +2,7 @@
 
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { useState, useEffect } from 'react';
+import { useRedSocial } from '@/hooks';
 
 interface TimeSlot {
   id: string;
@@ -23,6 +24,7 @@ interface AppointmentDialogProps {
 }
 
 export function AppointmentDialog({ isOpen, onClose }: AppointmentDialogProps) {
+  const { data: redes } = useRedSocial();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -123,7 +125,8 @@ export function AppointmentDialog({ isOpen, onClose }: AppointmentDialogProps) {
 
     const formattedDate = selectedDate!.toLocaleDateString('es-ES');
     const whatsappMessage = `Hola, me gustaría agendar una cita para el ${formattedDate} a las ${selectedTime}\n\nDatos:\nNombre: ${nombre} ${apellido}\nTeléfono: ${telefono}\nCorreo: ${correo}\nRecibir promociones: ${formData.promociones ? 'Sí' : 'No'}`;
-    const whatsappUrl = `https://wa.me/593964220600?text=${encodeURIComponent(whatsappMessage)}`;
+    const whatsappNumber = redes?.whatsapp?.replace(/[^0-9]/g, '') || "593964220600";
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
     window.open(whatsappUrl, '_blank');
     setShowModal(false);
     handleClose();

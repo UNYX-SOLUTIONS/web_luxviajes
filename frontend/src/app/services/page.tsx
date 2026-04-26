@@ -6,91 +6,42 @@ import Link from "next/link";
 import { useState } from "react";
 import { ContactDialog } from "@/components/common/contact_dialog";
 import ArrowLeftIcon from "@heroicons/react/24/outline/ArrowLeftIcon";
-
-const serviceCards = [
-  {
-    title: "Boleto Aereo",
-    image: "/images/services/flights.png",
-  },
-  {
-    title: "Paquetes Turisticos",
-    image: "/images/services/packages.png",
-    large: true,
-  },
-  {
-    title: "Tours Nacionales",
-    image: "/images/services/tours.png",
-  },
-  {
-    title: "Seguros de Viaje",
-    image: "/images/services/insurance.png",
-  },
-  {
-    title: "Visas y Pasaportes",
-    image: "/images/services/visas.png",
-  },
-  {
-    title: "Expediciones en Crucero",
-    image: "/images/services/cruise.png",
-    wide: true,
-  },
-];
-
-const testimonials = [
-  {
-    name: "Maria M.",
-    text: "Organizaron cada detalle y no tuve que preocuparme por nada.",
-    image: "/images/services/testimonials/maria.png",
-  },
-  {
-    name: "Alejandro M.",
-    text: "Luxviajes transformo mis vacaciones familiares en una experiencia perfecta.",
-    image: "/images/services/testimonials/alejandro.png",
-    featured: true,
-  },
-  {
-    name: "Pedro M.",
-    text: "Excelente asesoria para visas y rutas internacionales.",
-    image: "/images/services/testimonials/pedro.png",
-  },
-  {
-    name: "Maria M.",
-    text: "Organizaron cada detalle y no tuve que preocuparme por nada.",
-    image: "/images/services/testimonials/maria.png",
-  },
-  {
-    name: "Alejandro M.",
-    text: "Luxviajes transformo mis vacaciones familiares en una experiencia perfecta.",
-    image: "/images/services/testimonials/alejandro.png",
-    featured: true,
-  },
-  {
-    name: "Pedro M.",
-    text: "Excelente asesoria para visas y rutas internacionales.",
-    image: "/images/services/testimonials/pedro.png",
-  },
-];
+import { useRedSocial, useServicioData } from "@/hooks";
+import { Testimonio } from "@/types";
+ 
+ 
+function parseStyledText(text: string): string {
+  let parsed = text.replace(/\*([^*]+)\*/g, '<span class="text-primary-600">$1</span>');
+  parsed = parsed.replace(/<br\s*\/?>/gi, '<br />');
+  parsed = parsed.replace(/\n/g, '<br />');
+  return parsed;
+}
 
 export default function ServicesPage() {
+  const { data: redes } = useRedSocial();
+  const { data: servicioData } = useServicioData();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showContactDialog, setShowContactDialog] = useState(false);
 
   const getVisibleTestimonials = () => {
+    const items = servicioData?.testimonios || [];
     const indices = [
-      (currentIndex - 1 + testimonials.length) % testimonials.length,
+      (currentIndex - 1 + items.length) % items.length,
       currentIndex,
-      (currentIndex + 1) % testimonials.length,
+      (currentIndex + 1) % items.length,
     ];
-    return indices.map((i) => ({ ...testimonials[i], index: i }));
+    return indices.map((i) => ({ ...items[i], index: i }));
   };
 
   const nextTestimonial = () => {
-    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+    const items = servicioData?.testimonios || [];
+    setCurrentIndex((prev) => (prev + 1) % items.length);
   };
 
   const prevTestimonial = () => {
+    const items = servicioData?.testimonios || [];
     setCurrentIndex(
-      (prev) => (prev - 1 + testimonials.length) % testimonials.length,
+      (prev) => (prev - 1 + items.length) % items.length,
     );
   };
   return (
@@ -110,17 +61,20 @@ export default function ServicesPage() {
             <span className="inline-flex rounded-full bg-tertiary-800 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-tertiary-100">
               Viaje Exclusivo
             </span>
-            <h1 className="mt-5 text-5xl font-extrabold leading-tight md:text-7xl sm:pb-2 md:pb-4">
-              Tu Viaje <br /> Nuestra Prioridad
-            </h1>
+            <h1 
+              className="mt-5 text-5xl font-extrabold leading-tight md:text-7xl sm:pb-2 md:pb-4"
+              dangerouslySetInnerHTML={{
+                __html: parseStyledText(servicioData?.heroTitulo || "Tu Viaje")
+              }}
+            />
 
             <div className="sm:py-2 md:py-4">
-              <a className="mt-5 text-2xl font-regular text-primary-100">
-                Elevamos tus experiencias de viaje a una obra <br />
-                maestra. Un servicio de guante blanco diseñado <br />
-                para quienes buscan lo extraordinario.
-              </a>
-              <br />
+              <p 
+                className="mt-5 text-2xl font-regular text-primary-100 !text-white"
+                dangerouslySetInnerHTML={{
+                  __html: parseStyledText(servicioData?.heroSubtitulo || "Elevamos tus experiencias de viaje a una obra maestra. Un servicio de guante blanco diseñado para quienes buscan lo extraordinario.")
+                }}
+              />
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -160,42 +114,53 @@ export default function ServicesPage() {
           <div className="mb-10 flex items-end justify-between gap-4">
             <div>
               <h2 className="text-3xl font-bold text-[#661AA3] md:text-4xl">
-                Nuestra Propuesta de Valor
+                {servicioData?.serviciosTitulo || "Nuestra Propuesta de Valor"}
               </h2>
               <p className="mt-2 max-w-xl text-sm text-[#4C4452]">
-                Cada detalle es orquestado por expertos para asegurar que tu
-                unica preocupacion sea disfrutar el horizonte.
+                {servicioData?.serviciosDescripcion || "Cada detalle es orquestado por expertos para asegurar que tu unica preocupacion sea disfrutar el horizonte."}
               </p>
             </div>
             <div className="hidden h-0.5 w-16 bg-tertiary-500 md:block" />
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {serviceCards.map((card) => (
-              <article
-                key={card.title}
-                className={[
-                  "group relative overflow-hidden rounded-xl",
-                  card.large ? "md:col-span-2" : "",
-                  card.wide ? "md:col-span-3" : "",
-                ].join(" ")}
-              >
-                <img
-                  src={card.image}
-                  alt={card.title}
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {(servicioData?.tarjeta_servicios || []).map((card: any, index: number) => {
+              const cards = servicioData?.tarjeta_servicios || [];
+              const isSecond = index === 1;
+              const isLast = index === cards.length - 1;
+              
+              return (
+                <article
+                  key={card.titulo || card.title}
                   className={[
-                    "w-full object-cover transition duration-300 group-hover:scale-105",
-                    card.wide ? "h-44 md:h-52" : "h-52 md:h-60",
+                    "group relative overflow-hidden rounded-xl",
+                    isSecond ? "md:col-span-2" : "",
+                    isLast ? "md:col-span-3" : "",
                   ].join(" ")}
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-neutral-950/75 via-neutral-900/25 to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                  <h3 className="text-xl font-semibold text-white">
-                    {card.title}
-                  </h3>
-                </div>
-              </article>
-            ))}
+                >
+                  <img
+                    src={card.imagen || card.image}
+                    alt={card.titulo || card.title}
+                    className={[
+                      "w-full object-cover transition duration-300 group-hover:scale-105",
+                      isLast ? "h-44 md:h-52" : "h-52 md:h-60",
+                    ].join(" ")}
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-neutral-950/75 via-neutral-900/25 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-xl font-semibold text-white">
+                      {card.titulo || card.title}
+                    </h3>
+                    {(card.descripcion || card.subtitle) && (
+                      <p className="mt-1 text-sm text-white/90">
+                        {card.descripcion || card.subtitle}
+                      </p>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -215,35 +180,41 @@ export default function ServicesPage() {
             </button>
 
             <div className="grid grid-cols-1 gap-10 md:grid-cols-3 w-full max-w-6xl">
-              {getVisibleTestimonials().map((item, position) => (
-                <article
-                  key={item.name}
-                  className={`relative rounded-2xl shadow-lg transition-all duration-500   ${
-                    position === 1 ? "md:scale-105 h-80" : "md:scale-90 h-56"
-                  }`}
-                >
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className={`w-full object-cover rounded-2xl ${
-                      position === 1 ? "h-80" : "h-56"
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {getVisibleTestimonials().map((item: Testimonio, position: number) => {
+                const rating = item.calificacion || 5;
+                const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+                
+                return (
+                  <article
+                    key={`testimonio-${item.id}-${position}`}
+                    className={`relative rounded-2xl shadow-lg transition-all duration-500   ${
+                      position === 1 ? "md:scale-105 h-80" : "md:scale-90 h-56"
                     }`}
-                  />
-                  <div
-                    className={`absolute rounded-xl p-4 text-white right-4 w-48
-                      ${position === 1 ? "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/95" : "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/85"}
-                    `}
                   >
-                    <p className="text-xs font-semibold uppercase tracking-wider text-white!">
-                      {item.name}
-                    </p>
-                    <p className="mt-2 text-sm leading-relaxed text-white!">
-                      &quot;{item.text}&quot;
-                    </p>
-                    <p className="mt-2 text-[#F2B929]!">★★★★★</p>
-                  </div>
-                </article>
-              ))}
+                    <img
+                      src={item.imagen }
+                      alt={item.titulo }
+                      className={`w-full object-cover rounded-2xl ${
+                        position === 1 ? "h-80" : "h-56"
+                      }`}
+                    />
+                    <div
+                      className={`absolute rounded-xl p-4 text-white right-4 w-48
+                        ${position === 1 ? "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/95" : "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/85"}
+                      `}
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-wider text-white!">
+                        {item.titulo }
+                      </p>
+                      <p className="mt-2 text-sm leading-relaxed text-white!">
+                        &quot;{item.descripcion }&quot;
+                      </p>
+                      <p className="mt-2 text-[#F2B929]!">{stars}</p>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
 
             <button
@@ -275,7 +246,7 @@ export default function ServicesPage() {
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link
-                  href="https://wa.me/593964220600"
+                  href={redes?.whatsapp ? `https://wa.me/${redes.whatsapp.replace(/[^0-9]/g, '')}` : "https://wa.me/593964220600"}
                   target="_blank"
                   className="inline-flex items-center rounded-full bg-[#25D366] px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-accent-green/90"
                 >

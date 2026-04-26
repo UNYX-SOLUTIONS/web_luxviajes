@@ -1,5 +1,36 @@
 // Types para la aplicación Lux Viajes
 
+// Destino Soñado (Dream Destination)
+export interface DestinoSonado {
+  id: number;
+  documentId: string;
+  titulo: string;
+  subtitulo: string;
+  descripcion: string;
+  disponibilidad: string;
+  duracion: string;
+  precio: string;
+  descripcionDetallada: string;
+  imagen?: string; // URL completa de la imagen
+  pdf?: string; // URL completa del PDF
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+// Tarjeta de Servicio (Service Card)
+export interface TarjetaServicio {
+  id: number;
+  documentId: string;
+  titulo: string;
+  subtitulo: string;
+  imagen?: string; // URL completa de la imagen
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+// Legacy interfaces (mantener por compatibilidad)
 export interface Destination {
   id: string;
   name: string;
@@ -40,8 +71,17 @@ export interface Banner {
 
 export interface RedSocial {
   id: number;
-  platform: string;
-  url: string;
+  documentId: string;
+  llamada: string;
+  whatsapp: string;
+  instagram: string;
+  facebook: string;
+  tiktok: string;
+  youtube: string;
+  email_trabajos: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
 }
 
 export interface HomeStats {
@@ -64,8 +104,17 @@ export interface Home {
   updatedAt: string;
   publishedAt: string;
   banners: Banner[];
-  redes: RedSocial[];
+  redes?: RedSocial; // Objeto único con todas las redes sociales
   stats?: StatCard[] | null;
+  destinos?: DestinoSonado[];
+  servicios?: TarjetaServicio[];
+  serviciosTitulo?: string;
+  serviciosDescripcion?: string;
+  citaTitulo?: string;
+  citaSubtitulo?: string;
+  citaUrgencia?: string;
+  llamadaTitulo?: string;
+  llamadaSubtitulo?: string;
 }
 
 export interface ContactInfo {
@@ -84,4 +133,117 @@ export interface StatCard {
   label: string;
   value: string;
   icon?: string;
+}
+
+// About / Nosotros types
+export interface Asesor {
+  id: number;
+  documentId: string;
+  nombre: string;
+  sede: string;
+  imagen?: string; // URL completa de la imagen
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface About {
+  id: number;
+  documentId: string;
+  heroTitulo?: string;
+  heroSubtitulo?: string;
+  heroImagen?: string; // URL completa de la imagen
+  quienesSomosTitulo?: string;
+  quienesSomosDescripcion?: string;
+  numExpertos?: string;
+  ciudades?: string;
+  asesors?: Asesor[];
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+// Servicio types
+export interface TarjetaServicioDetallada {
+  id: number;
+  documentId: string;
+  titulo: string;
+  descripcion: string;
+  imagen?: string; // URL completa de la imagen
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface Testimonio {
+  id: number;
+  documentId: string;
+  titulo: string;
+  descripcion: string;
+  calificacion?: number;
+  imagen?: string; // URL completa de la imagen
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface Servicio {
+  id: number;
+  documentId: string;
+  heroTitulo?: string;
+  heroSubtitulo?: string;
+  serviciosTitulo?: string;
+  serviciosDescripcion?: string;
+  imagen?: string; // URL completa de la imagen (para Hero)
+  tarjeta_servicios?: TarjetaServicioDetallada[];
+  testimonios?: Testimonio[];
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+// Paquete types
+export interface PaquetePremium {
+  id: number;
+  documentId: string;
+  etiqueta: string;
+  dias: string;
+  titulo: string;
+  pdf?: string;
+  descripcion: string;
+  duracion: string;
+  precio: string;
+  imagen?: string; // URL completa de la imagen
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface ParqueTematico {
+  id: number;
+  documentId: string;
+  titulo: string;
+  subtitulo?: string;
+  imagen?: string; // URL completa de la imagen
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface Paquete {
+  id: number;
+  documentId: string;
+  heroTitulo?: string;
+  heroSubtitulo?: string;
+  llamadaTitulo?: string;
+  llamadaSubtitulo?: string;
+  boletinTitulo?: string;
+  boletinDescripcion?: string;
+  imagen?: string; // URL completa de la imagen (para Hero)
+  destinosSonados?: DestinoSonado[]; // Reutilizamos la interfaz existente
+  paquetesPremium?: PaquetePremium[];
+  parquesTematicos?: ParqueTematico[];
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
 }

@@ -41,11 +41,13 @@ export const DreamDestinationsSection: FC<
     startIndex + maxCards
   );
 
-  const handleDownloadPDF = (title: string) => {
-    const filename = `${title.toLowerCase().replace(/\s+/g, "-")}.pdf`;
+  const handleDownloadPDF = (pdfUrl?: string, title?: string) => {
+    if (!pdfUrl) return;
+    
     const link = document.createElement("a");
-    link.href = `/pdfs/${filename}`;
-    link.download = filename;
+    link.href = pdfUrl;
+    link.download = title ? `${title.toLowerCase().replace(/\s+/g, "-")}.pdf` : "download.pdf";
+    link.target = "_blank";
     link.click();
   };
 
@@ -172,11 +174,10 @@ export const DreamDestinationsSection: FC<
                         </p>
                       </div>
 
-                      <ul className="mt-2 space-y-3 text-xs text-neutral-700 shrink-0">
-                        <li>✈ Vuelo</li>
-                        <li>🏨 Hotel</li>
-                        <li>🧭 Tours</li>
-                        <li>🛡 Asistencia de viaje</li>
+                      <ul className="mt-2 space-y-1 text-xs text-neutral-700 shrink-0">
+                        {item.included.slice(0, 4).map((includedItem, idx) => (
+                          <li key={idx} className="line-clamp-1">{includedItem}</li>
+                        ))}
                       </ul>
 
                       <div className="grow" />
@@ -194,15 +195,17 @@ export const DreamDestinationsSection: FC<
                             Ver detalles
                           </button>
 
-                          <button
-                            onClick={() =>
-                              handleDownloadPDF(item.title)
-                            }
-                            className="flex-1 rounded-full border-2 border-primary-700 p-2.5 text-primary-700 transition hover:bg-primary-50 flex items-center justify-center gap-2 text-sm font-semibold"
-                          >
-                            <DocumentArrowDownIcon className="h-4 w-4" />
-                            Descargar
-                          </button>
+                          {item.pdf && (
+                            <button
+                              onClick={() =>
+                                handleDownloadPDF(item.pdf, item.title)
+                              }
+                              className="flex-1 rounded-full border-2 border-primary-700 p-2.5 text-primary-700 transition hover:bg-primary-50 flex items-center justify-center gap-2 text-sm font-semibold"
+                            >
+                              <DocumentArrowDownIcon className="h-4 w-4" />
+                              Descargar
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

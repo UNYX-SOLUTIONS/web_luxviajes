@@ -6,6 +6,7 @@ import { MapPinIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useState } from "react";
 import { AppointmentDialog } from "@/components/common/appointment_dialog";
+import { useRedSocial } from "@/hooks";
 
 interface ContactOption {
   title: string;
@@ -16,46 +17,6 @@ interface ContactOption {
   isVideocall?: boolean;
   isAgenda?: boolean;
 }
-
-const contactOptions: ContactOption[] = [
-  {
-    title: "Videollamada al Instante",
-    description:
-      "¿No quieres esperar? Agenda una videollamada inmediata con uno de nuestros asesores y resuelve todas tus dudas al instante.",
-    action: "Hacer Videollamada",
-    href: "#",
-    isVideocall: true,
-    image:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=900&h=600&fit=crop",
-  },
-  {
-    title: "WhatsApp",
-    description: "¿Prefieres escribir? Contáctanos directamente por WhatsApp y recibe atención personalizada en tiempo real.",
-    action: "WhatsApp Directo",
-    href: "https://wa.me/593964220600",
-    image:
-      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=900&h=600&fit=crop",
-  },
-  {
-    title: "Agenda tu cita Online",
-    description:
-      "¿Quieres una atención más personalizada? Agenda una cita online con uno de nuestros expertos y planifica tu viaje de ensueño con asesoría dedicada.",
-    action: "Agendar Cita",
-    href: "#",
-    isAgenda: true,
-    image:
-      "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&h=600&fit=crop",
-  },
-  {
-    title: "Asesoria en Oficinas",
-    description:
-      "¿Prefieres una atención cara a cara? Visítanos en nuestras oficinas ubicadas en las principales ciudades del país y recibe asesoría personalizada de nuestros expertos en viajes.",
-    action: "Ver Ubicaciones",
-    href: "#offices",
-    image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=600&fit=crop",
-  },
-];
 
 const offices = [
   {
@@ -79,7 +40,48 @@ const offices = [
 ];
 
 export default function ContactPage() {
+  const { data: redes } = useRedSocial();
   const [showAppointmentDialog, setShowAppointmentDialog] = useState(false);
+
+  const contactOptions: ContactOption[] = [
+    {
+      title: "Videollamada al Instante",
+      description:
+        "¿No quieres esperar? Agenda una videollamada inmediata con uno de nuestros asesores y resuelve todas tus dudas al instante.",
+      action: "Hacer Videollamada",
+      href: "#",
+      isVideocall: true,
+      image:
+        "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=900&h=600&fit=crop",
+    },
+    {
+      title: "WhatsApp",
+      description: "¿Prefieres escribir? Contáctanos directamente por WhatsApp y recibe atención personalizada en tiempo real.",
+      action: "WhatsApp Directo",
+      href: redes?.whatsapp ? `https://wa.me/${redes.whatsapp.replace(/[^0-9]/g, '')}` : "https://wa.me/593964220600",
+      image:
+        "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=900&h=600&fit=crop",
+    },
+    {
+      title: "Agenda tu cita Online",
+      description:
+        "¿Quieres una atención más personalizada? Agenda una cita online con uno de nuestros expertos y planifica tu viaje de ensueño con asesoría dedicada.",
+      action: "Agendar Cita",
+      href: "#",
+      isAgenda: true,
+      image:
+        "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&h=600&fit=crop",
+    },
+    {
+      title: "Asesoria en Oficinas",
+      description:
+        "¿Prefieres una atención cara a cara? Visítanos en nuestras oficinas ubicadas en las principales ciudades del país y recibe asesoría personalizada de nuestros expertos en viajes.",
+      action: "Ver Ubicaciones",
+      href: "#offices",
+      image:
+        "https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=600&fit=crop",
+    },
+  ];
 
   const handleScrollToOffices = () => {
     const officesSection = document.getElementById('offices');

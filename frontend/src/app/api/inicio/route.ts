@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import qs from "qs";
 
 const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
 const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com";
@@ -12,9 +13,60 @@ interface Banner {
       large?: {
         url?: string;
       };
+      medium?: {
+        url?: string;
+      };
+      small?: {
+        url?: string;
+      };
     };
     url?: string;
   };
+}
+
+interface DestinoSonado {
+  id: number;
+  documentId: string;
+  titulo: string;
+  subtitulo: string;
+  descripcion: string;
+  disponibilidad: string;
+  duracion: string;
+  precio: string;
+  descripcionDetallada: string;
+  imagen?: {
+    formats?: {
+      large?: { url?: string };
+      medium?: { url?: string };
+      small?: { url?: string };
+    };
+    url?: string;
+  };
+  pdf?: {
+    url?: string;
+    name?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+interface TarjetaServicio {
+  id: number;
+  documentId: string;
+  titulo: string;
+  subtitulo: string;
+  imagen?: {
+    formats?: {
+      large?: { url?: string };
+      medium?: { url?: string };
+      small?: { url?: string };
+    };
+    url?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
 }
 
 interface StrapiInitioResponse {
@@ -22,10 +74,19 @@ interface StrapiInitioResponse {
     id: number;
     documentId: string;
     banners?: Banner[];
+    destino_sonados?: DestinoSonado[];
+    tarjetasServicio?: TarjetaServicio[];
     clientesFrecuentes?: string;
     experiencia?: string;
     destinos?: string;
     valoracion?: string;
+    serviciosTitulo?: string;
+    serviciosDescripcion?: string;
+    citaTitulo?: string;
+    citaSubtitulo?: string;
+    citaUrgencia?: string;
+    llamadaTitulo?: string;
+    llamadaSubtitulo?: string;
     createdAt: string;
     updatedAt: string;
     publishedAt: string;
@@ -55,6 +116,27 @@ function transformBanners(banners: Banner[]) {
   });
 }
 
+function getImageUrl(
+  imagen?: DestinoSonado["imagen"] | TarjetaServicio["imagen"],
+): string {
+  if (!imagen) return "";
+
+  const url =
+    imagen.formats?.large?.url ||
+    imagen.formats?.medium?.url ||
+    imagen.formats?.small?.url ||
+    imagen.url ||
+    "";
+
+  if (!url) return "";
+  return url.startsWith("http") ? url : `${STRAPI_ORIGIN}${url}`;
+}
+
+function getPdfUrl(pdf?: DestinoSonado["pdf"]): string {
+  if (!pdf?.url) return "";
+  return pdf.url.startsWith("http") ? pdf.url : `${STRAPI_ORIGIN}${pdf.url}`;
+}
+
 function transformStats(data: StrapiInitioResponse["data"]): StatCardData[] {
   return [
     {
@@ -78,9 +160,27 @@ function transformStats(data: StrapiInitioResponse["data"]): StatCardData[] {
 
 export async function GET() {
   try {
-    const response = await fetch(
-      `${STRAPI_URL}/inicio?populate[banners][populate]=*`,
+    // Construir query con populate anidado para incluir campos media (imagen, pdf)
+    // populate=* solo pobla 1 nivel, necesitamos poblar explícitamente los campos media
+    // dentro de cada relación (nivel 2)
+    const query = qs.stringify(
+      {
+        populate: {
+          banners: {
+            populate: ["imagen"], // Poblar imagen dentro de banners
+          },
+          destino_sonados: {
+            populate: ["imagen", "pdf"], // Poblar imagen y pdf dentro de destinos
+          },
+          tarjetasServicio: {
+            populate: ["imagen"], // Poblar imagen dentro de servicios
+          },
+        },
+      },
+      { encodeValuesOnly: true },
     );
+
+    const response = await fetch(`${STRAPI_URL}/inicio?${query}`);
 
     if (!response.ok) {
       return NextResponse.json(
@@ -90,13 +190,42 @@ export async function GET() {
     }
 
     const data: StrapiInitioResponse = await response.json();
-    console.log("Datos de /inicio desde Strapi:", data);
+    console.log(
+      "Datos de /inicio desde Strapi:",
+      JSON.stringify(data, null, 2),
+    );
+
+    // Transformar destinos agregando URLs completas de imágenes y PDFs
+    const destinosTransformados = (data.data.destino_sonados || []).map(
+      (destino) => ({
+        ...destino,
+        imagen: getImageUrl(destino.imagen),
+        pdf: getPdfUrl(destino.pdf),
+      }),
+    );
+
+    // Transformar servicios agregando URLs completas de imágenes
+    const serviciosTransformados = (data.data.tarjetasServicio || []).map(
+      (servicio) => ({
+        ...servicio,
+        imagen: getImageUrl(servicio.imagen),
+      }),
+    );
 
     // Transformar los datos
     const transformedData = {
       ...data.data,
       banners: transformBanners(data.data.banners || []),
       stats: transformStats(data.data),
+      destinos: destinosTransformados,
+      servicios: serviciosTransformados,
+      serviciosTitulo: data.data.serviciosTitulo,
+      serviciosDescripcion: data.data.serviciosDescripcion,
+      citaTitulo: data.data.citaTitulo,
+      citaSubtitulo: data.data.citaSubtitulo,
+      citaUrgencia: data.data.citaUrgencia,
+      llamadaTitulo: data.data.llamadaTitulo,
+      llamadaSubtitulo: data.data.llamadaSubtitulo,
     };
 
     return NextResponse.json(transformedData, {

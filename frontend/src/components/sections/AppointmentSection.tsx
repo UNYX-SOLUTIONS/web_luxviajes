@@ -33,7 +33,40 @@ interface AppointmentWebhookPayload {
 const APPOINTMENT_WEBHOOK_URL =
   "https://flow.agencialuxviajes.com/webhook-test/de1e3a16-857f-48ec-a863-3eaf2aed41cc";
 
-export function AppointmentSection() {
+interface AppointmentSectionProps {
+  citaTitulo?: string;
+  citaSubtitulo?: string;
+  citaUrgencia?: string;
+}
+
+/**
+ * Parsea texto con formato markdown-like:
+ * - *texto* se convierte en <span className="text-primary-600">texto</span>
+ * - Soporta saltos de línea
+ */
+function parseStyledText(text: string): string {
+  if (!text) return '';
+  
+  // Reemplazar *texto* con span coloreado
+  let parsed = text.replace(
+    /\*([^*]+)\*/g,
+    '<span class="text-primary-600">$1</span>'
+  );
+  
+  // Convertir <br> y <br/> a <br /> válido
+  parsed = parsed.replace(/<br\s*\/?>/gi, '<br />');
+  
+  // Convertir \n en <br />
+  parsed = parsed.replace(/\n/g, '<br />');
+  
+  return parsed;
+}
+
+export function AppointmentSection({
+  citaTitulo,
+  citaSubtitulo,
+  citaUrgencia
+}: AppointmentSectionProps = {}) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -225,12 +258,22 @@ export function AppointmentSection() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-12 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary-900">
-            Agenda tu cita con nosotros
-          </h2>
-          <p className="text-lg text-neutral-700 max-w-2xl mx-auto">
-            Selecciona la fecha y hora que mejor se adapte a tu disponibilidad
-          </p>
+          <h2 
+            className="text-3xl md:text-4xl font-bold mb-4 text-primary-900"
+            dangerouslySetInnerHTML={{
+              __html: parseStyledText(
+                citaTitulo || "Agenda tu cita con nosotros"
+              )
+            }}
+          />
+          <p 
+            className="text-lg text-neutral-700 max-w-2xl mx-auto"
+            dangerouslySetInnerHTML={{
+              __html: parseStyledText(
+                citaSubtitulo || "Selecciona la fecha y hora que mejor se adapte a tu disponibilidad"
+              )
+            }}
+          />
         </div>
 
         {/* Content Grid */}
@@ -408,9 +451,12 @@ export function AppointmentSection() {
               <button
                 onClick={() => setShowModal(true)}
                 className="w-full py-3 rounded-lg border border-primary-600 text-primary-600 font-semibold hover:bg-primary-50 transition"
-              >
-                ¿No quieres esperar? Agenda una asesoría<br />en vivo y en 10 minutos te contactamos
-              </button>
+                dangerouslySetInnerHTML={{
+                  __html: parseStyledText(
+                    citaUrgencia || "¿No quieres esperar? Agenda una asesoría<br />en vivo y en 10 minutos te contactamos"
+                  )
+                }}
+              />
             </div>
           </div>
         </div>

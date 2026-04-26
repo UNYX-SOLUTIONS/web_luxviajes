@@ -10,10 +10,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { XMarkIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { DreamDestinationsSection } from "./packages/components";
-import {
-  dreamDestinations,
-  type DreamDestination,
-} from "./packages/data/packages-data";
+import { type DreamDestination } from "./packages/data/packages-data";
 import { useHomeData } from "@/hooks";
 
 interface PackageDetails {
@@ -23,6 +20,7 @@ interface PackageDetails {
   price: string;
   included: string[];
   highlights?: string[];
+  pdf?: string; // URL del PDF desde Strapi
 }
 
 export default function Home() {
@@ -38,13 +36,37 @@ export default function Home() {
   // Usar banners de la API o fallback a datos locales
   const heroSlides = homeData?.banners || [];
 
+  // Transformar destinos de Strapi a formato DreamDestination
+  const dreamDestinations: DreamDestination[] = (homeData?.destinos || []).map((destino) => ({
+    title: destino.titulo,
+    image: destino.imagen || "",
+    description: destino.descripcion,
+    duration: destino.duracion,
+    nights: destino.subtitulo,
+    season: destino.disponibilidad,
+    included: destino.descripcion.split("\n").filter(line => line.trim()), // Para las cards
+    detailIncluded: destino.descripcionDetallada.split("\n").filter(line => line.trim()), // Para el diálogo
+    price: destino.precio,
+    pdf: destino.pdf,
+  }));
+
+  // Transformar servicios de Strapi para ServicesDetailSection
+  const servicesData = (homeData?.servicios || []).map((servicio) => ({
+    id: servicio.documentId,
+    title: servicio.titulo,
+    label: servicio.titulo,
+    image: servicio.imagen || "",
+    description: servicio.subtitulo,
+  }));
+
   const handleOpenDetails = (pkg: DreamDestination) => {
     const packageDetails: PackageDetails = {
       title: pkg.title,
-      description: pkg.description,
+      description: pkg.season,
       duration: pkg.duration,
       price: pkg.price || "Consultar",
-      included: pkg.included || [],
+      included: pkg.detailIncluded || pkg.included || [], // Usar detailIncluded en el diálogo
+      pdf: pkg.pdf, // Incluir URL del PDF
     };
     setSelectedPackage(packageDetails);
     setShowDetailsDialog(true);
@@ -116,24 +138,36 @@ export default function Home() {
       </div>
 
       {/* Dream Destinations Section */}
-      <DreamDestinationsSection
-        destinations={dreamDestinations}
-        onDetalles={(destination) => handleOpenDetails(destination)}
-        maxCards={4}
-        showScrollControls={false}
-      />
-
-      {/* Promotions Map Section 
-      <PromotionsMap />*/}
+      {!loading && dreamDestinations.length > 0 && (
+        <DreamDestinationsSection
+          destinations={dreamDestinations}
+          onDetalles={(destination) => handleOpenDetails(destination)}
+          maxCards={4}
+          showScrollControls={false}
+        />
+      )}
 
       {/* Services Detail Section */}
-      <ServicesDetailSection />
+      {!loading && servicesData.length > 0 && (
+        <ServicesDetailSection 
+          services={servicesData} 
+          serviciosTitulo={homeData?.serviciosTitulo}
+          serviciosDescripcion={homeData?.serviciosDescripcion}
+        />
+      )}
 
       {/* Appointment Section */}
-      <AppointmentSection />
+      <AppointmentSection 
+        citaTitulo={homeData?.citaTitulo}
+        citaSubtitulo={homeData?.citaSubtitulo}
+        citaUrgencia={homeData?.citaUrgencia}
+      />
 
       {/* CTA Section */}
-      <CTASection />
+      <CTASection 
+        llamadaTitulo={homeData?.llamadaTitulo}
+        llamadaSubtitulo={homeData?.llamadaSubtitulo}
+      />
 
       {/* Contact Dialog */}
       <ContactDialog
@@ -213,15 +247,17 @@ export default function Home() {
               >
                 Reservar Ahora
               </button>
-              <button className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 cursor-pointer">
-                <a
-                  href={`/pdfs/${selectedPackage.title?.toLowerCase().replace(/\s/g, "_")}.pdf`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Descargar PDF
-                </a>
-              </button>
+              {selectedPackage.pdf && (
+                <button className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 cursor-pointer">
+                  <a
+                    href={selectedPackage.pdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Descargar PDF
+                  </a>
+                </button>
+              )}
             </div>
           </div>
         </div>

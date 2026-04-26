@@ -5,7 +5,32 @@ import { Hero } from "@/components/common/Hero";
 import { ContactDialog } from "@/components/common/contact_dialog";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useRedSocial, useAboutData } from "@/hooks";
+import type { Asesor } from "@/types";
+
+/**
+ * Parsea texto con formato markdown-like:
+ * - *texto* se convierte en <span className="...">texto</span>
+ * - Soporta saltos de línea con <br/> o \n
+ */
+function parseStyledText(text: string, className: string = "text-primary-700 italic"): string {
+  if (!text) return '';
+  
+  // Reemplazar *texto* con span estilizado
+  let parsed = text.replace(
+    /\*([^*]+)\*/g,
+    `<span class="${className}">$1</span>`
+  );
+  
+  // Convertir <br> y <br/> a <br /> válido
+  parsed = parsed.replace(/<br\s*\/?>/gi, '<br />');
+  
+  // Convertir \n en <br />
+  parsed = parsed.replace(/\n/g, '<br />');
+  
+  return parsed;
+}
 
 const highlights = [
   {
@@ -104,84 +129,79 @@ const values = [
   },
 ];
 
-const teamByOffice = [
-  {
-    office: "Sede Guayas Samborondón",
-    members: [
-      {
-        name: "Rommy Lapo",
-        photo: "/images/team/rommy.png",
-      },
-      {
-        name: "Joselyn Peralta",
-        photo: "/images/team/joselyn.png",
-      },
-      {
-        name: "Judith Villacís",
-        photo: "/images/team/judith.png",
-      },
-      {
-        name: "Gina Reyes",
-        photo: "/images/team/gina.png",
-      },
-      {
-        name: "Brittany Ramos",
-        photo: "/images/team/brittany.png",
-      },
-    ],
-  },
-  {
-    office: "Sede Quito",
-    members: [
-      {
-        name: "Karla Guaigua",
-        photo: "/images/team/karla.png",
-      },
-      {
-        name: "Kerlly Salas",
-        photo: "/images/team/kerlly.png",
-      },
-      {
-        name: "Kathleen Chimarro",
-        photo: "/images/team/kathleen.png",
-      },
-    ],
-  },
-  {
-    office: "Sede Cuenca",
-    members: [
-      {
-        name: "Sandy Campoverde",
-        photo: "/images/team/sandy.png",
-      },
-    ],
-  },
-  {
-    office: "Sede Guayaquil",
-    members: [
-      {
-        name: "Ashley Chavez",
-        photo: "/images/team/ashley.png",
-      },
-      {
-        name: "Stephany Victores",
-        photo: "/images/team/stephany.png",
-      },
-    ],
-  },
-];
-
 export default function AboutPage() {
+  const { data: redes } = useRedSocial();
+  const { data: aboutData } = useAboutData();
   const [showContactDialog, setShowContactDialog] = useState(false);
+
+  // Agrupar asesores por sede
+  const teamByOffice = useMemo(() => {
+    if (!aboutData?.asesors) return [];
+
+    console.log("=== INICIO AGRUPACIÓN ===");
+    console.log("Total de asesores recibidos en frontend:", aboutData.asesors.length);
+    console.log("Asesores completos:", aboutData.asesors);
+
+    const grouped: { [key: string]: Asesor[] } = {};
+    
+    aboutData.asesors.forEach((asesor, index) => {
+      // Normalizar sede a minúsculas y quitar espacios/acentos
+      const sedeOriginal = asesor.sede || 'sin-sede';
+      const sedeNormalizada = sedeOriginal
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
+        .trim();
+      
+      console.log(`[${index}] Asesor: ${asesor.nombre}`);
+      console.log(`     Sede RAW: "${asesor.sede}"`);
+      console.log(`     Sede Original: "${sedeOriginal}"`);
+      console.log(`     Sede Normalizada: "${sedeNormalizada}"`);
+      
+      if (!grouped[sedeNormalizada]) {
+        console.log(`     -> Creando nuevo grupo: "${sedeNormalizada}"`);
+        grouped[sedeNormalizada] = [];
+      } else {
+        console.log(`     -> Agregando a grupo existente: "${sedeNormalizada}"`);
+      }
+      
+      grouped[sedeNormalizada].push(asesor);
+      console.log(`     -> Total en grupo "${sedeNormalizada}": ${grouped[sedeNormalizada].length}`);
+    });
+
+    // Mapear nombres de sedes
+    const sedeNames: { [key: string]: string } = {
+      'samborondon': 'Sede Guayas Samborondón',
+      'quito': 'Sede Quito',
+      'cuenca': 'Sede Cuenca',
+      'guayaquil': 'Sede Guayaquil',
+    };
+
+    console.log("=== RESULTADO AGRUPACIÓN ===");
+    console.log("Grupos creados:", Object.keys(grouped));
+    Object.entries(grouped).forEach(([sede, asesores]) => {
+      console.log(`Sede "${sede}": ${asesores.length} asesores`);
+      asesores.forEach(a => console.log(`  - ${a.nombre}`));
+    });
+
+    return Object.entries(grouped).map(([sede, members]) => ({
+      office: sedeNames[sede] || sede,
+      members: members.map(m => ({
+        name: m.nombre,
+        photo: m.imagen || '/images/team/default.png',
+      })),
+    }));
+  }, [aboutData]);
 
   return (
     <>
       <Hero
-        title="Más que una agencia, somos tu aliado de viaje"
-        subtitle="Creamos experiencias, no solo viajes."
+        title={aboutData?.heroTitulo || "Más que una agencia, somos tu aliado de viaje"}
+        subtitle={aboutData?.heroSubtitulo || "Creamos experiencias, no solo viajes."}
         ctaText="Planifica tu viaje"
         ctaHref="#"
         onClick={() => setShowContactDialog(true)}
+        heroImage={aboutData?.heroImagen}
       />
       <section className="bg-white relative">
         {/* Quiénes somos */}
@@ -193,31 +213,24 @@ export default function AboutPage() {
               <p className="text-base font-semibold uppercase tracking-wide mb-3 text-[#880000]!">
                 Quienes somos
               </p>
-              <h2 className="mt-4 text-4xl font-bold leading-tight text-neutral-900">
-                Expertos en hacer{" "}
-                <span className="text-primary-700 italic">realidad</span>
-                <br />
-                tus sueños de viaje
-              </h2>
-              <div className="mt-6 space-y-4 text-neutral-700">
-                <p>
-                  Nuestra historia comenzó en 2016 como un sueño apasionado:
-                  transformar la manera en que los ecuatorianos descubren el
-                  mundo. Lo que empezó como una pequeña semilla de curiosidad,
-                  se convirtió en una visión clara de excelencia.
-                </p>
-                <p>
-                  A pesar de los desafíos globales, en 2021, tras la pandemia,
-                  Luxviajes nació oficialmente. Entendimos que el mundo había
-                  cambiado y que el viajero moderno buscaba algo más que un
-                  ticket: buscaba seguridad, personalización y, sobre todo, una
-                  mano experta que lo guiara.
-                </p>
-                <p>
-                  Hoy, somos el referente del lujo y la confianza en Guayaquil,
-                  Quito y Cuenca.
-                </p>
-              </div>
+              <h2 
+                className="mt-4 text-4xl font-bold leading-tight text-neutral-900"
+                dangerouslySetInnerHTML={{
+                  __html: parseStyledText(
+                    aboutData?.quienesSomosTitulo || "Expertos en hacer *realidad* <br/> tus sueños de viaje"
+                  )
+                }}
+              />
+              <div 
+                className="mt-6 space-y-4 text-neutral-700"
+                dangerouslySetInnerHTML={{
+                  __html: parseStyledText(
+                    aboutData?.quienesSomosDescripcion || 
+                    "Nuestra historia comenzó en 2016 como un sueño apasionado: transformar la manera en que los ecuatorianos descubren el mundo. Lo que empezó como una pequeña semilla de curiosidad, se convirtió en una visión clara de excelencia.\n\nA pesar de los desafíos globales, en 2021, tras la pandemia, Luxviajes nació oficialmente. Entendimos que el mundo había cambiado y que el viajero moderno buscaba algo más que un ticket: buscaba seguridad, personalización y, sobre todo, una mano experta que lo guiara.\n\nHoy, somos el referente del lujo y la confianza en Guayaquil, Quito y Cuenca.",
+                    "text-neutral-700"
+                  )
+                }}
+              />
             </div>
           </div>
         </div>
@@ -288,13 +301,13 @@ export default function AboutPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="rounded-2xl bg-white/10! px-6 py-5 min-h-25 flex flex-col justify-center">
-              <p className="text-4xl font-extrabold text-[#FFDDBB]!">+16</p>
+              <p className="text-4xl font-extrabold text-[#FFDDBB]!">{aboutData?.numExpertos || "+16"}</p>
               <p className="mt-1 text-xs uppercase tracking-wider text-white!">
                 Expertos en el equipo
               </p>
             </div>
             <div className="rounded-2xl bg-white/10! px-6 py-5 min-h-25 flex flex-col justify-center">
-              <p className="text-4xl font-extrabold text-[#FFDDBB]!">3</p>
+              <p className="text-4xl font-extrabold text-[#FFDDBB]!">{aboutData?.ciudades || "3"}</p>
               <p className="mt-1 text-xs uppercase tracking-wider text-white!">
                 Ciudades (Gye, Uio, Cue)
               </p>
@@ -409,8 +422,8 @@ export default function AboutPage() {
         <ContactDialog
           isOpen={showContactDialog}
           onClose={() => setShowContactDialog(false)}
-          whatsappNumber="593964220600"
-          phoneNumber="+593964220600"
+          whatsappNumber={redes?.whatsapp.replace(/[^0-9]/g, '') || "593964220600"}
+          phoneNumber={redes?.llamada || "+593964220600"}
           videoCallUrl="/contact"
         />
       </section>

@@ -2,11 +2,24 @@ import { PhoneIcon } from "@heroicons/react/24/solid";
 import type { FC } from "react";
 import Image from "next/image";
 
-interface CtaSectionProps {
-  onContactClick: () => void;
+function parseStyledText(text: string): string {
+  let parsed = text.replace(/\*([^*]+)\*/g, '<span class="text-primary-600">$1</span>');
+  parsed = parsed.replace(/<br\s*\/?>/gi, '<br />');
+  parsed = parsed.replace(/\n/g, '<br />');
+  return parsed;
 }
 
-export const CtaSection: FC<CtaSectionProps> = ({ onContactClick }) => {
+interface CtaSectionProps {
+  onContactClick: () => void;
+  titulo?: string;
+  subtitulo?: string;
+}
+
+export const CtaSection: FC<CtaSectionProps> = ({ 
+  onContactClick,
+  titulo = "¿Listo para cruzar fronteras?",
+  subtitulo = "Nuestros asesores expertos están listos para diseñar el viaje de tus sueños. Consultoría personalizada y sin compromiso."
+}) => {
   return (
     <section className="bg-neutral-50 pb-16 md:pb-20">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -22,13 +35,14 @@ export const CtaSection: FC<CtaSectionProps> = ({ onContactClick }) => {
           </div>
           <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
-              <h3 className="text-5xl font-bold leading-none">
-                ¿Listo para cruzar fronteras?
-              </h3>
-              <p className="mt-4 max-w-2xl text-white!">
-                Nuestros asesores expertos estan listos para disenar el viaje de
-                tus suenos. Consultoria personalizada y sin compromiso.
-              </p>
+              <h3 
+                className="text-5xl font-bold leading-none"
+                dangerouslySetInnerHTML={{ __html: parseStyledText(titulo) }}
+              />
+              <p 
+                className="mt-4 max-w-2xl text-white!"
+                dangerouslySetInnerHTML={{ __html: parseStyledText(subtitulo) }}
+              />
             </div>
             <button
               onClick={onContactClick}

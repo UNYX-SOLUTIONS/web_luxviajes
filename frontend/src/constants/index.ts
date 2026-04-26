@@ -4,6 +4,7 @@ export const COMPANY_INFO = {
   name: "Lux Viajes",
   tagline: "Agencia de Viajes Premium",
   description: "Experiencias de viaje inolvidables a destinos internacionales",
+  // DEPRECATED: Use useRedSocial() hook para obtener datos actualizados desde Strapi
   phone: "+593 98 422 0600",
   whatsapp: "+593 98 422 0600",
   email: "info@luxviajes.com",

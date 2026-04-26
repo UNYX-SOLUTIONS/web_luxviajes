@@ -7,6 +7,7 @@ import { cn } from "@/utils/cn";
 import { useState, useRef, useEffect } from "react";
 import ArrowRightIcon from "@heroicons/react/24/solid/ArrowRightIcon";
 import { PhoneArrowUpRightIcon } from "@heroicons/react/24/solid";
+import { useRedSocial } from "@/hooks";
 
 interface LocationPin {
   id: string;
@@ -71,6 +72,7 @@ export function PromotionsMap({
   className,
   pins = DEFAULT_PINS,
 }: PromotionsMapProps) {
+  const { data: redes } = useRedSocial();
   const [showPromoDialog, setShowPromoDialog] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
@@ -440,8 +442,8 @@ export function PromotionsMap({
           <ContactDialog
             isOpen={showContactDialog}
             onClose={() => setShowContactDialog(false)}
-            whatsappNumber="593964220600"
-            phoneNumber="+593964220600"
+            whatsappNumber={redes?.whatsapp.replace(/[^0-9]/g, '') || "593964220600"}
+            phoneNumber={redes?.llamada || "+593964220600"}
             videoCallUrl="/contact"
           />
 

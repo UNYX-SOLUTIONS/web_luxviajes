@@ -1,25 +1,67 @@
 "use client";
 
 import Link from "next/link";
+import { useRedSocial } from "@/hooks";
 
-export function CTASection() {
+interface CTASectionProps {
+  llamadaTitulo?: string;
+  llamadaSubtitulo?: string;
+}
+
+/**
+ * Parsea texto con formato markdown-like:
+ * - *texto* se convierte en <span className="text-primary-600">texto</span>
+ * - Soporta saltos de línea
+ */
+function parseStyledText(text: string): string {
+  if (!text) return '';
+  
+  // Reemplazar *texto* con span coloreado (en este caso white porque el fondo es oscuro)
+  let parsed = text.replace(
+    /\*([^*]+)\*/g,
+    '<span class="text-white font-extrabold">$1</span>'
+  );
+  
+  // Convertir <br> y <br/> a <br /> válido
+  parsed = parsed.replace(/<br\s*\/?>/gi, '<br />');
+  
+  // Convertir \n en <br />
+  parsed = parsed.replace(/\n/g, '<br />');
+  
+  return parsed;
+}
+
+export function CTASection({ llamadaTitulo, llamadaSubtitulo }: CTASectionProps = {}) {
+  const { data: redes } = useRedSocial();
+  
+  const whatsappNumber = redes?.whatsapp?.replace(/[^0-9]/g, '') || "593984220600";
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=Hola%2C%20quiero%20agendar%20una%20cita%20para%20planificar%20mi%20pr%C3%B3xima%20aventura`;
+
   return (
     <section className="py-16 md:py-20 bg-linear-to-r from-primary-600 via-primary-700 to-secondary-700">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 text-white leading-tight">
-          ¿Listo para tu próxima aventura?
-        </h2>
+        <h2 
+          className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 text-white leading-tight"
+          dangerouslySetInnerHTML={{
+            __html: parseStyledText(
+              llamadaTitulo || "¿Listo para tu próxima aventura?"
+            )
+          }}
+        />
 
-        <p className="text-lg text-neutral-100! mb-10 max-w-2xl mx-auto leading-relaxed">
-          Nuestros especialistas están listos para diseñar un itinerario que
-          supere todas tus expectativas. Comienza hoy mismo tu viaje hacia lo
-          extraordinario.
-        </p>
+        <p 
+          className="text-lg text-neutral-100! mb-10 max-w-2xl mx-auto leading-relaxed"
+          dangerouslySetInnerHTML={{
+            __html: parseStyledText(
+              llamadaSubtitulo || "Nuestros especialistas están listos para diseñar un itinerario que supere todas tus expectativas. Comienza hoy mismo tu viaje hacia lo extraordinario."
+            )
+          }}
+        />
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           {/* WhatsApp Button */}
           <a
-            href="https://wa.me/593984220600?text=Hola%2C%20quiero%20agendar%20una%20cita%20para%20planificar%20mi%20pr%C3%B3xima%20aventura"
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-white text-primary-600 font-semibold rounded-full hover:bg-neutral-100 transition-all shadow-lg hover:shadow-xl"

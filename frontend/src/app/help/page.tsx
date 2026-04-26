@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ContactDialog } from "@/components/common/contact_dialog";
+import { useRedSocial } from "@/hooks";
 import {
   DocumentTextIcon,
   CreditCardIcon,
@@ -75,6 +76,7 @@ const faqs = [
 ];
 
 export default function HelpPage() {
+  const { data: redes } = useRedSocial();
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
   const [showContactDialog, setShowContactDialog] = useState(false);
@@ -95,7 +97,7 @@ export default function HelpPage() {
       title: "WhatsApp Directo",
       description: "Mensajeria instantanea con nuestros expertos locales.",
       icon: ChatBubbleLeftIcon,
-      href: "https://wa.me/593964220600",
+      href: redes?.whatsapp ? `https://wa.me/${redes.whatsapp.replace(/[^0-9]/g, '')}` : "https://wa.me/593964220600",
       isExternal: true,
       bgColor: "bg-secondary-100",
       bgColorSelected: "bg-primary-700",
@@ -109,14 +111,14 @@ export default function HelpPage() {
       description:
         "Llamanos en cualquier momento, desde cualquier lugar del mundo.",
       icon: PhoneIcon,
-      href: "tel:+593964220600",
+      href: redes?.llamada ? `tel:${redes.llamada}` : "tel:+593964220600",
       isExternal: false,
       bgColor: "bg-secondary-100",
       bgColorSelected: "bg-primary-700",
       buttonColor:
         "border border-primary-300 text-primary-700 hover:bg-primary-50",
       textColor: "text-neutral-900",
-      buttonText: "+593 96 422 0600",
+      buttonText: redes?.llamada || "+593 96 422 0600",
     },
     {
       id: "email",
