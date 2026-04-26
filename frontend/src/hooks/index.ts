@@ -8,3 +8,4 @@ export { useRedSocial } from "./useRedSocial";
 export { useAboutData } from "./useAboutData";
 export { useServicioData } from "./useServicioData";
 export { usePaqueteData } from "./usePaqueteData";
+export { useVisasData } from "./useVisasData";

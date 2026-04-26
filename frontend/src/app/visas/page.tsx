@@ -7,168 +7,12 @@ import {
   AdjustmentsHorizontalIcon,
   EnvelopeIcon,
   XMarkIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/solid";
 import { useState, useEffect } from "react";
 import { ContactDialog } from "@/components/common/contact_dialog";
-
-const visaCards = [
-  {
-    country: "Visa Americana",
-    subtitle: "Turismo, Negocios y Transito",
-    flag: "🇺🇸",
-  },
-  { country: "Schengen", subtitle: "27 Paises Europeos", flag: "🇪🇺" },
-  { country: "Mexico", subtitle: "Visitame sin permiso de lujo", flag: "🇲🇽" },
-  { country: "Canada", subtitle: "eTA o Visa de Visitante", flag: "🇨🇦" },
-  {
-    country: "Reino Unido (UK)",
-    subtitle: "Turismo, Negocios y Transito",
-    flag: "🇬🇧",
-  },
-  { country: "Costa Rica", subtitle: "27 Paises Europeos", flag: "🇪🇺" },
-  { country: "Japon", subtitle: "Visitame sin permiso de lujo", flag: "🇯🇵" },
-  { country: "Australia", subtitle: "eTA o Visa de Visitante", flag: "🇦🇺" },
-  {
-    country: "Visado de Estudios Largos",
-    subtitle: "Programas + 1 ano",
-    flag: "🇺🇸",
-  },
-  {
-    country: "Visados de Estudios Cortos",
-    subtitle: "Cursos y diplomados",
-    flag: "🇪🇺",
-  },
-];
-
-const visaRequirements = {
-  "Visa Americana": {
-    duration: "10 años",
-    processing: "10-15 días",
-    requirements: [
-      "Pasaporte válido por mínimo 6 meses",
-      "Formulario DS-160 completado",
-      "Foto digital según especificaciones",
-      "Comprobante de pago de la tarifa",
-      "Comprobante de cita consular",
-      "Documentos que demuestren vínculos con Ecuador",
-      "Comprobante de solvencia económica",
-      "Itinerario del viaje",
-    ],
-  },
-  Schengen: {
-    duration: "3 años",
-    processing: "15-20 días",
-    requirements: [
-      "Pasaporte válido por mínimo 3 meses después del viaje",
-      "Formulario de solicitud completado",
-      "Fotografía del tamaño correcto",
-      "Seguro de viaje Schengen",
-      "Comprobante de medios económicos",
-      "Reserva de hotel o carta de invitación",
-      "Reserva de vuelos",
-      "Comprobante de solvencia laboral",
-    ],
-  },
-  Mexico: {
-    duration: "6 años",
-    processing: "3-5 días",
-    requirements: [
-      "Pasaporte válido",
-      "Forma TM180 completada",
-      "Comprobante de pago",
-      "Fotografía digital",
-      "Comprobante de estancia económica",
-      "Comprobante de domicilio",
-    ],
-  },
-  Canada: {
-    duration: "10 años",
-    processing: "4-6 semanas",
-    requirements: [
-      "Pasaporte válido por mínimo 6 meses",
-      "Confirmación de residencia",
-      "Comprobante de medios económicos",
-      "Carta de empleador",
-      "Documentos de propósito de viaje",
-      "Antecedentes penales limpios",
-      "Examen médico (si aplica)",
-    ],
-  },
-  "Reino Unido (UK)": {
-    duration: "2-10 años",
-    processing: "3-4 semanas",
-    requirements: [
-      "Pasaporte válido",
-      "Comprobante de fondos económicos",
-      "Comprobante de alojamiento",
-      "Confirmación de viaje",
-      "Carta de empleador",
-      "Extractos bancarios de los últimos 6 meses",
-      "Documentos que muestren vínculos con Ecuador",
-    ],
-  },
-  "Costa Rica": {
-    duration: "Exento para ecuatorianos",
-    processing: "Inmediato",
-    requirements: [
-      "Pasaporte válido",
-      "Comprobante de fondos",
-      "Boleto de retorno",
-      "Dirección en Costa Rica",
-    ],
-  },
-  Japon: {
-    duration: "90 días",
-    processing: "4-7 días",
-    requirements: [
-      "Pasaporte válido por mínimo 6 meses",
-      "Formulario completado",
-      "Fotografía 4x6 cm",
-      "Comprobante de estancia económica",
-      "Itinerario de viaje",
-      "Carta de empleador",
-      "Comprobantes de vivienda",
-    ],
-  },
-  Australia: {
-    duration: "1-3 años",
-    processing: "1-3 semanas",
-    requirements: [
-      "Pasaporte válido",
-      "Comprobante de fondos",
-      "Comprobante laboral",
-      "Comprobante de domicilio",
-      "Antecedentes penales",
-      "Examen médico requerido",
-      "Información de contacto de emergencia",
-    ],
-  },
-  "Visado de Estudios Largos": {
-    duration: "Según programa",
-    processing: "2-3 meses",
-    requirements: [
-      "Carta de aceptación de la universidad",
-      "Comprobante de fondos suficientes",
-      "Pasaporte válido",
-      "Certificado de antecedentes penales",
-      "Examen médico",
-      "Seguro de salud estudiantil",
-      "Comprobante de solvencia económica de patrocinador",
-    ],
-  },
-  "Visados de Estudios Cortos": {
-    duration: "3-6 meses",
-    processing: "7-15 días",
-    requirements: [
-      "Carta de inscripción de la escuela",
-      "Comprobante de pagos de cursos",
-      "Pasaporte válido",
-      "Comprobante de fondos",
-      "Comprobante de domicilio",
-      "Seguro de viaje",
-    ],
-  },
-};
+import { useVisasData } from "@/hooks/useVisasData";
+import { Visa } from "@/types";
 
 const steps = [
   {
@@ -192,12 +36,13 @@ const steps = [
 ];
 
 export default function VisasPage() {
-  const [selectedVisa, setSelectedVisa] = useState<string | null>(null);
+  const [selectedVisa, setSelectedVisa] = useState<Visa | null>(null);
   const [showRequirementsDialog, setShowRequirementsDialog] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
+  const { data: visasPageData, loading, error } = useVisasData();
 
-  const handleShowRequirements = (country: string) => {
-    setSelectedVisa(country);
+  const handleShowRequirements = (visa: Visa) => {
+    setSelectedVisa(visa);
     setShowRequirementsDialog(true);
   };
 
@@ -234,7 +79,7 @@ export default function VisasPage() {
       <section className="relative overflow-hidden bg-neutral-900 h-screen py-32">
         <div className="absolute inset-0">
           <img
-            src="/images/hero/visas.png"
+            src={visasPageData?.heroImagen || "/images/hero/visas.png"}
             alt="Asesoria de visas"
             className="h-full w-full object-cover"
           />
@@ -246,15 +91,16 @@ export default function VisasPage() {
             <span className="inline-flex rounded-full bg-primary-500/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
               Servicio White-Glove
             </span>
-            <h1 className="mt-5 text-5xl font-extrabold leading-tight md:text-7xl">
-              Viaja Sin
-              <br />
-              <span className="text-primary-400">Fronteras</span>
-            </h1>
+            <h1
+              className="mt-5 text-5xl font-extrabold leading-tight md:text-7xl"
+              dangerouslySetInnerHTML={{
+                __html:
+                  visasPageData?.heroTitulo || "Viaja Sin <br /> Fronteras",
+              }}
+            />
             <h5 className="mt-5 max-w-xl text-base text-white md:text-lg">
-              Gestionamos tu documentacion con la precision de un concierge
-              digital. Disfruta de tramites sin estres mientras nosotros
-              cuidamos cada detalle de tu visado.
+              {visasPageData?.heroSubtitulo ||
+                "Gestionamos tu documentacion con la precision de un concierge digital. Disfruta de tramites sin estres mientras nosotros cuidamos cada detalle de tu visado."}
             </h5>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -279,46 +125,70 @@ export default function VisasPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-5xl font-bold text-neutral-900">
-              Especialistas en Visados Mundiales
+              {visasPageData?.seccionGeneralTitulo ||
+                "Especialistas en Visados Mundiales"}
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-base text-neutral-600">
-              Seleccionamos los destinos mas solicitados para brindarte una
-              experiencia de solicitud optimizada y garantizada.
+              {visasPageData?.seccionGeneralContenido ||
+                "Seleccionamos los destinos mas solicitados para brindarte una experiencia de solicitud optimizada y garantizada."}
             </p>
           </div>
 
           <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {visaCards.map((item) => (
-              <article
-                key={item.country}
-                className="flex flex-col rounded-3xl bg-white p-8 shadow-sm ring-1 ring-neutral-200 transition hover:shadow-md"
-              >
-                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 text-4xl">
-                  {item.flag}
-                </div>
-                <h5 className="text-lg font-bold text-neutral-900">
-                  {item.country}
-                </h5>
-                <p className="mt-2 mb-6 text-sm text-neutral-600">
-                  {item.subtitle}
-                </p>
+            {loading ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-neutral-600">Cargando visas...</p>
+              </div>
+            ) : error ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-red-600">Error al cargar las visas</p>
+              </div>
+            ) : visasPageData?.visa_items &&
+              visasPageData.visa_items.length > 0 ? (
+              visasPageData.visa_items.map((visa) => (
+                <article
+                  key={visa.documentId}
+                  className="flex flex-col rounded-3xl bg-white p-8 shadow-sm ring-1 ring-neutral-200 transition hover:shadow-md"
+                >
+                  <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-neutral-100 overflow-hidden">
+                    {visa.imagen ? (
+                      <img
+                        src={visa.imagen}
+                        alt={visa.titulo}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-3xl">🌍</span>
+                    )}
+                  </div>
+                  <h5 className="text-lg font-bold text-neutral-900">
+                    {visa.titulo}
+                  </h5>
+                  <p className="mt-2 mb-6 text-sm text-neutral-600">
+                    {visa.subtitulo}
+                  </p>
 
-                <div className="mt-auto">
-                  <button
-                    onClick={() => setShowContactDialog(true)}
-                    className="w-full rounded-full bg-secondary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 cursor-pointer"
-                  >
-                    Solicitar
-                  </button>
-                  <button
-                    onClick={() => handleShowRequirements(item.country)}
-                    className="mt-4 block w-full text-center text-xs text-neutral-600 hover:text-primary-700 transition cursor-pointer"
-                  >
-                    Requisitos
-                  </button>
-                </div>
-              </article>
-            ))}
+                  <div className="mt-auto">
+                    <button
+                      onClick={() => setShowContactDialog(true)}
+                      className="w-full rounded-full bg-secondary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 cursor-pointer"
+                    >
+                      Solicitar
+                    </button>
+                    <button
+                      onClick={() => handleShowRequirements(visa)}
+                      className="mt-4 block w-full text-center text-xs text-neutral-600 hover:text-primary-700 transition cursor-pointer"
+                    >
+                      Más Información
+                    </button>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-neutral-600">No hay visas disponibles</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -452,10 +322,12 @@ export default function VisasPage() {
       <section className="bg-white pb-16 md:pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl bg-linear-to-r from-primary-800 to-primary-700 px-8 py-14 text-center text-white shadow-xl">
-            <h3 className="text-5xl font-bold">Listo para despegar?</h3>
+            <h3 className="text-5xl font-bold">
+              {visasPageData?.llamadaTitulo || "Listo para despegar?"}
+            </h3>
             <p className="mx-auto mt-3 max-w-2xl text-white!">
-              Habla hoy con un especialista en visados y garantiza que tu
-              proxima aventura comience sin contratiempos.
+              {visasPageData?.llamadaSubtitulo ||
+                "Habla hoy con un especialista en visados y garantiza que tu proxima aventura comience sin contratiempos."}
             </p>
 
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -485,7 +357,8 @@ export default function VisasPage() {
 
             <div>
               <h3 className="text-4xl font-bold text-primary-700">
-                Ofertas exclusivas en tu email
+                {visasPageData?.subscripcionTitulo ||
+                  "Ofertas exclusivas en tu email"}
               </h3>
               <form className="mt-5 flex flex-col gap-3 sm:flex-row">
                 <input
@@ -501,8 +374,8 @@ export default function VisasPage() {
                 </button>
               </form>
               <p className="mt-3 text-xs text-neutral-500">
-                Recibiras emails promocionales de Luxviajes. Para mas
-                informacion consulta las politicas de privacidad.
+                {visasPageData?.subscripcionSubtitulo ||
+                  "Recibiras emails promocionales de Luxviajes. Para mas informacion consulta las politicas de privacidad."}
               </p>
             </div>
           </div>
@@ -523,25 +396,30 @@ export default function VisasPage() {
               </button>
 
               <div className="flex items-center gap-4 pr-10">
-                <span className="text-5xl">
-                  {visaCards.find((v) => v.country === selectedVisa)?.flag}
-                </span>
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-neutral-100 overflow-hidden">
+                  {selectedVisa.imagen ? (
+                    <img
+                      src={selectedVisa.imagen}
+                      alt={selectedVisa.titulo}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-4xl">🌍</span>
+                  )}
+                </div>
                 <div className="flex-1 min-w-0">
                   <h2 className="text-3xl font-bold text-neutral-900 truncate">
-                    {selectedVisa}
+                    {selectedVisa.titulo}
                   </h2>
                   <p className="text-sm text-neutral-600 mt-1 truncate">
-                    {
-                      visaCards.find((v) => v.country === selectedVisa)
-                        ?.subtitle
-                    }
+                    {selectedVisa.subtitulo}
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Dialog Content - Scrollable */}
-            <div className="flex-1 overflow-hidden p-8 md:p-10">
+            <div className="flex-1 overflow-y-auto p-8 md:p-10">
               {/* Quick Info */}
               <div className="mb-8 grid grid-cols-2 gap-4">
                 <div className="rounded-lg bg-primary-50 p-4">
@@ -549,11 +427,7 @@ export default function VisasPage() {
                     Validez
                   </p>
                   <p className="mt-2 text-lg font-bold text-neutral-900">
-                    {
-                      visaRequirements[
-                        selectedVisa as keyof typeof visaRequirements
-                      ]?.duration
-                    }
+                    {selectedVisa.validez}
                   </p>
                 </div>
                 <div className="rounded-lg bg-tertiary-50 p-4">
@@ -561,11 +435,7 @@ export default function VisasPage() {
                     Procesamiento
                   </p>
                   <p className="mt-2 text-lg font-bold text-neutral-900">
-                    {
-                      visaRequirements[
-                        selectedVisa as keyof typeof visaRequirements
-                      ]?.processing
-                    }
+                    {selectedVisa.procesamiento}
                   </p>
                 </div>
               </div>
@@ -576,14 +446,17 @@ export default function VisasPage() {
                   Requisitos Necesarios
                 </h3>
                 <ul className="space-y-3">
-                  {visaRequirements[
-                    selectedVisa as keyof typeof visaRequirements
-                  ]?.requirements.map((req, idx) => (
-                    <li key={idx} className="flex gap-3">
-                      <CheckBadgeIcon className="h-5 w-5 shrink-0 text-primary-700 mt-0.5" />
-                      <span className="text-sm text-neutral-700">{req}</span>
-                    </li>
-                  ))}
+                  {selectedVisa.requisitos
+                    .split("\n")
+                    .filter((req: string) => req.trim())
+                    .map((req: string, idx: number) => (
+                      <li key={idx} className="flex gap-3">
+                        <CheckBadgeIcon className="h-5 w-5 shrink-0 text-primary-700 mt-0.5" />
+                        <span className="text-sm text-neutral-700">
+                          {req.trim()}
+                        </span>
+                      </li>
+                    ))}
                 </ul>
               </div>
             </div>
@@ -596,16 +469,24 @@ export default function VisasPage() {
               >
                 Iniciar Trámite
               </button>
-              {/*Boton para descargar pdf*/}
-              <button className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 cursor-pointer">
+              {selectedVisa.pdf && (
                 <a
-                  href={`/pdfs/${selectedVisa?.toLowerCase().replace(/\s/g, "_")}_requirements.pdf`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={selectedVisa.pdf}
+                  download
+                  className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 cursor-pointer flex items-center justify-center gap-2"
                 >
+                  <ArrowDownTrayIcon className="h-4 w-4" />
                   Descargar PDF
                 </a>
-              </button>
+              )}
+              {!selectedVisa.pdf && (
+                <button
+                  onClick={handleCloseDialog}
+                  className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 cursor-pointer"
+                >
+                  Cerrar
+                </button>
+              )}
             </div>
           </div>
         </div>

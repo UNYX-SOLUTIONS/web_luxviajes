@@ -30,6 +30,36 @@ export interface TarjetaServicio {
   publishedAt: string;
 }
 
+// Visa
+export interface Visa {
+  id: number;
+  documentId: string;
+  titulo: string;
+  subtitulo: string;
+  validez: string;
+  procesamiento: string;
+  requisitos: string;
+  imagen?: string;
+  pdf?: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+// Página de Visas
+export interface VisasPage {
+  heroTitulo: string;
+  heroSubtitulo: string;
+  seccionGeneralTitulo: string;
+  seccionGeneralContenido: string;
+  llamadaTitulo: string;
+  llamadaSubtitulo: string;
+  subscripcionTitulo: string;
+  subscripcionSubtitulo: string;
+  heroImagen?: string;
+  visa_items: Visa[];
+}
+
 // Legacy interfaces (mantener por compatibilidad)
 export interface Destination {
   id: string;
