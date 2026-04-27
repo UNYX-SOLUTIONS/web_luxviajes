@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   luxviajes-web:
     build:
@@ -15,7 +13,7 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api.luxviajes.com}
-      # Agrega aquí tus variables de entorno
+      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-https://luxviajes.com}
     healthcheck:
       test:
         [
@@ -27,13 +25,12 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 45s
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "5"
-    # Limites de recursos (ajusta según tu VPS)
     deploy:
       resources:
         limits:
