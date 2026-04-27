@@ -11,7 +11,6 @@ import {
   StarIcon,
   ShieldCheckIcon,
   MapIcon,
-  MagnifyingGlassIcon,
   ChatBubbleLeftIcon,
   PhoneIcon,
   EnvelopeIcon,
