@@ -9,32 +9,19 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/solid";
-import {
-  DocumentArrowDownIcon,
-} from "@heroicons/react/24/outline";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/24/solid";
+ 
 import type { FC } from "react";
 import type { DreamDestination } from "../data/packages-data";
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-
-interface DreamDestinationsSectionProps {
+ interface DreamDestinationsSectionProps {
   destinations: DreamDestination[];
   onDetalles: (destination: DreamDestination) => void;
   maxCards?: number;
   showScrollControls?: boolean;
-  maxCards?: number;
-  showScrollControls?: boolean;
+ 
 }
-
-export const DreamDestinationsSection: FC<
-  DreamDestinationsSectionProps
-> = ({
+ 
 export const DreamDestinationsSection: FC<
   DreamDestinationsSectionProps
 > = ({
@@ -42,8 +29,7 @@ export const DreamDestinationsSection: FC<
   onDetalles,
   maxCards = destinations.length,
   showScrollControls = false,
-  maxCards = destinations.length,
-  showScrollControls = false,
+ 
 }) => {
   const [page, setPage] = useState(0);
 
@@ -120,66 +106,10 @@ export const DreamDestinationsSection: FC<
 
     return rangeWithDots;
   };
-
-  // ✅ FIX REAL: evita salto de scroll
-  const handlePageChange = (newPage: number) => {
-    if (newPage === page) return;
-
-    const sectionTop =
-      sectionRef.current?.getBoundingClientRect().top ?? 0;
-
-    setPage(newPage);
-
-    requestAnimationFrame(() => {
-      window.scrollBy({
-        top: sectionTop - 100, // ajusta según altura de tu navbar
-        behavior: "instant", // usa "smooth" si quieres animación
-      });
-    });
-  };
-
-  const getPaginationItems = (
-    currentPage: number,
-    totalPages: number
-  ) => {
-    const current = currentPage + 1;
-    const delta = 2;
-    const range: number[] = [];
-    const rangeWithDots: (number | string)[] = [];
-
-    for (
-      let i = Math.max(2, current - delta);
-      i <= Math.min(totalPages - 1, current + delta);
-      i++
-    ) {
-      range.push(i);
-    }
-
-    if (current - delta > 2) {
-      rangeWithDots.push(1, "...");
-    } else {
-      rangeWithDots.push(1);
-    }
-
-    rangeWithDots.push(...range);
-
-    if (current + delta < totalPages - 1) {
-      rangeWithDots.push("...", totalPages);
-    } else if (
-      totalPages > 1 &&
-      rangeWithDots[rangeWithDots.length - 1] !== totalPages
-    ) {
-      rangeWithDots.push(totalPages);
-    }
-
-    return rangeWithDots;
-  };
-
+ 
+ 
   return (
-    <section
-      ref={sectionRef}
-      className="bg-neutral-50 py-16 md:py-20"
-    >
+    
     <section
       ref={sectionRef}
       className="bg-neutral-50 py-16 md:py-20"
