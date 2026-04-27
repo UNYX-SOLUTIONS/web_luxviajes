@@ -24,7 +24,7 @@ export function Footer() {
     { label: 'Centro de Ayuda', href: '/help' },
     { label: 'Contacto', href: '/contact' },
     { label: 'Seguro de Viaje', href: '/help' },
-    { label: 'Términos y Condiciones', href: '/terms' },
+    { label: 'Términos y Condiciones', href: '/#' },
   ];
 
   const socialLinks = [
@@ -162,7 +162,7 @@ export function Footer() {
             <Link href="/privacy" onClick={handleScrollToTop} className="hover:text-primary-600 transition-colors">
               Privacidad
             </Link>
-            <Link href="/terms" onClick={handleScrollToTop} className="hover:text-primary-600 transition-colors">
+            <Link href="/#" onClick={handleScrollToTop} className="hover:text-primary-600 transition-colors">
               Términos
             </Link>
             <Link href="/contact" onClick={handleScrollToTop} className="hover:text-primary-600 transition-colors">
