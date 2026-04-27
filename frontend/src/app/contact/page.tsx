@@ -34,13 +34,14 @@ interface AppointmentWebhookPayload {
   email: string;
   phone: string;
   service: string;
+  appointment_date: string;
   message: string;
   receivePromotion: boolean;
   source: "web";
 }
 
 const CONTACT_WEBHOOK_URL =
-  "https://flow.agencialuxviajes.com/webhook-test/de1e3a16-857f-48ec-a863-3eaf2aed41cc";
+  "https://flow.agencialuxviajes.com/webhook/de1e3a16-857f-48ec-a863-3eaf2aed41cc";
 
 export default function ContactPage() {
   const { data: redes } = useRedSocial();
@@ -114,6 +115,15 @@ export default function ContactPage() {
     }));
   };
 
+  const generateAppointmentDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const defaultTime = "10:00";
+    return `${day}/${month}/${year} ${defaultTime}`;
+  };
+
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -134,6 +144,7 @@ export default function ContactPage() {
       email: correo,
       phone: telefono,
       service: servicio,
+      appointment_date: generateAppointmentDate(),
       message: mensaje,
       receivePromotion: formData.promociones,
       source: "web",
