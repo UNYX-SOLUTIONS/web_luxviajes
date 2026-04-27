@@ -183,7 +183,7 @@ export function HeroCarousel({
         </div>
       </div>
 
-      <div
+    {/*   <div
         className={cn(
           "absolute left-1/2 -translate-x-1/2 max-w-4xl text-center bottom-24 z-20 w-full px-4  duration-1000",
           showSearchForm ? "opacity-100" : "opacity-0",
@@ -203,7 +203,7 @@ export function HeroCarousel({
             />
           </div>
         </form>
-      </div>
+      </div> */}
 
       {/* Top Right CTA Buttons - WhatsApp and Contact */}
       <div className="absolute top-48 right-8 z-20 flex flex-col sm:flex-row items-center gap-3">

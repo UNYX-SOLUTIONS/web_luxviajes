@@ -108,7 +108,7 @@ export default function Home() {
       {/* Hero Section */}
       <div ref={heroRef}>
         {loading ? (
-          <div className="w-full h-screen flex items-center justify-center bg-gradient-to-b from-primary-900 to-primary-800">
+          <div className="w-full h-screen flex items-center justify-center bg-linear-to-b from-primary-900 to-primary-800">
             <div className="text-center text-white">
               <div className="mb-4 flex justify-center">
                 <div className="h-12 w-12 border-4 border-primary-200 border-t-white rounded-full animate-spin"></div>
@@ -117,7 +117,7 @@ export default function Home() {
             </div>
           </div>
         ) : error ? (
-          <div className="w-full h-screen flex items-center justify-center bg-gradient-to-b from-primary-900 to-primary-800">
+          <div className="w-full h-screen flex items-center justify-center bg-linear-to-b from-primary-900 to-primary-800">
             <div className="text-center text-white">
               <p className="text-lg mb-2">Error al cargar los datos</p>
               <p className="text-sm opacity-75">Por favor, recarga la página</p>
@@ -126,7 +126,7 @@ export default function Home() {
         ) : heroSlides.length > 0 ? (
           <HeroCarousel slides={heroSlides} />
         ) : (
-          <div className="w-full h-screen flex items-center justify-center bg-gradient-to-b from-primary-900 to-primary-800">
+          <div className="w-full h-screen flex items-center justify-center bg-linear-to-b from-primary-900 to-primary-800">
             <div className="text-center text-white">
               <p className="text-lg">Sin banners disponibles</p>
             </div>

@@ -262,7 +262,7 @@ export function AppointmentSection({
             className="text-3xl md:text-4xl font-bold mb-4 text-primary-900"
             dangerouslySetInnerHTML={{
               __html: parseStyledText(
-                citaTitulo || "Agenda tu cita con nosotros",
+                citaTitulo || "con nosotros",
               ),
             }}
           />
