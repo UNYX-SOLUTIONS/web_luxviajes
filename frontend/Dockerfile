@@ -15,8 +15,8 @@ RUN pnpm install --frozen-lockfile
 # Copiar todo el código fuente
 COPY . .
 
-# Build de Next.js con modo producción
-RUN NODE_ENV=production pnpm run build
+# Build de Next.js
+RUN pnpm build
 
 # ====================================
 # Stage 2: Runtime - Ejecutar aplicación
