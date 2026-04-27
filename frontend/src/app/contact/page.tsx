@@ -6,7 +6,7 @@ import { MapPinIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useState } from "react";
 import { AppointmentDialog } from "@/components/common/appointment_dialog";
-import { useRedSocial } from "@/hooks";
+import { useRedSocial, useContactData } from "@/hooks";
 
 interface ContactOption {
   title: string;
@@ -18,29 +18,9 @@ interface ContactOption {
   isAgenda?: boolean;
 }
 
-const offices = [
-  {
-    city: "Guayaquil",
-    address: "Edificio X, Oficina Y, Sector Puerto Santa Ana.",
-    image: "/images/Contacts/Guayaquil.png",
-    mapUrl: "https://maps.app.goo.gl/Jb8QSrh2MjZH4HDz7",
-  },
-  {
-    city: "Quito",
-    address: "Av. Amazonas y Eloy Alfaro, Edificio Luxury Trade.",
-    image: "/images/Contacts/Quito.png",
-    mapUrl: "https://maps.app.goo.gl/f7gdNvxg5XPnrpB48",
-  },
-  {
-    city: "Cuenca",
-    address: "Calle Larga y Borrero, Casa Colonial Lux.",
-    image: "/images/Contacts/Cuenca.png",
-    mapUrl: "https://maps.app.goo.gl/zdy3WGpCAEsfBBzZ6",
-  },
-];
-
 export default function ContactPage() {
   const { data: redes } = useRedSocial();
+  const { data: contactData, loading, error } = useContactData();
   const [showAppointmentDialog, setShowAppointmentDialog] = useState(false);
 
   const contactOptions: ContactOption[] = [
@@ -90,13 +70,39 @@ export default function ContactPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-700 mx-auto"></div>
+          <p className="mt-4 text-neutral-600">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600">Error al cargar datos: {error.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const heroImage = contactData?.heroImagen || "/images/contacts/hero.png";
+  const heroTitle = contactData?.heroTitulo || "Contáctanos";
+  const heroSubtitle = contactData?.heroSubtitulo || "¿Tienes alguna pregunta o comentario? ¡Háznoslo saber!";
+  const direcciones = contactData?.direcciones || [];
+
   return (
     <>
       <section className="relative overflow-hidden bg-neutral-900 h-screen">
         <div className="absolute inset-0">
           <img
-            src="/images/contacts/hero.png"
-            alt="Contáctanos"
+            src={heroImage}
+            alt={heroTitle}
             className="h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-linear-to-r from-primary-950/85 via-primary-900/55 to-primary-900/25" />
@@ -108,24 +114,20 @@ export default function ContactPage() {
               Viaje Exclusivo
             </span>
             <h1 className="mt-5 text-5xl font-extrabold leading-tight md:text-7xl sm:pb-2 md:pb-4">
-              Contáctanos
+              {heroTitle}
             </h1>
             <div className="sm:py-2 md:py-4">
-              <a className="mt-5 text-2xl font-semibold text-primary-100">
-                ¿Tienes alguna pregunta o comentario?
-              </a>
-              <br />
               <a className="text-2xl font-semibold text-primary-100">
-                ¡Háznoslo saber!
+                {heroSubtitle}
               </a>
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
-                href="tel:+593123456789"
+                href={redes?.llamada ? `tel:${redes.llamada}` : "tel:+593123456789"}
                 className="inline-flex rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-primary-700"
               >
-                Llámanos +593123456789{" "}
+                Llámanos {redes?.llamada || "+593123456789"}{" "}
                 <ArrowRightIcon className="ml-2 h-4 w-4" />
               </Link>
               <span className="text-sm text-primary-100">
@@ -306,42 +308,48 @@ export default function ContactPage() {
           </div>
 
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {offices.map((office, index) => (
-              <article
-                key={office.city}
-                className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200"
-              >
-                <div className="relative">
-                  <img
-                    src={office.image}
-                    alt={office.city}
-                    className="h-44 w-full object-cover"
-                  />
-                  {index === 0 && (
-                    <span className="absolute left-3 top-3 rounded-full bg-primary-700 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white">
-                      Matriz
-                    </span>
-                  )}
-                </div>
+            {direcciones.length > 0 ? (
+              direcciones.map((office, index) => (
+                <article
+                  key={office.documentId}
+                  className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200"
+                >
+                  <div className="relative">
+                    <img
+                      src={office.imagen || "/images/Contacts/default.png"}
+                      alt={office.ciudad}
+                      className="h-44 w-full object-cover"
+                    />
+                    {index === 0 && (
+                      <span className="absolute left-3 top-3 rounded-full bg-primary-700 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white">
+                        Matriz
+                      </span>
+                    )}
+                  </div>
 
-                <div className="p-5">
-                  <h3 className="text-3xl font-bold text-neutral-900">
-                    {office.city}
-                  </h3>
-                  <p className="mt-2 text-sm text-neutral-600">
-                    <MapPinIcon className="inline-block h-5 w-5 mr-2 text-primary-700" />{" "}
-                    {office.address}
-                  </p>
+                  <div className="p-5">
+                    <h3 className="text-3xl font-bold text-neutral-900">
+                      {office.ciudad}
+                    </h3>
+                    <p className="mt-2 text-sm text-neutral-600">
+                      <MapPinIcon className="inline-block h-5 w-5 mr-2 text-primary-700" />{" "}
+                      {office.direccion}
+                    </p>
 
-                  <button 
-                    onClick={() => window.open(office.mapUrl, '_blank')}
-                    className="mt-4 w-full rounded-lg bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100"
-                  >
-                    VER MAPA
-                  </button>
-                </div>
-              </article>
-            ))}
+                    <button 
+                      onClick={() => window.open(office.url, '_blank')}
+                      className="mt-4 w-full rounded-lg bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100"
+                    >
+                      VER MAPA
+                    </button>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-10">
+                <p className="text-neutral-600">No hay oficinas disponibles en este momento.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>

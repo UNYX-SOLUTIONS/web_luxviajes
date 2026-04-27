@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ContactDialog } from "@/components/common/contact_dialog";
-import { useRedSocial } from "@/hooks";
+import { useRedSocial, useHelpData } from "@/hooks";
 import {
   DocumentTextIcon,
   CreditCardIcon,
@@ -30,12 +30,14 @@ const helpTopics = [
     description:
       "Informacion sobre nuestras politicas de reserva, precios y condiciones.",
     icon: CreditCardIcon,
+    downloadKey: "pdfPoliticasAgencia",
   },
   {
     title: "Politicas de Viaje",
     description:
       "Requisitos de entrada, restricciones de viaje y recomendaciones para destinos específicos.",
     icon: CalendarDaysIcon,
+    downloadKey: "pdfPoliticasViaje",
   },
   {
     title: "Programa de Lealtad",
@@ -57,26 +59,9 @@ const helpTopics = [
   },
 ];
 
-const faqs = [
-  {
-    question: "Como verificar el estado de mi visa?",
-    answer:
-      "Puedes rastrear tu solicitud directamente en tu panel de Luxviajes bajo la pestana de Documentos. Tambien enviamos actualizaciones automaticas via email y WhatsApp en cada paso del proceso de verificacion.",
-  },
-  {
-    question: "Cual es la politica de cancelacion?",
-    answer:
-      "Trabajamos con politicas flexibles segun proveedor. Nuestro equipo revisa tu caso y te presenta la mejor alternativa entre reembolso, cambio de fecha o credito de viaje.",
-  },
-  {
-    question: "Como contacto a mi asesora?",
-    answer:
-      "Puedes escribir por WhatsApp, llamar a nuestra linea de soporte o responder al correo de confirmacion. Siempre tendras una asesora asignada para seguimiento personalizado.",
-  },
-];
-
 export default function HelpPage() {
   const { data: redes } = useRedSocial();
+  const { data: helpData, loading, error } = useHelpData();
   const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
   const [showContactDialog, setShowContactDialog] = useState(false);
@@ -97,7 +82,7 @@ export default function HelpPage() {
       title: "WhatsApp Directo",
       description: "Mensajeria instantanea con nuestros expertos locales.",
       icon: ChatBubbleLeftIcon,
-      href: redes?.whatsapp ? `https://wa.me/${redes.whatsapp.replace(/[^0-9]/g, '')}` : "https://wa.me/593964220600",
+      href: redes?.whatsapp ? `https://wa.me/${redes.whatsapp.replace(/[^0-9]/g, '')}` : "",
       isExternal: true,
       bgColor: "bg-secondary-100",
       bgColorSelected: "bg-primary-700",
@@ -111,7 +96,7 @@ export default function HelpPage() {
       description:
         "Llamanos en cualquier momento, desde cualquier lugar del mundo.",
       icon: PhoneIcon,
-      href: redes?.llamada ? `tel:${redes.llamada}` : "tel:+593964220600",
+      href: redes?.llamada ? `tel:${redes.llamada}` : "",
       isExternal: false,
       bgColor: "bg-secondary-100",
       bgColorSelected: "bg-primary-700",
@@ -217,16 +202,30 @@ export default function HelpPage() {
                       <p className="text-sm leading-relaxed text-white! text-center">
                         {topic.description}
                       </p>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowContactDialog(true);
-                          toggleFlip(topic.title);
-                        }}
-                        className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-tertiary-500 px-4 py-2.5 text-sm font-bold text-tertiary-950 transition hover:bg-tertiary-400"
-                      >
-                        Consultar
-                      </button>
+                      {topic.downloadKey && helpData && helpData[topic.downloadKey as keyof typeof helpData] ? (
+                        <a
+                          href={helpData[topic.downloadKey as keyof typeof helpData] as string}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-tertiary-500 px-4 py-2.5 text-sm font-bold text-tertiary-950 transition hover:bg-tertiary-400"
+                        >
+                          Descargar PDF
+                        </a>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowContactDialog(true);
+                            toggleFlip(topic.title);
+                          }}
+                          className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-tertiary-500 px-4 py-2.5 text-sm font-bold text-tertiary-950 transition hover:bg-tertiary-400"
+                        >
+                          Consultar
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -241,23 +240,38 @@ export default function HelpPage() {
             Preguntas Frecuentes
           </h2>
 
-          <div className="mt-10 space-y-3">
-            {faqs.map((faq, index) => (
-              <details
-                key={faq.question}
-                className="group overflow-hidden rounded-2xl bg-white ring-1 ring-neutral-200"
-                open={index === 0}
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-left text-sm font-semibold text-neutral-900">
-                  {faq.question}
-                  <ChevronDownIcon className="h-5 w-5 text-primary-700 transition-transform duration-200 group-open:rotate-180" />
-                </summary>
-                <p className="px-5 pb-5 text-sm leading-relaxed text-neutral-600!">
-                  {faq.answer}
-                </p>
-              </details>
-            ))}
-          </div>
+          {loading ? (
+            <div className="mt-10 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-700 mx-auto"></div>
+              <p className="mt-4 text-neutral-600">Cargando preguntas...</p>
+            </div>
+          ) : error ? (
+            <div className="mt-10 text-center">
+              <p className="text-red-600">Error al cargar preguntas frecuentes</p>
+            </div>
+          ) : (
+            <div className="mt-10 space-y-3">
+              {helpData?.preguntasFrecuentes && helpData.preguntasFrecuentes.length > 0 ? (
+                helpData.preguntasFrecuentes.map((faq, index) => (
+                  <details
+                    key={faq.documentId}
+                    className="group overflow-hidden rounded-2xl bg-white ring-1 ring-neutral-200"
+                    open={index === 0}
+                  >
+                    <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-left text-sm font-semibold text-neutral-900">
+                      {faq.titulo}
+                      <ChevronDownIcon className="h-5 w-5 text-primary-700 transition-transform duration-200 group-open:rotate-180" />
+                    </summary>
+                    <p className="px-5 pb-5 text-sm leading-relaxed text-neutral-600!">
+                      {faq.descripcion}
+                    </p>
+                  </details>
+                ))
+              ) : (
+                <p className="text-center text-neutral-600">No hay preguntas frecuentes disponibles.</p>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
@@ -339,7 +353,7 @@ export default function HelpPage() {
             </p>
             {/* Boton que envia a correo */}
             <a
-              href="mailto:agencia@luxviajes.com"
+              href={redes?.email_trabajos ? `mailto:${redes.email_trabajos}` : "mailto:agencia@luxviajes.com"}
               className="mt-6 inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50"
             >
               Haznos llegar tu CV
