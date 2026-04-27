@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-'use client';
+"use client";
 
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { MapPinIcon } from "@heroicons/react/24/outline";
@@ -18,10 +18,44 @@ interface ContactOption {
   isAgenda?: boolean;
 }
 
+interface FormData {
+  nombre: string;
+  apellido: string;
+  telefono: string;
+  correo: string;
+  servicio: string;
+  mensaje: string;
+  promociones: boolean;
+}
+
+interface AppointmentWebhookPayload {
+  name: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  service: string;
+  message: string;
+  receivePromotion: boolean;
+  source: "web";
+}
+
+const CONTACT_WEBHOOK_URL =
+  "https://flow.agencialuxviajes.com/webhook-test/de1e3a16-857f-48ec-a863-3eaf2aed41cc";
+
 export default function ContactPage() {
   const { data: redes } = useRedSocial();
   const { data: contactData, loading, error } = useContactData();
   const [showAppointmentDialog, setShowAppointmentDialog] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
+    nombre: "",
+    apellido: "",
+    telefono: "",
+    correo: "",
+    servicio: "",
+    mensaje: "",
+    promociones: false,
+  });
 
   const contactOptions: ContactOption[] = [
     {
@@ -36,9 +70,12 @@ export default function ContactPage() {
     },
     {
       title: "WhatsApp",
-      description: "¿Prefieres escribir? Contáctanos directamente por WhatsApp y recibe atención personalizada en tiempo real.",
+      description:
+        "¿Prefieres escribir? Contáctanos directamente por WhatsApp y recibe atención personalizada en tiempo real.",
       action: "WhatsApp Directo",
-      href: redes?.whatsapp ? `https://wa.me/${redes.whatsapp.replace(/[^0-9]/g, '')}` : "https://wa.me/593964220600",
+      href: redes?.whatsapp
+        ? `https://wa.me/${redes.whatsapp.replace(/[^0-9]/g, "")}`
+        : "https://wa.me/593964220600",
       image:
         "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=900&h=600&fit=crop",
     },
@@ -63,10 +100,81 @@ export default function ContactPage() {
     },
   ];
 
+  const handleFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    const nextValue =
+      e.target instanceof HTMLInputElement && e.target.type === "checkbox"
+        ? e.target.checked
+        : value;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: nextValue,
+    }));
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const { nombre, apellido, telefono, correo, servicio, mensaje } = formData;
+    if (!nombre || !apellido || !telefono || !correo || !servicio || !mensaje) {
+      alert("Por favor completa todos los campos");
+      return;
+    }
+
+    if (!CONTACT_WEBHOOK_URL) {
+      alert("Falta configurar el webhook de contacto");
+      return;
+    }
+
+    const payload: AppointmentWebhookPayload = {
+      name: nombre,
+      lastName: apellido,
+      email: correo,
+      phone: telefono,
+      service: servicio,
+      message: mensaje,
+      receivePromotion: formData.promociones,
+      source: "web",
+    };
+
+    try {
+      setIsSubmitting(true);
+      const response = await fetch(CONTACT_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook respondio con estado ${response.status}`);
+      }
+
+      alert("Mensaje enviado correctamente. Nos pondremos en contacto pronto.");
+      setFormData({
+        nombre: "",
+        apellido: "",
+        telefono: "",
+        correo: "",
+        servicio: "",
+        mensaje: "",
+        promociones: false,
+      });
+    } catch (error) {
+      console.error("Error al enviar mensaje:", error);
+      alert("No se pudo enviar el mensaje. Intenta nuevamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleScrollToOffices = () => {
-    const officesSection = document.getElementById('offices');
+    const officesSection = document.getElementById("offices");
     if (officesSection) {
-      officesSection.scrollIntoView({ behavior: 'smooth' });
+      officesSection.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -93,7 +201,9 @@ export default function ContactPage() {
 
   const heroImage = contactData?.heroImagen || "/images/contacts/hero.png";
   const heroTitle = contactData?.heroTitulo || "Contáctanos";
-  const heroSubtitle = contactData?.heroSubtitulo || "¿Tienes alguna pregunta o comentario? ¡Háznoslo saber!";
+  const heroSubtitle =
+    contactData?.heroSubtitulo ||
+    "¿Tienes alguna pregunta o comentario? ¡Háznoslo saber!";
   const direcciones = contactData?.direcciones || [];
 
   return (
@@ -124,7 +234,9 @@ export default function ContactPage() {
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
-                href={redes?.llamada ? `tel:${redes.llamada}` : "tel:+593123456789"}
+                href={
+                  redes?.llamada ? `tel:${redes.llamada}` : "tel:+593123456789"
+                }
                 className="inline-flex rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-primary-700"
               >
                 Llámanos {redes?.llamada || "+593123456789"}{" "}
@@ -170,7 +282,7 @@ export default function ContactPage() {
                   <p className="mt-3 grow text-sm leading-relaxed text-neutral-600">
                     {option.description}
                   </p>
-                  {(option.isVideocall || option.isAgenda) ? (
+                  {option.isVideocall || option.isAgenda ? (
                     <button
                       onClick={() => setShowAppointmentDialog(true)}
                       className="mt-6 mb-8 inline-flex w-full items-center justify-center rounded-full bg-neutral-100 px-4 py-3 text-sm font-bold text-primary-700 transition hover:bg-primary-800 hover:text-white duration-200"
@@ -188,7 +300,9 @@ export default function ContactPage() {
                     <Link
                       href={option.href}
                       target={
-                        option.href.startsWith("https://") ? "_blank" : undefined
+                        option.href.startsWith("https://")
+                          ? "_blank"
+                          : undefined
                       }
                       className="mt-6 mb-8 inline-flex w-full items-center justify-center rounded-full bg-neutral-100 px-4 py-3 text-sm font-bold text-primary-700 transition hover:bg-primary-800 hover:text-white duration-200"
                     >
@@ -225,7 +339,10 @@ export default function ContactPage() {
             </p>
           </div>
 
-          <form className="rounded-3xl bg-white p-8 shadow-lg ring-1 ring-primary-100 sm:p-10 h-auto overflow-y-auto">
+          <form
+            onSubmit={handleFormSubmit}
+            className="rounded-3xl bg-white p-8 shadow-lg ring-1 ring-primary-100 sm:p-10 h-auto overflow-y-auto"
+          >
             <h3 className="text-3xl font-bold text-primary-700">
               Envíenos un mensaje
             </h3>
@@ -233,21 +350,52 @@ export default function ContactPage() {
             <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                  Nombre Completo
+                  Nombre
                 </label>
                 <input
                   type="text"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleFormChange}
                   placeholder="Ej: Juan Pérez"
                   className="h-12 w-full rounded-lg border border-primary-200 bg-primary-50 px-4 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition"
                 />
               </div>
-
+              <div>
+                <label className="block text-sm font-semibold text-neutral-900 mb-2">
+                  Apellido
+                </label>
+                <input
+                  type="text"
+                  name="apellido"
+                  value={formData.apellido}
+                  onChange={handleFormChange}
+                  placeholder="Ej: García López"
+                  className="h-12 w-full rounded-lg border border-primary-200 bg-primary-50 px-4 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-neutral-900 mb-2">
+                  Teléfono
+                </label>
+                <input
+                  type="tel"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleFormChange}
+                  placeholder="+593"
+                  className="h-12 w-full rounded-lg border border-primary-200 bg-primary-50 px-4 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-semibold text-neutral-900 mb-2">
                   Correo Electrónico
                 </label>
                 <input
                   type="email"
+                  name="correo"
+                  value={formData.correo}
+                  onChange={handleFormChange}
                   placeholder="ejemplo@email.com"
                   className="h-12 w-full rounded-lg border border-primary-200 bg-primary-50 px-4 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition"
                 />
@@ -255,26 +403,20 @@ export default function ContactPage() {
 
               <div>
                 <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                  Teléfono
+                  Servicio
                 </label>
                 <input
-                  type="tel"
-                  placeholder="+593"
+                  type="text"
+                  name="servicio"
+                  value={formData.servicio}
+                  onChange={handleFormChange}
+                  maxLength={20}
+                  placeholder="Asesoría de viajes"
                   className="h-12 w-full rounded-lg border border-primary-200 bg-primary-50 px-4 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                  Destino de Interés
-                </label>
-                <select className="h-12 w-full rounded-lg border border-primary-200 bg-primary-50 px-4 text-sm text-neutral-700 outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition appearance-none cursor-pointer">
-                  <option>Seleccione un destino</option>
-                  <option>Europa</option>
-                  <option>Asia</option>
-                  <option>Estados Unidos</option>
-                  <option>Sudamérica</option>
-                </select>
+                <p className="text-xs text-neutral-400 text-right mt-1">
+                  {formData.servicio.length}/20
+                </p>
               </div>
             </div>
 
@@ -283,16 +425,38 @@ export default function ContactPage() {
                 Mensaje
               </label>
               <textarea
+                name="mensaje"
+                value={formData.mensaje}
+                onChange={handleFormChange}
+                maxLength={100}
                 placeholder="Cuéntenos sobre el viaje de sus sueños..."
                 className="h-40 w-full rounded-lg border border-primary-200 bg-primary-50 px-4 py-3 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition resize-none"
               />
+              <p className="text-xs text-neutral-400 text-right mt-1">
+                {formData.mensaje.length}/100
+              </p>
+            </div>
+
+            <div className="mt-6 flex items-center">
+              <input
+                type="checkbox"
+                id="promociones"
+                name="promociones"
+                checked={formData.promociones}
+                onChange={handleFormChange}
+                className="w-4 h-4 rounded border-primary-200 text-primary-600 focus:ring-primary-600"
+              />
+              <label htmlFor="promociones" className="ml-3 text-sm text-neutral-700">
+                Deseo recibir promociones y descuentos en mi correo
+              </label>
             </div>
 
             <button
               type="submit"
-              className="mt-8 inline-flex rounded-full bg-primary-700 px-10 py-3 text-base font-semibold text-white transition hover:bg-primary-800 shadow-lg hover:shadow-xl"
+              disabled={isSubmitting}
+              className="mt-8 inline-flex rounded-full bg-primary-700 px-10 py-3 text-base font-semibold text-white transition hover:bg-primary-800 shadow-lg hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Enviar Solicitud
+              {isSubmitting ? "Enviando..." : "Enviar Solicitud"}
             </button>
           </form>
         </div>
@@ -336,8 +500,8 @@ export default function ContactPage() {
                       {office.direccion}
                     </p>
 
-                    <button 
-                      onClick={() => window.open(office.url, '_blank')}
+                    <button
+                      onClick={() => window.open(office.url, "_blank")}
                       className="mt-4 w-full rounded-lg bg-primary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100"
                     >
                       VER MAPA
@@ -347,7 +511,9 @@ export default function ContactPage() {
               ))
             ) : (
               <div className="col-span-3 text-center py-10">
-                <p className="text-neutral-600">No hay oficinas disponibles en este momento.</p>
+                <p className="text-neutral-600">
+                  No hay oficinas disponibles en este momento.
+                </p>
               </div>
             )}
           </div>

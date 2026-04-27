@@ -6,7 +6,6 @@ import { Button } from "./Button";
 import { cn } from "@/utils/cn";
 import { trackWhatsAppClick, trackPhoneClick } from "@/lib/analytics";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
 import { useRedSocial } from "@/hooks";
 
 interface BannerSlide {
@@ -52,7 +51,7 @@ export function HeroCarousel({
   const { data: redes } = useRedSocial();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [showSearchForm, setShowSearchForm] = useState(false);
+  const [, setShowSearchForm] = useState(false);
 
   // Mostrar el formulario de búsqueda después de 2 segundos
   useEffect(() => {

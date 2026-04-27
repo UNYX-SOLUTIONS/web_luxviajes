@@ -166,8 +166,8 @@ export function AppointmentDialog({ isOpen, onClose }: AppointmentDialogProps) {
   return (
     <>
       {/* Main Dialog */}
-      <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
-        <div className="relative w-full max-w-5xl rounded-3xl bg-white shadow-2xl flex flex-col max-h-[90vh] z-[1000] overflow-hidden">
+      <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/50 p-4">
+        <div className="relative w-full max-w-5xl rounded-3xl bg-white shadow-2xl flex flex-col max-h-[90vh] z-1000 overflow-hidden">
           {/* Header */}
           <div className="shrink-0 border-b border-neutral-200 bg-white px-8 py-6 flex items-center justify-between">
             <h2 className="text-3xl font-bold text-neutral-900">Agenda tu cita con nosotros</h2>
@@ -296,7 +296,7 @@ export function AppointmentDialog({ isOpen, onClose }: AppointmentDialogProps) {
               {/* Time Selection */}
               <div className="flex flex-col h-fit">
                 <div className="mb-8 flex flex-col flex-1">
-                  <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex-shrink-0">
+                  <h3 className="text-lg font-semibold text-neutral-900 mb-4 shrink-0">
                     Selecciona una hora
                   </h3>
 
@@ -339,7 +339,7 @@ export function AppointmentDialog({ isOpen, onClose }: AppointmentDialogProps) {
                 </div>
 
                 {/* Booking Summary */}
-                <div className="bg-primary-50 p-6 rounded-2xl border border-primary-200 flex-shrink-0 mt-4">
+                <div className="bg-primary-50 p-6 rounded-2xl border border-primary-200 shrink-0 mt-4">
                   <button
                     onClick={handleOpenModal}
                     disabled={!selectedDate || !selectedTime}
@@ -363,7 +363,7 @@ export function AppointmentDialog({ isOpen, onClose }: AppointmentDialogProps) {
 
       {/* Form Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[1001]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-1001">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
             {/* Header */}
             <div className="mb-6">
