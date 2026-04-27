@@ -15,14 +15,12 @@ export interface PremiumPackage extends BasePackage {
   highlights: string[];
   price: string;
   season: string;
-} 
+}
 
 export interface DreamDestination extends BasePackage {
   nights: string;
   season: string;
 }
-
-
 
 export const themeParks = [
   {

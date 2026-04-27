@@ -591,6 +591,7 @@ export function AppointmentSection({
                 </div>
 
                 {/* <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Mensaje
                   </label>
@@ -605,6 +606,7 @@ export function AppointmentSection({
                   <p className="text-xs text-neutral-400 text-right mt-1">
                     {formData.mensaje.length}/100
                   </p>
+                </div> */}
                 </div> */}
 
                 <div className="flex items-center">

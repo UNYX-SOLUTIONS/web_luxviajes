@@ -1,7 +1,10 @@
 function parseStyledText(text: string): string {
-  let parsed = text.replace(/\*([^*]+)\*/g, '<span class="text-primary-300">$1</span>');
-  parsed = parsed.replace(/<br\s*\/?>/gi, '<br />');
-  parsed = parsed.replace(/\n/g, '<br />');
+  let parsed = text.replace(
+    /\*([^*]+)\*/g,
+    '<span class="text-primary-300">$1</span>',
+  );
+  parsed = parsed.replace(/<br\s*\/?>/gi, "<br />");
+  parsed = parsed.replace(/\n/g, "<br />");
   return parsed;
 }
 
@@ -10,18 +13,18 @@ interface NewsletterSectionProps {
   descripcion?: string;
 }
 
-export function NewsletterSection({ 
+export function NewsletterSection({
   titulo = "Únete a nuestra comunidad luxviajes VIP",
-  descripcion = "Suscríbete a nuestro boletín para recibir ofertas exclusivas, consejos de viaje y las últimas novedades directamente en tu bandeja de entrada."
+  descripcion = "Suscríbete a nuestro boletín para recibir ofertas exclusivas, consejos de viaje y las últimas novedades directamente en tu bandeja de entrada.",
 }: NewsletterSectionProps) {
   return (
     <section className="bg-primary-700 py-16 text-white">
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-        <h3 
+        <h3
           className="text-4xl font-bold"
           dangerouslySetInnerHTML={{ __html: parseStyledText(titulo) }}
         />
-        <p 
+        <p
           className="mx-auto mt-3 max-w-2xl text-white!"
           dangerouslySetInnerHTML={{ __html: parseStyledText(descripcion) }}
         />

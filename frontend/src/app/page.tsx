@@ -37,18 +37,22 @@ export default function Home() {
   const heroSlides = homeData?.banners || [];
 
   // Transformar destinos de Strapi a formato DreamDestination
-  const dreamDestinations: DreamDestination[] = (homeData?.destinos || []).map((destino) => ({
-    title: destino.titulo,
-    image: destino.imagen || "",
-    description: destino.descripcion,
-    duration: destino.duracion,
-    nights: destino.subtitulo,
-    season: destino.disponibilidad,
-    included: destino.descripcion.split("\n").filter(line => line.trim()), // Para las cards
-    detailIncluded: destino.descripcionDetallada.split("\n").filter(line => line.trim()), // Para el diálogo
-    price: destino.precio,
-    pdf: destino.pdf,
-  }));
+  const dreamDestinations: DreamDestination[] = (homeData?.destinos || []).map(
+    (destino) => ({
+      title: destino.titulo,
+      image: destino.imagen || "",
+      description: destino.descripcion,
+      duration: destino.duracion,
+      nights: destino.subtitulo,
+      season: destino.disponibilidad,
+      included: destino.descripcion.split("\n").filter((line) => line.trim()), // Para las cards
+      detailIncluded: destino.descripcionDetallada
+        .split("\n")
+        .filter((line) => line.trim()), // Para el diálogo
+      price: destino.precio,
+      pdf: destino.pdf,
+    }),
+  );
 
   // Transformar servicios de Strapi para ServicesDetailSection
   const servicesData = (homeData?.servicios || []).map((servicio) => ({
@@ -149,22 +153,22 @@ export default function Home() {
 
       {/* Services Detail Section */}
       {!loading && servicesData.length > 0 && (
-        <ServicesDetailSection 
-          services={servicesData} 
+        <ServicesDetailSection
+          services={servicesData}
           serviciosTitulo={homeData?.serviciosTitulo}
           serviciosDescripcion={homeData?.serviciosDescripcion}
         />
       )}
 
       {/* Appointment Section */}
-      <AppointmentSection 
+      <AppointmentSection
         citaTitulo={homeData?.citaTitulo}
         citaSubtitulo={homeData?.citaSubtitulo}
         citaUrgencia={homeData?.citaUrgencia}
       />
 
       {/* CTA Section */}
-      <CTASection 
+      <CTASection
         llamadaTitulo={homeData?.llamadaTitulo}
         llamadaSubtitulo={homeData?.llamadaSubtitulo}
       />

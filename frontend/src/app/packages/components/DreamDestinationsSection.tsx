@@ -9,8 +9,17 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/solid";
+import {
+  DocumentArrowDownIcon,
+} from "@heroicons/react/24/outline";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/24/solid";
 import type { FC } from "react";
 import type { DreamDestination } from "../data/packages-data";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -19,13 +28,20 @@ interface DreamDestinationsSectionProps {
   onDetalles: (destination: DreamDestination) => void;
   maxCards?: number;
   showScrollControls?: boolean;
+  maxCards?: number;
+  showScrollControls?: boolean;
 }
 
 export const DreamDestinationsSection: FC<
   DreamDestinationsSectionProps
 > = ({
+export const DreamDestinationsSection: FC<
+  DreamDestinationsSectionProps
+> = ({
   destinations,
   onDetalles,
+  maxCards = destinations.length,
+  showScrollControls = false,
   maxCards = destinations.length,
   showScrollControls = false,
 }) => {
@@ -105,15 +121,77 @@ export const DreamDestinationsSection: FC<
     return rangeWithDots;
   };
 
+  // ✅ FIX REAL: evita salto de scroll
+  const handlePageChange = (newPage: number) => {
+    if (newPage === page) return;
+
+    const sectionTop =
+      sectionRef.current?.getBoundingClientRect().top ?? 0;
+
+    setPage(newPage);
+
+    requestAnimationFrame(() => {
+      window.scrollBy({
+        top: sectionTop - 100, // ajusta según altura de tu navbar
+        behavior: "instant", // usa "smooth" si quieres animación
+      });
+    });
+  };
+
+  const getPaginationItems = (
+    currentPage: number,
+    totalPages: number
+  ) => {
+    const current = currentPage + 1;
+    const delta = 2;
+    const range: number[] = [];
+    const rangeWithDots: (number | string)[] = [];
+
+    for (
+      let i = Math.max(2, current - delta);
+      i <= Math.min(totalPages - 1, current + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+
+    if (current - delta > 2) {
+      rangeWithDots.push(1, "...");
+    } else {
+      rangeWithDots.push(1);
+    }
+
+    rangeWithDots.push(...range);
+
+    if (current + delta < totalPages - 1) {
+      rangeWithDots.push("...", totalPages);
+    } else if (
+      totalPages > 1 &&
+      rangeWithDots[rangeWithDots.length - 1] !== totalPages
+    ) {
+      rangeWithDots.push(totalPages);
+    }
+
+    return rangeWithDots;
+  };
+
   return (
+    <section
+      ref={sectionRef}
+      className="bg-neutral-50 py-16 md:py-20"
+    >
     <section
       ref={sectionRef}
       className="bg-neutral-50 py-16 md:py-20"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* HEADER */}
+        {/* HEADER */}
         <div className="mb-7 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
           <div>
+            <p className="text-sm text-accent-red">
+              Escapa, Explora, Disfruta
+            </p>
             <p className="text-sm text-accent-red">
               Escapa, Explora, Disfruta
             </p>
@@ -121,6 +199,15 @@ export const DreamDestinationsSection: FC<
               Top Destinos del Mes
             </h2>
           </div>
+
+          {!showScrollControls && (
+            <Link
+              href="/packages"
+              className="text-sm font-semibold text-primary-700 transition hover:text-primary-800"
+            >
+              Ver más destinos populares →
+            </Link>
+          )}
 
           {!showScrollControls && (
             <Link
@@ -215,6 +302,63 @@ export const DreamDestinationsSection: FC<
             </AnimatePresence>
           </div>
         </div>
+
+        {/* PAGINACIÓN */}
+        {showScrollControls && totalPages > 1 && (
+          <div className="mt-8 flex justify-center items-center gap-2">
+            <button
+              onClick={() =>
+                handlePageChange(Math.max(0, page - 1))
+              }
+              disabled={page === 0}
+              className={`p-2 rounded-full transition ${
+                page === 0
+                  ? "bg-neutral-200 text-neutral-400"
+                  : "bg-neutral-200 hover:bg-neutral-300"
+              }`}
+            >
+              <ChevronLeftIcon className="h-4 w-4" />
+            </button>
+
+            {getPaginationItems(page, totalPages).map(
+              (item, index) => (
+                <button
+                  key={index}
+                  onClick={() =>
+                    typeof item === "number" &&
+                    handlePageChange(item - 1)
+                  }
+                  disabled={typeof item !== "number"}
+                  className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
+                    item === page + 1
+                      ? "bg-primary-700 text-white"
+                      : typeof item === "number"
+                      ? "bg-neutral-200 hover:bg-neutral-300"
+                      : "text-neutral-500 cursor-default"
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            )}
+
+            <button
+              onClick={() =>
+                handlePageChange(
+                  Math.min(totalPages - 1, page + 1)
+                )
+              }
+              disabled={page === totalPages - 1}
+              className={`p-2 rounded-full transition ${
+                page === totalPages - 1
+                  ? "bg-neutral-200 text-neutral-400"
+                  : "bg-neutral-200 hover:bg-neutral-300"
+              }`}
+            >
+              <ChevronRightIcon className="h-4 w-4" />
+            </button>
+          </div>
+        )}
 
         {/* PAGINACIÓN */}
         {showScrollControls && totalPages > 1 && (
