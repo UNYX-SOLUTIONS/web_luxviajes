@@ -14,8 +14,7 @@ interface FormData {
   apellido: string;
   telefono: string;
   correo: string;
-  servicio?: string;
-  mensaje?: string;
+  
   promociones: boolean;
 }
 
@@ -23,10 +22,8 @@ interface AppointmentWebhookPayload {
   name: string;
   lastName: string;
   email: string;
-  phone: string;
-  service: string;
-  appointment_date: string;
-  message: string;
+  phone: string; 
+  appointment_date: string; 
   receivePromotion: boolean;
   source: "web";
 }
@@ -80,8 +77,7 @@ export function AppointmentBase({
     apellido: "",
     telefono: "",
     correo: "",
-    servicio: "",
-    mensaje: "",
+    
     promociones: false,
   });
 
@@ -289,7 +285,7 @@ export function AppointmentBase({
   };
 
   const handleSubmit = async () => {
-    const { nombre, apellido, telefono, correo, servicio, mensaje } = formData;
+    const { nombre, apellido, telefono, correo} = formData;
     if (!nombre || !apellido || !telefono || !correo) {
       alert("Por favor completa los campos obligatorios");
       return;
@@ -311,7 +307,7 @@ export function AppointmentBase({
     }
 
     const formattedDate = selectedDate.toLocaleDateString("es-ES");
-    const whatsappMessage = `Hola, me gustaría agendar una cita para el ${formattedDate} a las ${selectedTime}\n\nDatos:\nNombre: ${nombre} ${apellido}\nTeléfono: ${telefono}\nCorreo: ${correo}${servicio ? `\nServicio: ${servicio}` : ""}${mensaje ? `\nMensaje: ${mensaje}` : ""}\nRecibir promociones: ${formData.promociones ? "Sí" : "No"}`;
+    const whatsappMessage = `Hola, me gustaría agendar una cita para el ${formattedDate} a las ${selectedTime}\n\nDatos:\nNombre: ${nombre} ${apellido}\nTeléfono: ${telefono}\nCorreo: ${correo}\nRecibir promociones: ${formData.promociones ? "Sí" : "No"}`;
     const whatsappNumber =
       redes?.whatsapp?.replace(/[^0-9]/g, "") || "593964220600";
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
@@ -322,10 +318,8 @@ export function AppointmentBase({
         name: nombre,
         lastName: apellido,
         email: correo,
-        phone: telefono,
-        service: servicio || "Cita General",
-        appointment_date: formatAppointmentDate(selectedDate, selectedTime),
-        message: mensaje || "Agendado desde la web",
+        phone: telefono, 
+        appointment_date: formatAppointmentDate(selectedDate, selectedTime), 
         receivePromotion: formData.promociones,
         source: "web",
       };
@@ -363,8 +357,6 @@ export function AppointmentBase({
       apellido: "",
       telefono: "",
       correo: "",
-      servicio: "",
-      mensaje: "",
       promociones: false,
     });
     setSelectedDate(null);
@@ -695,32 +687,8 @@ export function AppointmentBase({
                     required
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Servicio (opcional)
-                  </label>
-                  <input
-                    type="text"
-                    name="servicio"
-                    value={formData.servicio}
-                    onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                    placeholder="¿Qué servicio te interesa?"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Mensaje (opcional)
-                  </label>
-                  <textarea
-                    name="mensaje"
-                    value={formData.mensaje}
-                    onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                    placeholder="¿Alguna pregunta o comentario?"
-                    rows={3}
-                  />
-                </div>
+                
+                
                 <div className="flex items-center">
                   <input
                     type="checkbox"

@@ -32,7 +32,7 @@ interface AppointmentWebhookPayload {
 }
 
 const APPOINTMENT_WEBHOOK_URL =
-  "https://flow.agencialuxviajes.com/webhook/de1e3a16-857f-48ec-a863-3eaf2aed41cc";
+  "https://flow.agencialuxviajes.com/webhook-test/de1e3a16-857f-48ec-a863-3eaf2aed41cc";
 
 interface AppointmentSectionProps {
   citaTitulo?: string;
