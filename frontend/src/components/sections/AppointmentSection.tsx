@@ -26,8 +26,8 @@ interface AppointmentWebhookPayload {
   service: string;
   appointment_date: string;
   message: string;
-  receivePromotion: boolean;
-  source: "web";
+  receivePromotion: boolean; 
+  source: string;
 }
 
 const APPOINTMENT_WEBHOOK_URL =
@@ -217,7 +217,7 @@ export function AppointmentSection({
       appointment_date: formatAppointmentDate(selectedDate, selectedTime),
       message: mensaje,
       receivePromotion: formData.promociones,
-      source: "web",
+      source: "calendar",
     };
 
     try {
