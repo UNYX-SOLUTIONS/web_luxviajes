@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AppointmentBase } from "../common/AppointmentBase";
 
 interface TimeSlot {
   id: string;
