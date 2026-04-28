@@ -6,7 +6,6 @@ import { Button } from "./Button";
 import { cn } from "@/utils/cn";
 import { trackWhatsAppClick, trackPhoneClick } from "@/lib/analytics";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import MagnifyingGlassIcon from "@heroicons/react/24/solid/MagnifyingGlassIcon";
 import { useRedSocial } from "@/hooks";
 
 interface BannerSlide {
@@ -52,7 +51,7 @@ export function HeroCarousel({
   const { data: redes } = useRedSocial();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [showSearchForm, setShowSearchForm] = useState(false);
+  const [, setShowSearchForm] = useState(false);
 
   // Mostrar el formulario de búsqueda después de 2 segundos
   useEffect(() => {
@@ -183,7 +182,7 @@ export function HeroCarousel({
         </div>
       </div>
 
-      <div
+    {/*   <div
         className={cn(
           "absolute left-1/2 -translate-x-1/2 max-w-4xl text-center bottom-24 z-20 w-full px-4  duration-1000",
           showSearchForm ? "opacity-100" : "opacity-0",
@@ -203,7 +202,7 @@ export function HeroCarousel({
             />
           </div>
         </form>
-      </div>
+      </div> */}
 
       {/* Top Right CTA Buttons - WhatsApp and Contact */}
       <div className="absolute top-48 right-8 z-20 flex flex-col sm:flex-row items-center gap-3">

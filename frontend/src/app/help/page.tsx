@@ -11,7 +11,6 @@ import {
   StarIcon,
   ShieldCheckIcon,
   MapIcon,
-  MagnifyingGlassIcon,
   ChatBubbleLeftIcon,
   PhoneIcon,
   EnvelopeIcon,
@@ -135,7 +134,7 @@ export default function HelpPage() {
               ¿Cómo podemos ayudarte hoy?
             </h1>
 
-            <form className="mx-auto mt-8 max-w-xl w-full">
+            {/* <form className="mx-auto mt-8 max-w-xl w-full">
               <div className="flex items-center rounded-full bg-white px-4 py-3 shadow-lg ring-1 ring-neutral-300 focus-within:ring-1 focus-within:ring-primary-500">
                 <MagnifyingGlassIcon className="mr-3 h-5 w-5 text-neutral-700" />
                 <input
@@ -144,7 +143,7 @@ export default function HelpPage() {
                   className="w-full bg-transparent text-sm text-neutral-800! outline-none placeholder:text-neutral-400"
                 />
               </div>
-            </form>
+            </form> */}
           </div>
         </div>
       </section>

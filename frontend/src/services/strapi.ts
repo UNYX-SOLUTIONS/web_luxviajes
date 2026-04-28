@@ -133,7 +133,7 @@ function mapHomeDataToHome(homeData: HomeData, banners: Banner[]): Home {
     updatedAt: homeData.updatedAt,
     publishedAt: homeData.publishedAt,
     banners,
-    redes: homeData.Redes ?? [],
+    redes: homeData.Redes?.[0],
     stats: transformStats(homeData),
   };
 }

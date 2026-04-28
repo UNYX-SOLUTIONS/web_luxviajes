@@ -1,83 +1,347 @@
-# Despliegue en Hostinger
+# Despliegue en Hostinger VPS con Docker
 
-## Carpetas y archivos generados para producción
+## Opción A: Deployment con Docker (Recomendado)
 
-### Carpetas principales:
+### 1. Preparar el servidor
 
-- **.next/** - Contiene el build optimizado de Next.js para producción
-- **public/** - Assets estáticos (imágenes, CSS, JS)
-- **node_modules/** - Dependencias del proyecto
+```bash
+# Conectar vía SSH a tu VPS Hostinger
+ssh root@tu-ip-vps
 
-### Archivos necesarios:
+# Actualizar el sistema
+apt update && apt upgrade -y
 
-- **package.json** - Definición del proyecto y dependencias
-- **pnpm-lock.yaml** - Lock file para reproducir las dependencias exactas
-- **next.config.ts** - Configuración de Next.js
-- **tsconfig.json** - Configuración de TypeScript
-- **tailwind.config.ts** - Configuración de Tailwind CSS
-- **postcss.config.mjs** - Configuración de PostCSS
-- **eslint.config.mjs** - Configuración de ESLint
+# Instalar Docker y Docker Compose
+apt install -y docker.io docker-compose-plugin curl
 
-## Pasos para desplegar en Hostinger:
+# Iniciar Docker
+systemctl start docker
+systemctl enable docker
 
-### 1. Preparar los archivos
-
-Copia estas carpetas y archivos a Hostinger:
-
-```
-.next/
-public/
-node_modules/ (o ejecutar 'pnpm install' en el servidor)
-package.json
-pnpm-lock.yaml
-next.config.ts
-tsconfig.json
-tailwind.config.ts
-postcss.config.mjs
-.env.local (con tus variables de entorno)
+# Verificar instalación
+docker --version
+docker compose version
 ```
 
-### 2. En Hostinger - Instalación
+### 2. Preparar el proyecto en el servidor
 
-Si usas cPanel o File Manager:
+```bash
+# Crear directorio para la aplicación
+mkdir -p /var/www/luxviajes
+cd /var/www/luxviajes
 
-1. Conecta vía SSH o SFTP
-2. Copia los archivos a la carpeta del proyecto
-3. Ejecuta: `pnpm install` (si no copias node_modules)
-4. Ejecuta: `pnpm build` (para regenerar .next)
+# Clonar el repositorio o copiar archivos
+# Opción 1: Clonar directamente
+git clone https://tu-repositorio.git .
 
-### 3. En Hostinger - Configuración Node.js
-
-1. En cPanel, ve a "Node.js Manager" o "Application Manager"
-2. Crea una nueva aplicación Node.js
-3. Configuración recomendada:
-   - **Node.js version**: 20.x o superior
-   - **Entry point**: next/dist/server/lib/start-server.js
-   - **App URL**: tu-dominio.com
-   - **App root path**: /home/usuario/public_html/tu-app
-
-### 4. Variables de entorno (.env.local)
-
-Crea un archivo `.env.local` en Hostinger con:
-
-```
-NEXT_PUBLIC_API_URL=tu-url-api
-# Agrega aquí otras variables necesarias
+# Opción 2: Copiar vía SFTP/FTP
+# Copia los archivos a /var/www/luxviajes
 ```
 
-### 5. Iniciar la aplicación
+### 3. Configurar variables de entorno
 
-En cPanel:
+```bash
+# Crear archivo .env.local
+nano .env/local
 
-1. Ve a "Node.js Manager"
-2. Selecciona tu aplicación
-3. Haz clic en "Start" o "Restart"
+# Agregar las variables necesarias:
+NODE_ENV=production
+PORT=3000
+NEXT_PUBLIC_API_URL=https://tu-api.luxviajes.com
+NEXT_PUBLIC_BASE_URL=https://luxviajes.com
 
-### 6. Configurar dominio
+# Guardar: Ctrl+O, Enter, Ctrl+X
+```
 
-1. En cPanel, ve a "Addon Domains" o "Parked Domains"
-2. Apunta tu dominio a la aplicación Node.js
-3. Configura SSL/TLS (recomendado)
+### 4. Construir e iniciar con Docker Compose
+
+```bash
+# Desde /var/www/luxviajes
+cd frontend
+
+# Construir la imagen
+docker compose build
+
+# Iniciar el contenedor en background
+docker compose up -d
+
+# Verificar que está corriendo
+docker compose ps
+docker compose logs -f luxviajes-app
+```
+
+### 5. Configurar Nginx como proxy inverso
+
+```bash
+# Instalar Nginx
+apt install -y nginx
+
+# Crear configuración
+nano /etc/nginx/sites-available/luxviajes
+
+# Agregar esta configuración:
+```
+
+```nginx
+upstream nextjs {
+    server 127.0.0.1:3000;
+    keepalive 64;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name luxviajes.com www.luxviajes.com;
+
+    # Redirigir a HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name luxviajes.com www.luxviajes.com;
+
+    # Certificados SSL (Let's Encrypt)
+    ssl_certificate /etc/letsencrypt/live/luxviajes.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/luxviajes.com/privkey.pem;
+
+    # SSL Configuration
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    client_max_body_size 20M;
+
+    location / {
+        proxy_pass http://nextjs;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_redirect off;
+    }
+
+    # Cache estático (images, css, js)
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        proxy_pass http://nextjs;
+        proxy_cache_valid 200 60d;
+        proxy_cache_bypass $http_pragma $http_authorization;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        expires 1y;
+    }
+
+    # Denegar acceso a archivos sensibles
+    location ~ /\. {
+        deny all;
+    }
+}
+```
+
+```bash
+# Habilitar la configuración
+ln -s /etc/nginx/sites-available/luxviajes /etc/nginx/sites-enabled/
+
+# Verificar sintaxis
+nginx -t
+
+# Recargar Nginx
+systemctl reload nginx
+systemctl enable nginx
+```
+
+### 6. Configurar SSL con Let's Encrypt
+
+```bash
+# Instalar Certbot
+apt install -y certbot python3-certbot-nginx
+
+# Obtener certificado
+certbot certonly --nginx -d luxviajes.com -d www.luxviajes.com
+
+# Renovación automática (ya está configurada)
+systemctl status certbot.timer
+```
+
+### 7. Monitoreo y Logs
+
+```bash
+# Ver logs de la aplicación
+docker compose logs -f luxviajes-app
+
+# Ver logs de Nginx
+tail -f /var/log/nginx/access.log
+tail -f /var/log/nginx/error.log
+
+# Verificar estado del contenedor
+docker ps
+docker stats luxviajes-app
+```
+
+---
+
+## Opción B: Deployment Sin Docker (Alternativa)
+
+### 1. Preparar servidor Node.js
+
+```bash
+# Instalar Node.js 20.x
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+apt install -y nodejs
+
+# Instalar pnpm globalmente
+npm install -g pnpm
+
+# Crear usuario para la aplicación
+useradd -m -s /bin/bash luxviajes
+```
+
+### 2. Clonar y configurar aplicación
+
+```bash
+# Crear directorio
+mkdir -p /var/www/luxviajes
+cd /var/www/luxviajes
+
+# Clonar repositorio
+git clone https://tu-repositorio.git .
+cd frontend
+
+# Instalar dependencias
+pnpm install --frozen-lockfile
+
+# Build
+pnpm build
+
+# Configurar permisos
+chown -R luxviajes:luxviajes /var/www/luxviajes
+```
+
+### 3. Crear servicio systemd
+
+```bash
+# Crear archivo de servicio
+nano /etc/systemd/system/luxviajes.service
+```
+
+```ini
+[Unit]
+Description=Lux Viajes Next.js Application
+After=network.target
+
+[Service]
+Type=simple
+User=luxviajes
+WorkingDirectory=/var/www/luxviajes/frontend
+ExecStart=/home/luxviajes/.local/share/pnpm/pnpm start
+Restart=always
+RestartSec=10
+Environment="NODE_ENV=production"
+Environment="PORT=3000"
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+# Activar servicio
+systemctl daemon-reload
+systemctl start luxviajes
+systemctl enable luxviajes
+
+# Verificar estado
+systemctl status luxviajes
+```
+
+---
+
+## Tareas de Mantenimiento
+
+### Actualizar la aplicación
+
+```bash
+cd /var/www/luxviajes
+
+# Con Docker
+docker compose down
+git pull origin main
+docker compose build
+docker compose up -d
+
+# Sin Docker
+git pull origin main
+cd frontend
+pnpm install
+pnpm build
+systemctl restart luxviajes
+```
+
+### Backup
+
+```bash
+# Crear backup de la aplicación
+tar -czf luxviajes-backup-$(date +%Y%m%d).tar.gz /var/www/luxviajes
+
+# Crear backup de la BD (si aplica)
+# mysqldump -u usuario -p basedatos > backup.sql
+```
+
+### Monitoreo de recursos
+
+```bash
+# Instalar htop para monitoreo
+apt install -y htop
+htop
+
+# Con Docker
+docker stats luxviajes-app
+
+# Ver uso de disco
+df -h
+```
+
+---
+
+## Troubleshooting
+
+### Contenedor no inicia
+
+```bash
+# Revisar logs detallados
+docker compose logs luxviajes-app
+
+# Verificar imagen
+docker images
+
+# Reconstruir imagen
+docker compose build --no-cache
+```
+
+### Proxy reverso no funciona
+
+```bash
+# Verificar Nginx
+nginx -t
+systemctl status nginx
+
+# Verificar puertos
+netstat -tlpn | grep 3000
+netstat -tlpn | grep 80
+```
+
+### Out of memory
+
+```bash
+# Aumentar límites en docker-compose.yml
+# Ver sección "deploy.resources.limits"
+
+# Reiniciar contenedor
+docker compose restart
+```
 
 ## Archivos generados por el build:
 

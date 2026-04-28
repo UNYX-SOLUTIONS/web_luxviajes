@@ -15,7 +15,7 @@ export default function Error({ error, reset }: ErrorProps) {
   }, [error]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100 px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-linear-to-b from-slate-50 to-slate-100 px-4">
       <div className="text-center max-w-md">
         <h1 className="text-4xl font-bold text-slate-900 mb-4">¡Oops!</h1>
         <p className="text-lg text-slate-600 mb-6">
