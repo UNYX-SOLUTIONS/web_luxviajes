@@ -574,7 +574,7 @@ export function AppointmentSection({
                   />
                 </div>
 
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Servicio
                   </label>
@@ -590,7 +590,7 @@ export function AppointmentSection({
                   <p className="text-xs text-neutral-400 text-right mt-1">
                     {formData.servicio.length}/20
                   </p>
-                </div>
+                </div> */}
 
                {/*  <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
