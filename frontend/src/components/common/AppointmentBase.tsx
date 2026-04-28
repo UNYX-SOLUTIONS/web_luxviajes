@@ -25,7 +25,7 @@ interface AppointmentWebhookPayload {
   phone: string; 
   appointment_date: string; 
   receivePromotion: boolean;
-  source: "web";
+  source: string;
 }
 
 const APPOINTMENT_WEBHOOK_URL =
@@ -60,7 +60,6 @@ function parseStyledText(text: string): string {
 
 export function AppointmentBase({
   onSuccess,
-  onCancel,
   showUrgencia = false,
   citaUrgencia,
   isDialogMode = false,
@@ -135,7 +134,7 @@ export function AppointmentBase({
         "15:00", "15:30", "16:00", "16:30", "17:00", "17:30"
       ];
       
-      return baseSlots.map((time, index) => {
+      return baseSlots.map((time) => {
         // Verificar si el horario ya está reservado
         let available = !bookedForDate.includes(time);
         
@@ -321,7 +320,7 @@ export function AppointmentBase({
         phone: telefono, 
         appointment_date: formatAppointmentDate(selectedDate, selectedTime), 
         receivePromotion: formData.promociones,
-        source: "web",
+        source: "calendar",
       };
 
       try {
@@ -582,7 +581,7 @@ export function AppointmentBase({
 
       {/* Form Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[1001]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-1001">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full flex flex-col max-h-[90vh]">
             <div className="px-6 pt-6 shrink-0 flex items-start justify-between gap-4">
               <div>
