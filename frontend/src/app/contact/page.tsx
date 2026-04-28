@@ -412,9 +412,9 @@ export default function ContactPage() {
                 />
               </div>
 
-              <div>
+              {/* <div>
                 <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                  Servicio
+                  Servicioo
                 </label>
                 <input
                   type="text"
@@ -428,10 +428,10 @@ export default function ContactPage() {
                 <p className="text-xs text-neutral-400 text-right mt-1">
                   {formData.servicio.length}/20
                 </p>
-              </div>
+              </div> */}
             </div>
 
-            <div className="mt-6">
+            {/* <div className="mt-6">
               <label className="block text-sm font-semibold text-neutral-900 mb-2">
                 Mensaje
               </label>
@@ -446,7 +446,7 @@ export default function ContactPage() {
               <p className="text-xs text-neutral-400 text-right mt-1">
                 {formData.mensaje.length}/100
               </p>
-            </div>
+            </div> */}
 
             <div className="mt-6 flex items-center">
               <input
