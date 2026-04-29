@@ -1,7 +1,7 @@
 'use client';
 
 import { XMarkIcon } from '@heroicons/react/24/solid';
-import { AppointmentBase } from './AppointmentBase';
+import { AppointmentBase, AppointmentSource } from './AppointmentBase';
 
 interface AppointmentDialogProps {
   isOpen: boolean;
@@ -12,8 +12,8 @@ export function AppointmentDialog({ isOpen, onClose }: AppointmentDialogProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
-      <div className="relative w-full max-w-5xl rounded-3xl bg-white shadow-2xl flex flex-col max-h-[90vh] z-[1000] overflow-hidden">
+    <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/50 p-4">
+      <div className="relative w-full max-w-5xl rounded-3xl bg-white shadow-2xl flex flex-col max-h-[90vh] z-1000 overflow-hidden">
         {/* Header */}
         <div className="shrink-0 border-b border-neutral-200 bg-white px-8 py-6 flex items-center justify-between">
           <h2 className="text-3xl font-bold text-neutral-900">Agenda tu cita con nosotros</h2>
@@ -36,6 +36,7 @@ export function AppointmentDialog({ isOpen, onClose }: AppointmentDialogProps) {
             onCancel={onClose} 
             isDialogMode={true} 
             showUrgencia={false}
+            appointmentSource={AppointmentSource.NOW} // El source es "now" en el diálogo
           />
         </div>
       </div>

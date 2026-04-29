@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ContactDialog } from "../common/contact_dialog";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useRedSocial } from "@/hooks";
 
 interface ServiceDetail {
@@ -80,6 +81,7 @@ export function ServicesDetailSection({
   serviciosTitulo, 
   serviciosDescripcion 
 }: ServicesDetailSectionProps = {}) {
+  const router = useRouter();
   const { data: redes } = useRedSocial();
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -107,6 +109,18 @@ export function ServicesDetailSection({
       observer.disconnect();
     };
   }, []);
+
+  // Función para manejar el clic en la card
+  const handleCardClick = (serviceId: string) => {
+    // Navegar a /packages para cualquier card
+    router.push("/packages");
+  };
+
+  // Función para manejar el clic en el botón (evita la propagación)
+  const handleButtonClick = (e: React.MouseEvent, serviceId: string) => {
+    e.stopPropagation(); // Evita que el clic se propague a la card
+    setShowContactDialog(true);
+  };
 
   return (
     <section ref={sectionRef} className="py-16 md:py-20 bg-[#F8F5FA]">
@@ -185,8 +199,11 @@ export function ServicesDetailSection({
               <div
                 key={service.id}
               >
-                {/* Card Container */}
-                <div className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group hover:-translate-y-1">
+                {/* Card Container - Ahora clickeable */}
+                <div 
+                  onClick={() => handleCardClick(service.id)}
+                  className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group hover:-translate-y-1 cursor-pointer"
+                >
                   {/* Background Image */}
                   <Image
                     src={service.image}
@@ -207,7 +224,10 @@ export function ServicesDetailSection({
 
                     {/* Badge Button */}
                     <div className="flex justify-end">
-                      <button onClick={() => setShowContactDialog(true)} className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors shadow-md hover:shadow-lg cursor-pointer">
+                      <button 
+                        onClick={(e) => handleButtonClick(e, service.id)} 
+                        className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors shadow-md hover:shadow-lg cursor-pointer"
+                      >
                         <span>Solicitar asesoría</span>
                         <svg
                           className="w-4 h-4"
@@ -245,7 +265,7 @@ export function ServicesDetailSection({
         <ContactDialog
           isOpen={showContactDialog}
           onClose={() => setShowContactDialog(false)}
-          whatsappNumber={redes?.whatsapp.replace(/[^0-9]/g, '') || "593964220600"}
+          whatsappNumber={redes?.whatsapp?.replace(/[^0-9]/g, '') || "593964220600"}
           phoneNumber={redes?.llamada || "+593964220600"}
           videoCallUrl="/contact"
         />

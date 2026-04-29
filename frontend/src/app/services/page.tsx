@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 import ArrowRightIcon from "@heroicons/react/24/solid/ArrowRightIcon";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ContactDialog } from "@/components/common/contact_dialog";
 import ArrowLeftIcon from "@heroicons/react/24/outline/ArrowLeftIcon";
 import { useRedSocial, useServicioData } from "@/hooks";
@@ -22,6 +22,10 @@ export default function ServicesPage() {
   const { data: servicioData } = useServicioData();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showContactDialog, setShowContactDialog] = useState(false);
+
+   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []); // Esto fuerza el scroll al cargar la página
 
   const getVisibleTestimonials = () => {
     const items = servicioData?.testimonios || [];

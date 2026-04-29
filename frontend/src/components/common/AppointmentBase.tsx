@@ -3,6 +3,14 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRedSocial } from "@/hooks";
 
+// Enum para los tipos de origen de la cita
+export enum AppointmentSource {
+  WEB = "web",      // Citas agendadas desde el calendario normal
+  NOW = "now",      // Citas de urgencia/asesoría en vivo desde el dialog
+  URGENCY = "urgency", // Citas urgentes desde el botón de urgencia
+  MAIL_MARKETING = "mailMarketing", // Suscripciones al newsletter
+}
+
 interface TimeSlot {
   id: string;
   time: string;
@@ -14,7 +22,8 @@ interface FormData {
   apellido: string;
   telefono: string;
   correo: string;
-  
+  servicio?: string;
+  mensaje?: string;
   promociones: boolean;
 }
 
@@ -22,13 +31,15 @@ interface AppointmentWebhookPayload {
   name: string;
   lastName: string;
   email: string;
-  phone: string; 
-  appointment_date: string; 
+  phone: string;
+  service: string;
+  appointment_date: string;
+  message: string;
   receivePromotion: boolean;
-  source: string;
+  source: AppointmentSource;
 }
 
-const APPOINTMENT_WEBHOOK_URL =
+export const APPOINTMENT_WEBHOOK_URL =
   "https://flow.agencialuxviajes.com/webhook/de1e3a16-857f-48ec-a863-3eaf2aed41cc";
 
 interface AppointmentBaseProps {
@@ -37,6 +48,7 @@ interface AppointmentBaseProps {
   showUrgencia?: boolean;
   citaUrgencia?: string;
   isDialogMode?: boolean;
+  appointmentSource?: AppointmentSource;
 }
 
 /**
@@ -60,9 +72,11 @@ function parseStyledText(text: string): string {
 
 export function AppointmentBase({
   onSuccess,
+  onCancel,
   showUrgencia = false,
   citaUrgencia,
   isDialogMode = false,
+  appointmentSource = AppointmentSource.WEB,
 }: AppointmentBaseProps) {
   const { data: redes } = useRedSocial();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -71,12 +85,14 @@ export function AppointmentBase({
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<Record<string, string[]>>({});
+  const [isUrgencyMode, setIsUrgencyMode] = useState(false); // Nuevo estado para modo urgencia
   const [formData, setFormData] = useState<FormData>({
     nombre: "",
     apellido: "",
     telefono: "",
     correo: "",
-    
+    servicio: "",
+    mensaje: "",
     promociones: false,
   });
 
@@ -85,18 +101,10 @@ export function AppointmentBase({
     try {
       const dateKey = date.toISOString().split('T')[0];
       
-      // Si ya tenemos los horarios en caché, no los solicitamos de nuevo
       if (bookedSlots[dateKey]) return;
       
-      // Aquí deberías reemplazar con tu endpoint real
-      // const response = await fetch(`/api/appointments/booked?date=${dateKey}`);
-      // const data = await response.json();
-      
-      // Simulamos una respuesta del backend (reemplazar con llamada real)
       const mockBookedSlots: Record<string, string[]> = {
-        // Ejemplo de horarios ya reservados para fechas específicas
         // "2024-12-15": ["10:00", "14:30"],
-        // "2024-12-16": ["11:00", "15:30"],
       };
       
       setBookedSlots(prev => ({
@@ -127,7 +135,6 @@ export function AppointmentBase({
       const dateKey = date.toISOString().split('T')[0];
       const bookedForDate = bookedSlots[dateKey] || [];
       
-      // Horarios base (puedes ajustar según necesidades del negocio)
       const baseSlots = [
         "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
         "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
@@ -135,19 +142,13 @@ export function AppointmentBase({
       ];
       
       return baseSlots.map((time) => {
-        // Verificar si el horario ya está reservado
         let available = !bookedForDate.includes(time);
         
-        // Aplicar regla de 30 minutos de anticipación SOLO para hoy
         if (isToday && available) {
           const [hours, minutes] = time.split(":").map(Number);
           const slotTime = new Date();
           slotTime.setHours(hours, minutes, 0, 0);
-          
-          // Calcular diferencia en minutos
           const diffMinutes = (slotTime.getTime() - now.getTime()) / 1000 / 60;
-          
-          // Solo disponible si falta más de 30 minutos
           available = diffMinutes > 30;
         }
         
@@ -160,12 +161,9 @@ export function AppointmentBase({
     };
   }, [bookedSlots]);
 
-  // Efecto para consultar disponibilidad cuando cambia la fecha
   useEffect(() => {
     if (selectedDate) {
-      // Resetear hora seleccionada al cambiar fecha
       setSelectedTime(null);
-      // Consultar horarios reservados para la fecha seleccionada
       fetchBookedSlots(selectedDate);
     }
   }, [selectedDate]);
@@ -225,7 +223,6 @@ export function AppointmentBase({
   };
 
   const handleTimeSelect = (time: string) => {
-    // Validar nuevamente disponibilidad antes de seleccionar
     if (selectedDate) {
       const slots = getAvailableTimeSlots(selectedDate);
       const slot = slots.find(s => s.time === time);
@@ -237,10 +234,10 @@ export function AppointmentBase({
 
   const handleOpenModal = () => {
     if (selectedDate && selectedTime) {
-      // Validar disponibilidad nuevamente antes de abrir el modal
       const slots = getAvailableTimeSlots(selectedDate);
       const slot = slots.find(s => s.time === selectedTime);
       if (slot?.available) {
+        setIsUrgencyMode(false); // No es modo urgencia
         setShowModal(true);
       } else {
         alert("Este horario ya no está disponible. Por favor selecciona otro.");
@@ -249,7 +246,18 @@ export function AppointmentBase({
     }
   };
 
-  const handleCloseModal = () => setShowModal(false);
+  const handleUrgencyClick = () => {
+    // Modo urgencia: no requiere fecha ni hora
+    setIsUrgencyMode(true);
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setIsUrgencyMode(false); // Resetear modo urgencia al cerrar
+  };
 
   useEffect(() => {
     if (showModal) {
@@ -284,43 +292,70 @@ export function AppointmentBase({
   };
 
   const handleSubmit = async () => {
-    const { nombre, apellido, telefono, correo} = formData;
+    const { nombre, apellido, telefono, correo, servicio, mensaje } = formData;
     if (!nombre || !apellido || !telefono || !correo) {
       alert("Por favor completa los campos obligatorios");
       return;
     }
 
-    if (!selectedDate || !selectedTime) {
+    // Para modo normal, validar fecha y hora
+    if (!isUrgencyMode && (!selectedDate || !selectedTime)) {
       alert("Selecciona fecha y hora para la cita");
       return;
     }
 
-    // Validar disponibilidad final antes de enviar
-    const slots = getAvailableTimeSlots(selectedDate);
-    const selectedSlot = slots.find(s => s.time === selectedTime);
-    if (!selectedSlot?.available) {
-      alert("Lo sentimos, este horario ya no está disponible. Por favor selecciona otro.");
-      setSelectedTime(null);
-      setShowModal(false);
-      return;
+    // Validar disponibilidad solo si no es modo urgencia
+    if (!isUrgencyMode && selectedDate && selectedTime) {
+      const slots = getAvailableTimeSlots(selectedDate);
+      const selectedSlot = slots.find(s => s.time === selectedTime);
+      if (!selectedSlot?.available) {
+        alert("Lo sentimos, este horario ya no está disponible. Por favor selecciona otro.");
+        setSelectedTime(null);
+        setShowModal(false);
+        return;
+      }
     }
 
-    const formattedDate = selectedDate.toLocaleDateString("es-ES");
-    const whatsappMessage = `Hola, me gustaría agendar una cita para el ${formattedDate} a las ${selectedTime}\n\nDatos:\nNombre: ${nombre} ${apellido}\nTeléfono: ${telefono}\nCorreo: ${correo}\nRecibir promociones: ${formData.promociones ? "Sí" : "No"}`;
+    let whatsappMessage = "";
+    let appointmentDate = "";
+
+    if (isUrgencyMode) {
+      // Mensaje para cita urgente
+      whatsappMessage = `Hola, me gustaría agendar una ASESORÍA EN VIVO (cita urgente)\n\nDatos:\nNombre: ${nombre} ${apellido}\nTeléfono: ${telefono}\nCorreo: ${correo}${servicio ? `\nServicio: ${servicio}` : ""}${mensaje ? `\nMensaje: ${mensaje}` : ""}\nRecibir promociones: ${formData.promociones ? "Sí" : "No"}\n\nPor favor contactarme lo antes posible.`;
+      appointmentDate = "Cita urgente - Asesoría en vivo";
+    } else {
+      // Mensaje para cita normal con fecha y hora
+      const formattedDate = selectedDate!.toLocaleDateString("es-ES");
+      whatsappMessage = `Hola, me gustaría agendar una cita para el ${formattedDate} a las ${selectedTime}\n\nDatos:\nNombre: ${nombre} ${apellido}\nTeléfono: ${telefono}\nCorreo: ${correo}${servicio ? `\nServicio: ${servicio}` : ""}${mensaje ? `\nMensaje: ${mensaje}` : ""}\nRecibir promociones: ${formData.promociones ? "Sí" : "No"}`;
+      appointmentDate = formatAppointmentDate(selectedDate!, selectedTime!);
+    }
+
     const whatsappNumber =
       redes?.whatsapp?.replace(/[^0-9]/g, "") || "593964220600";
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
-    // Intentar Webhook si es el caso
+    // Enviar webhook
     if (!isDialogMode && APPOINTMENT_WEBHOOK_URL) {
+      let currentSource = appointmentSource;
+      
+      if (isDialogMode) {
+        currentSource = AppointmentSource.NOW;
+      }
+      
+      if (isUrgencyMode) {
+        currentSource = AppointmentSource.URGENCY;
+      }
+      
       const payload: AppointmentWebhookPayload = {
         name: nombre,
         lastName: apellido,
         email: correo,
-        phone: telefono, 
-        appointment_date: formatAppointmentDate(selectedDate, selectedTime), 
+        phone: telefono,
+        service: servicio || (isUrgencyMode ? "Asesoría en vivo" : "Cita General"),
+        appointment_date: appointmentDate,
+        message: mensaje || (isUrgencyMode ? "Cita urgente - Asesoría en vivo" : "Agendado desde la web"),
         receivePromotion: formData.promociones,
-        source: "calendar",
+        source: currentSource,
       };
 
       try {
@@ -346,8 +381,9 @@ export function AppointmentBase({
     // Abrir WhatsApp
     window.open(whatsappUrl, "_blank");
 
-    alert("Cita procesada correctamente");
+    alert(isUrgencyMode ? "Solicitud de asesoría enviada correctamente" : "Cita procesada correctamente");
     setShowModal(false);
+    setIsUrgencyMode(false);
     if (onSuccess) onSuccess();
 
     // Reset form
@@ -356,13 +392,16 @@ export function AppointmentBase({
       apellido: "",
       telefono: "",
       correo: "",
+      servicio: "",
+      mensaje: "",
       promociones: false,
     });
-    setSelectedDate(null);
-    setSelectedTime(null);
+    if (!isUrgencyMode) {
+      setSelectedDate(null);
+      setSelectedTime(null);
+    }
   };
 
-  // Generar horarios dinámicos basados en la fecha seleccionada
   const timeSlots = useMemo(() => {
     return getAvailableTimeSlots(selectedDate);
   }, [selectedDate, getAvailableTimeSlots]);
@@ -419,7 +458,6 @@ export function AppointmentBase({
               </button>
             </div>
 
-            {/* Days of week */}
             <div className="grid grid-cols-7 gap-2 mb-2">
               {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sab"].map((day) => (
                 <div
@@ -431,7 +469,6 @@ export function AppointmentBase({
               ))}
             </div>
 
-            {/* Calendar days */}
             <div className="grid grid-cols-7 gap-2">
               {calendarDays.map((date, index) => (
                 <button
@@ -544,7 +581,6 @@ export function AppointmentBase({
             )}
           </div>
 
-          {/* Booking Summary */}
           <div className="bg-primary-50 p-6 rounded-2xl border border-primary-200 shrink-0 mt-4">
             <button
               onClick={handleOpenModal}
@@ -565,7 +601,7 @@ export function AppointmentBase({
           {showUrgencia && (
             <div className="mt-4 bg-neutral-50 p-6 rounded-2xl border border-neutral-200 shrink-0">
               <button
-                onClick={() => setShowModal(true)}
+                onClick={handleUrgencyClick}
                 className="w-full py-3 rounded-lg border border-primary-600 text-primary-600 font-semibold hover:bg-primary-50 transition"
                 dangerouslySetInnerHTML={{
                   __html: parseStyledText(
@@ -581,16 +617,17 @@ export function AppointmentBase({
 
       {/* Form Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-1001">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[1001]">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full flex flex-col max-h-[90vh]">
             <div className="px-6 pt-6 shrink-0 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-2xl font-bold text-neutral-900 mb-2">
-                  Completa tu información
+                  {isUrgencyMode ? "Solicitar Asesoría en Vivo" : "Completa tu información"}
                 </h3>
                 <p className="text-neutral-600">
-                  Para confirmar tu cita, por favor completa los siguientes
-                  datos
+                  {isUrgencyMode 
+                    ? "Déjanos tus datos y en 10 minutos te contactamos para una asesoría personalizada" 
+                    : "Para confirmar tu cita, por favor completa los siguientes datos"}
                 </p>
               </div>
               <button
@@ -614,19 +651,22 @@ export function AppointmentBase({
               </button>
             </div>
 
-            <div className="mx-6 mt-4 shrink-0 bg-primary-50 p-4 rounded-lg border border-primary-200">
-              <p className="text-sm text-neutral-600 mb-2">
-                Resumen de tu cita:
-              </p>
-              <p className="font-semibold text-neutral-900">
-                {selectedDate?.toLocaleDateString("es-ES", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                })}{" "}
-                a las {selectedTime}
-              </p>
-            </div>
+            {/* Resumen de cita - SOLO se muestra si NO es modo urgencia */}
+            {!isUrgencyMode && (
+              <div className="mx-6 mt-4 shrink-0 bg-primary-50 p-4 rounded-lg border border-primary-200">
+                <p className="text-sm text-neutral-600 mb-2">
+                  Resumen de tu cita:
+                </p>
+                <p className="font-semibold text-neutral-900">
+                  {selectedDate?.toLocaleDateString("es-ES", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                  })}{" "}
+                  a las {selectedTime}
+                </p>
+              </div>
+            )}
 
             <div className="overflow-y-auto flex-1 px-6 mt-4">
               <div className="space-y-4 mb-6">
@@ -686,8 +726,32 @@ export function AppointmentBase({
                     required
                   />
                 </div>
-                
-                
+               {/*  <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Servicio (opcional)
+                  </label>
+                  <input
+                    type="text"
+                    name="servicio"
+                    value={formData.servicio}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                    placeholder="¿Qué servicio te interesa?"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Mensaje (opcional)
+                  </label>
+                  <textarea
+                    name="mensaje"
+                    value={formData.mensaje}
+                    onChange={handleFormChange}
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
+                    placeholder="¿Alguna pregunta o comentario?"
+                    rows={3}
+                  />
+                </div> */}
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -719,7 +783,7 @@ export function AppointmentBase({
                 disabled={isSubmitting}
                 className="flex-1 py-2 px-4 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "Enviando..." : "Confirmar Cita"}
+                {isSubmitting ? "Enviando..." : (isUrgencyMode ? "Solicitar Asesoría" : "Confirmar Cita")}
               </button>
             </div>
           </div>

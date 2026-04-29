@@ -355,7 +355,7 @@ export default function ContactPage() {
             className="rounded-3xl bg-white p-8 shadow-lg ring-1 ring-primary-100 sm:p-10 h-auto overflow-y-auto"
           >
             <h3 className="text-3xl font-bold text-primary-700">
-              Envíenos un mensaje
+              Envíanos un mensaje
             </h3>
 
             <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
