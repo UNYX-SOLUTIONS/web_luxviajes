@@ -74,7 +74,7 @@ export default function ServicesPage() {
 
             <div className="sm:py-2 md:py-4">
               <p 
-                className="mt-5 text-2xl font-regular text-primary-100 !text-white"
+                className="mt-5 text-2xl font-regular text-white!"
                 dangerouslySetInnerHTML={{
                   __html: parseStyledText(servicioData?.heroSubtitulo || "Elevamos tus experiencias de viaje a una obra maestra. Un servicio de guante blanco diseñado para quienes buscan lo extraordinario.")
                 }}
@@ -184,7 +184,7 @@ export default function ServicesPage() {
             </button>
 
             <div className="grid grid-cols-1 gap-10 md:grid-cols-3 w-full max-w-6xl">
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              
               {getVisibleTestimonials().map((item: Testimonio, position: number) => {
                 const rating = item.calificacion || 5;
                 const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
