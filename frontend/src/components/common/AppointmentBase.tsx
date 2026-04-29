@@ -5,9 +5,9 @@ import { useRedSocial } from "@/hooks";
 
 // Enum para los tipos de origen de la cita
 export enum AppointmentSource {
-  WEB = "web",      // Citas agendadas desde el calendario normal
-  NOW = "now",      // Citas de urgencia/asesoría en vivo desde el dialog
-  URGENCY = "urgency", // Citas urgentes desde el botón de urgencia
+  CALENDAR = "calendar",      // Citas agendadas desde el calendario normal
+  NOW = "now",                // Citas de urgencia/asesoría en vivo desde el dialog
+  URGENCY = "urgency",        // Citas urgentes desde el botón de urgencia
   MAIL_MARKETING = "mailMarketing", // Suscripciones al newsletter
 }
 
@@ -22,8 +22,6 @@ interface FormData {
   apellido: string;
   telefono: string;
   correo: string;
-  servicio?: string;
-  mensaje?: string;
   promociones: boolean;
 }
 
@@ -32,9 +30,7 @@ interface AppointmentWebhookPayload {
   lastName: string;
   email: string;
   phone: string;
-  service: string;
   appointment_date: string;
-  message: string;
   receivePromotion: boolean;
   source: AppointmentSource;
 }
@@ -76,37 +72,29 @@ export function AppointmentBase({
   showUrgencia = false,
   citaUrgencia,
   isDialogMode = false,
-  appointmentSource = AppointmentSource.WEB,
+  appointmentSource = AppointmentSource.CALENDAR,
 }: AppointmentBaseProps) {
-  const { data: redes } = useRedSocial();
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<Record<string, string[]>>({});
-  const [isUrgencyMode, setIsUrgencyMode] = useState(false); // Nuevo estado para modo urgencia
+  const [isUrgencyMode, setIsUrgencyMode] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     nombre: "",
     apellido: "",
     telefono: "",
     correo: "",
-    servicio: "",
-    mensaje: "",
     promociones: false,
   });
 
-  // Función para obtener horarios ya reservados desde el backend
   const fetchBookedSlots = async (date: Date) => {
     try {
       const dateKey = date.toISOString().split('T')[0];
-      
       if (bookedSlots[dateKey]) return;
       
-      const mockBookedSlots: Record<string, string[]> = {
-        // "2024-12-15": ["10:00", "14:30"],
-      };
-      
+      const mockBookedSlots: Record<string, string[]> = {};
       setBookedSlots(prev => ({
         ...prev,
         [dateKey]: mockBookedSlots[dateKey] || []
@@ -120,7 +108,6 @@ export function AppointmentBase({
     }
   };
 
-  // Función para generar horarios dinámicamente basados en la fecha seleccionada
   const getAvailableTimeSlots = useMemo(() => {
     return (date: Date | null): TimeSlot[] => {
       if (!date) return [];
@@ -237,7 +224,7 @@ export function AppointmentBase({
       const slots = getAvailableTimeSlots(selectedDate);
       const slot = slots.find(s => s.time === selectedTime);
       if (slot?.available) {
-        setIsUrgencyMode(false); // No es modo urgencia
+        setIsUrgencyMode(false);
         setShowModal(true);
       } else {
         alert("Este horario ya no está disponible. Por favor selecciona otro.");
@@ -247,7 +234,6 @@ export function AppointmentBase({
   };
 
   const handleUrgencyClick = () => {
-    // Modo urgencia: no requiere fecha ni hora
     setIsUrgencyMode(true);
     setSelectedDate(null);
     setSelectedTime(null);
@@ -256,7 +242,7 @@ export function AppointmentBase({
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setIsUrgencyMode(false); // Resetear modo urgencia al cerrar
+    setIsUrgencyMode(false);
   };
 
   useEffect(() => {
@@ -292,7 +278,7 @@ export function AppointmentBase({
   };
 
   const handleSubmit = async () => {
-    const { nombre, apellido, telefono, correo, servicio, mensaje } = formData;
+    const { nombre, apellido, telefono, correo, promociones } = formData;
     if (!nombre || !apellido || !telefono || !correo) {
       alert("Por favor completa los campos obligatorios");
       return;
@@ -316,89 +302,70 @@ export function AppointmentBase({
       }
     }
 
-    let whatsappMessage = "";
     let appointmentDate = "";
 
     if (isUrgencyMode) {
-      // Mensaje para cita urgente
-      whatsappMessage = `Hola, me gustaría agendar una ASESORÍA EN VIVO (cita urgente)\n\nDatos:\nNombre: ${nombre} ${apellido}\nTeléfono: ${telefono}\nCorreo: ${correo}${servicio ? `\nServicio: ${servicio}` : ""}${mensaje ? `\nMensaje: ${mensaje}` : ""}\nRecibir promociones: ${formData.promociones ? "Sí" : "No"}\n\nPor favor contactarme lo antes posible.`;
       appointmentDate = "Cita urgente - Asesoría en vivo";
     } else {
-      // Mensaje para cita normal con fecha y hora
-      const formattedDate = selectedDate!.toLocaleDateString("es-ES");
-      whatsappMessage = `Hola, me gustaría agendar una cita para el ${formattedDate} a las ${selectedTime}\n\nDatos:\nNombre: ${nombre} ${apellido}\nTeléfono: ${telefono}\nCorreo: ${correo}${servicio ? `\nServicio: ${servicio}` : ""}${mensaje ? `\nMensaje: ${mensaje}` : ""}\nRecibir promociones: ${formData.promociones ? "Sí" : "No"}`;
       appointmentDate = formatAppointmentDate(selectedDate!, selectedTime!);
     }
 
-    const whatsappNumber =
-      redes?.whatsapp?.replace(/[^0-9]/g, "") || "593964220600";
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-
-    // Enviar webhook
-    if (!isDialogMode && APPOINTMENT_WEBHOOK_URL) {
-      let currentSource = appointmentSource;
-      
-      if (isDialogMode) {
-        currentSource = AppointmentSource.NOW;
-      }
-      
-      if (isUrgencyMode) {
-        currentSource = AppointmentSource.URGENCY;
-      }
-      
-      const payload: AppointmentWebhookPayload = {
-        name: nombre,
-        lastName: apellido,
-        email: correo,
-        phone: telefono,
-        service: servicio || (isUrgencyMode ? "Asesoría en vivo" : "Cita General"),
-        appointment_date: appointmentDate,
-        message: mensaje || (isUrgencyMode ? "Cita urgente - Asesoría en vivo" : "Agendado desde la web"),
-        receivePromotion: formData.promociones,
-        source: currentSource,
-      };
-
-      try {
-        setIsSubmitting(true);
-        const response = await fetch(APPOINTMENT_WEBHOOK_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Webhook respondió con estado ${response.status}`);
-        }
-      } catch (error) {
-        console.error("Error al enviar cita al webhook:", error);
-      } finally {
-        setIsSubmitting(false);
-      }
+    // Determinar el source
+    let currentSource = appointmentSource;
+    if (isDialogMode) {
+      currentSource = AppointmentSource.NOW;
+    }
+    if (isUrgencyMode) {
+      currentSource = AppointmentSource.URGENCY;
     }
 
-    // Abrir WhatsApp
-    window.open(whatsappUrl, "_blank");
+    const payload: AppointmentWebhookPayload = {
+      name: nombre,
+      lastName: apellido,
+      email: correo,
+      phone: telefono,
+      appointment_date: appointmentDate,
+      receivePromotion: promociones,
+      source: currentSource,
+    };
 
-    alert(isUrgencyMode ? "Solicitud de asesoría enviada correctamente" : "Cita procesada correctamente");
-    setShowModal(false);
-    setIsUrgencyMode(false);
-    if (onSuccess) onSuccess();
+    try {
+      setIsSubmitting(true);
+      const response = await fetch(APPOINTMENT_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-    // Reset form
-    setFormData({
-      nombre: "",
-      apellido: "",
-      telefono: "",
-      correo: "",
-      servicio: "",
-      mensaje: "",
-      promociones: false,
-    });
-    if (!isUrgencyMode) {
-      setSelectedDate(null);
-      setSelectedTime(null);
+      if (!response.ok) {
+        throw new Error(`Webhook respondió con estado ${response.status}`);
+      }
+
+      alert(isUrgencyMode ? "Solicitud de asesoría enviada correctamente" : "Cita procesada correctamente");
+      setShowModal(false);
+      setIsUrgencyMode(false);
+      if (onSuccess) onSuccess();
+
+      // Reset form
+      setFormData({
+        nombre: "",
+        apellido: "",
+        telefono: "",
+        correo: "",
+        promociones: false,
+      });
+      if (!isUrgencyMode) {
+        setSelectedDate(null);
+        setSelectedTime(null);
+      }
+      
+    } catch (error) {
+      console.error("Error al enviar cita al webhook:", error);
+      alert("Hubo un error al procesar tu solicitud. Por favor intenta nuevamente.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -531,10 +498,10 @@ export function AppointmentBase({
                 {timeSlots.length > 0 ? (
                   timeSlots.map((slot) => {
                     const isToday = selectedDate && new Date(selectedDate).toDateString() === new Date().toDateString();
+                    const now = new Date();
                     const [hours, minutes] = slot.time.split(":").map(Number);
                     const slotTime = new Date();
                     slotTime.setHours(hours, minutes, 0, 0);
-                    const now = new Date();
                     const minutesUntilSlot = Math.round((slotTime.getTime() - now.getTime()) / 1000 / 60);
                     
                     return (
@@ -726,32 +693,6 @@ export function AppointmentBase({
                     required
                   />
                 </div>
-               {/*  <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Servicio (opcional)
-                  </label>
-                  <input
-                    type="text"
-                    name="servicio"
-                    value={formData.servicio}
-                    onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                    placeholder="¿Qué servicio te interesa?"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Mensaje (opcional)
-                  </label>
-                  <textarea
-                    name="mensaje"
-                    value={formData.mensaje}
-                    onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600"
-                    placeholder="¿Alguna pregunta o comentario?"
-                    rows={3}
-                  />
-                </div> */}
                 <div className="flex items-center">
                   <input
                     type="checkbox"

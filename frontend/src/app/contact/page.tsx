@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { AppointmentDialog } from "@/components/common/appointment_dialog";
 import { useRedSocial, useContactData } from "@/hooks";
+import { AppointmentSource } from "@/components/common/AppointmentBase";
 
 interface ContactOption {
   title: string;
@@ -37,7 +38,7 @@ interface AppointmentWebhookPayload {
   appointment_date: string;
   message: string;
   receivePromotion: boolean;
-  source: "web";
+  source: AppointmentSource.CALENDAR;
 }
 
 const CONTACT_WEBHOOK_URL =
@@ -147,7 +148,7 @@ export default function ContactPage() {
       appointment_date: generateAppointmentDate(),
       message: mensaje,
       receivePromotion: formData.promociones,
-      source: "web",
+      source: AppointmentSource.CALENDAR,
     };
 
     try {
