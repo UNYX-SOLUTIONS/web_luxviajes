@@ -4,16 +4,11 @@
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { MapPinIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { AppointmentDialog } from "@/components/common/appointment_dialog";
+import { UrgencyFormModal } from "@/components/common/UrgencyFormModal";
 import { useRedSocial, useContactData } from "@/hooks";
-import {
-  AppointmentSource,
-  AppointmentBase,
-  AppointmentBaseRef,
-} from "@/components/common/AppointmentBase";
-
-
+import { AppointmentSource } from "@/components/common/AppointmentBase";
 
 interface ContactOption {
   title: string;
@@ -64,9 +59,6 @@ export default function ContactPage() {
     mensaje: "",
     promociones: false,
   });
-
-  // Ref para el AppointmentBase que manejará el modal de urgencia
-  const appointmentBaseRef = useRef<AppointmentBaseRef>(null);
 
   const contactOptions: ContactOption[] = [
     {
@@ -193,14 +185,6 @@ export default function ContactPage() {
   // Función para abrir el modal de urgencia
   const handleOpenUrgencyModal = () => {
     setShowUrgencyModal(true);
-    // Si quieres resetear el modal cada vez, puedes usar el ref aquí si es necesario
-    if (appointmentBaseRef.current) {
-      appointmentBaseRef.current.openUrgencyModal();
-    }
-  };
-
-  const handleCloseUrgencyModal = () => {
-    setShowUrgencyModal(false);
   };
 
   if (loading) {
@@ -551,13 +535,12 @@ export default function ContactPage() {
         isOpen={showAppointmentDialog}
         onClose={() => setShowAppointmentDialog(false)}
       />
+
       {/* Modal de urgencia para videollamada */}
-      <AppointmentBase
-        ref={appointmentBaseRef}
-        showUrgencia={showUrgencyModal}
+      <UrgencyFormModal
+        isOpen={showUrgencyModal}
+        onClose={() => setShowUrgencyModal(false)}
         appointmentSource={AppointmentSource.URGENCY}
-        onCancel={handleCloseUrgencyModal}
-        onSuccess={handleCloseUrgencyModal}
       />
     </>
   );

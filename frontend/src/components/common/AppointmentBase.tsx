@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, forwardRef, useImperativeHandle } from "react";
 import { useRedSocial } from "@/hooks";
+import { UrgencyFormModal } from "./UrgencyFormModal";
 
 // Enum para los tipos de origen de la cita
 export enum AppointmentSource {
@@ -32,6 +33,7 @@ interface AppointmentWebhookPayload {
   email: string;
   phone: string;
   appointment_date: string;
+  appointment_iso: string;
   receivePromotion: boolean;
   source: AppointmentSource;
 }
@@ -60,6 +62,27 @@ function parseStyledText(text: string): string {
   return parsed;
 }
 
+// Función para obtener la fecha local en formato ISO con offset
+function getLocalISOStringFromDate(date: Date, time: string): string {
+  const [hours, minutes] = time.split(":").map(Number);
+  const dateWithTime = new Date(date);
+  dateWithTime.setHours(hours, minutes, 0, 0);
+  
+  const offset = -dateWithTime.getTimezoneOffset();
+  const offsetHours = Math.floor(Math.abs(offset) / 60);
+  const offsetMinutes = Math.abs(offset) % 60;
+  const offsetSign = offset >= 0 ? "+" : "-";
+  
+  const year = dateWithTime.getFullYear();
+  const month = String(dateWithTime.getMonth() + 1).padStart(2, "0");
+  const day = String(dateWithTime.getDate()).padStart(2, "0");
+  const hourStr = String(dateWithTime.getHours()).padStart(2, "0");
+  const minuteStr = String(dateWithTime.getMinutes()).padStart(2, "0");
+  const secondStr = String(dateWithTime.getSeconds()).padStart(2, "0");
+  
+  return `${year}-${month}-${day}T${hourStr}:${minuteStr}:${secondStr}${offsetSign}${String(offsetHours).padStart(2, "0")}:${String(offsetMinutes).padStart(2, "0")}`;
+}
+
 export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBaseProps>(({
   onSuccess,
   onCancel,
@@ -72,9 +95,9 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
+  const [showUrgencyModal, setShowUrgencyModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<Record<string, string[]>>({});
-  const [isUrgencyMode, setIsUrgencyMode] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     nombre: "",
     apellido: "",
@@ -86,14 +109,9 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
   // Exponer la función para abrir el modal de urgencia
   useImperativeHandle(ref, () => ({
     openUrgencyModal: () => {
-      setIsUrgencyMode(true);
-      setSelectedDate(null);
-      setSelectedTime(null);
-      setShowModal(true);
+      setShowUrgencyModal(true);
     }
   }));
-
-  // ... (resto de tu código igual: fetchBookedSlots, getAvailableTimeSlots, useEffect, etc.)
 
   const fetchBookedSlots = async (date: Date) => {
     try {
@@ -211,7 +229,6 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
       const slots = getAvailableTimeSlots(selectedDate);
       const slot = slots.find(s => s.time === selectedTime);
       if (slot?.available) {
-        setIsUrgencyMode(false);
         setShowModal(true);
       } else {
         alert("Este horario ya no está disponible. Por favor selecciona otro.");
@@ -221,15 +238,15 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
   };
 
   const handleUrgencyClick = () => {
-    setIsUrgencyMode(true);
-    setSelectedDate(null);
-    setSelectedTime(null);
-    setShowModal(true);
+    setShowUrgencyModal(true);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setIsUrgencyMode(false);
+  };
+
+  const handleCloseUrgencyModal = () => {
+    setShowUrgencyModal(false);
   };
 
   useEffect(() => {
@@ -265,35 +282,23 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
       return;
     }
 
-    if (!isUrgencyMode && (!selectedDate || !selectedTime)) {
+    if (!selectedDate || !selectedTime) {
       alert("Selecciona fecha y hora para la cita");
       return;
     }
 
-    if (!isUrgencyMode && selectedDate && selectedTime) {
-      const slots = getAvailableTimeSlots(selectedDate);
-      const selectedSlot = slots.find(s => s.time === selectedTime);
-      if (!selectedSlot?.available) {
-        alert("Lo sentimos, este horario ya no está disponible. Por favor selecciona otro.");
-        setSelectedTime(null);
-        setShowModal(false);
-        return;
-      }
-    }
-
-    let appointmentDate = "";
-    if (isUrgencyMode) {
-      appointmentDate = "Cita urgente - Asesoría en vivo";
-    } else {
-      appointmentDate = formatAppointmentDate(selectedDate!, selectedTime!);
+    const slots = getAvailableTimeSlots(selectedDate);
+    const selectedSlot = slots.find(s => s.time === selectedTime);
+    if (!selectedSlot?.available) {
+      alert("Lo sentimos, este horario ya no está disponible. Por favor selecciona otro.");
+      setSelectedTime(null);
+      setShowModal(false);
+      return;
     }
 
     let currentSource = appointmentSource;
     if (isDialogMode) {
       currentSource = AppointmentSource.NOW;
-    }
-    if (isUrgencyMode) {
-      currentSource = AppointmentSource.URGENCY;
     }
 
     const payload: AppointmentWebhookPayload = {
@@ -301,7 +306,8 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
       lastName: apellido,
       email: correo,
       phone: telefono,
-      appointment_date: appointmentDate,
+      appointment_date: formatAppointmentDate(selectedDate, selectedTime),
+      appointment_iso: getLocalISOStringFromDate(selectedDate, selectedTime),
       receivePromotion: promociones,
       source: currentSource,
     };
@@ -314,9 +320,8 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
         body: JSON.stringify(payload),
       });
       if (!response.ok) throw new Error(`Webhook respondió con estado ${response.status}`);
-      alert(isUrgencyMode ? "Solicitud de asesoría enviada correctamente" : "Cita procesada correctamente");
+      alert("Cita procesada correctamente");
       setShowModal(false);
-      setIsUrgencyMode(false);
       if (onSuccess) onSuccess();
       setFormData({
         nombre: "",
@@ -325,10 +330,8 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
         correo: "",
         promociones: false,
       });
-      if (!isUrgencyMode) {
-        setSelectedDate(null);
-        setSelectedTime(null);
-      }
+      setSelectedDate(null);
+      setSelectedTime(null);
     } catch (error) {
       console.error("Error al enviar cita al webhook:", error);
       alert("Hubo un error al procesar tu solicitud. Por favor intenta nuevamente.");
@@ -432,25 +435,24 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
         </div>
       </div>
 
+      {/* Modal para cita normal con calendario */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[1001]">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full flex flex-col max-h-[90vh]">
             <div className="px-6 pt-6 shrink-0 flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-2xl font-bold text-neutral-900 mb-2">{isUrgencyMode ? "Solicitar Asesoría en Vivo" : "Completa tu información"}</h3>
-                <p className="text-neutral-600">{isUrgencyMode ? "Déjanos tus datos y en 10 minutos te contactamos para una asesoría personalizada" : "Para confirmar tu cita, por favor completa los siguientes datos"}</p>
+                <h3 className="text-2xl font-bold text-neutral-900 mb-2">Completa tu información</h3>
+                <p className="text-neutral-600">Para confirmar tu cita, por favor completa los siguientes datos</p>
               </div>
               <button onClick={handleCloseModal} className="shrink-0 p-1 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition" aria-label="Cerrar">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
 
-            {!isUrgencyMode && (
-              <div className="mx-6 mt-4 shrink-0 bg-primary-50 p-4 rounded-lg border border-primary-200">
-                <p className="text-sm text-neutral-600 mb-2">Resumen de tu cita:</p>
-                <p className="font-semibold text-neutral-900">{selectedDate?.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las {selectedTime}</p>
-              </div>
-            )}
+            <div className="mx-6 mt-4 shrink-0 bg-primary-50 p-4 rounded-lg border border-primary-200">
+              <p className="text-sm text-neutral-600 mb-2">Resumen de tu cita:</p>
+              <p className="font-semibold text-neutral-900">{selectedDate?.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })} a las {selectedTime}</p>
+            </div>
 
             <div className="overflow-y-auto flex-1 px-6 mt-4">
               <div className="space-y-4 mb-6">
@@ -468,12 +470,20 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
             <div className="px-6 py-4 shrink-0 border-t border-neutral-100 flex gap-3">
               <button onClick={handleCloseModal} className="flex-1 py-2 px-4 border border-neutral-300 rounded-lg text-neutral-700 font-medium hover:bg-neutral-50 transition">Cancelar</button>
               <button onClick={handleSubmit} disabled={isSubmitting} className="flex-1 py-2 px-4 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition disabled:opacity-60 disabled:cursor-not-allowed">
-                {isSubmitting ? "Enviando..." : (isUrgencyMode ? "Solicitar Asesoría" : "Confirmar Cita")}
+                {isSubmitting ? "Enviando..." : "Confirmar Cita"}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Modal de urgencia reutilizable */}
+      <UrgencyFormModal
+        isOpen={showUrgencyModal}
+        onClose={handleCloseUrgencyModal}
+        onSuccess={onSuccess}
+        appointmentSource={AppointmentSource.URGENCY}
+      />
     </>
   );
 });
