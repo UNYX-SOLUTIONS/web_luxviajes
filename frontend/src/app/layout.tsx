@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   description: COMPANY_INFO.description,
   keywords: 'viajes, agencia de viajes, paquetes internacionales, turismo',
   authors: [{ name: COMPANY_INFO.name }],
+  icons: {
+    icon: '/images/svg/logo2.svg',
+  },
   openGraph: {
     type: 'website',
     locale: 'es_ES',

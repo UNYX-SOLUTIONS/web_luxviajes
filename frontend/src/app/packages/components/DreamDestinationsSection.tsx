@@ -116,12 +116,8 @@ export const DreamDestinationsSection: FC<
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* HEADER */}
-        {/* HEADER */}
         <div className="mb-7 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <p className="text-sm text-accent-red">
-              Escapa, Explora, Disfruta
-            </p>
             <p className="text-sm text-accent-red">
               Escapa, Explora, Disfruta
             </p>
@@ -129,15 +125,6 @@ export const DreamDestinationsSection: FC<
               Top Destinos del Mes
             </h2>
           </div>
-
-          {!showScrollControls && (
-            <Link
-              href="/packages"
-              className="text-sm font-semibold text-primary-700 transition hover:text-primary-800"
-            >
-              Ver más destinos populares →
-            </Link>
-          )}
 
           {!showScrollControls && (
             <Link

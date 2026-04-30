@@ -4,9 +4,14 @@
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { MapPinIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { AppointmentDialog } from "@/components/common/appointment_dialog";
 import { useRedSocial, useContactData } from "@/hooks";
+import {
+  AppointmentSource,
+  AppointmentBase,
+  AppointmentBaseRef,
+} from "@/components/common/AppointmentBase";
 
 
 
@@ -30,16 +35,15 @@ interface FormData {
   promociones: boolean;
 }
 
-interface AppointmentWebhookPayload {
+interface ContactFormWebhookPayload {
   name: string;
   lastName: string;
   email: string;
   phone: string;
   service: string;
-  appointment_date: string;
   message: string;
   receivePromotion: boolean;
-  source: "web";
+  source: AppointmentSource.CONTACT_FORM;
 }
 
 const CONTACT_WEBHOOK_URL =
@@ -59,6 +63,9 @@ export default function ContactPage() {
     mensaje: "",
     promociones: false,
   });
+
+  // Ref para el AppointmentBase que manejará el modal de urgencia
+  const appointmentBaseRef = useRef<AppointmentBaseRef>(null);
 
   const contactOptions: ContactOption[] = [
     {
@@ -117,21 +124,13 @@ export default function ContactPage() {
     }));
   };
 
-  const generateAppointmentDate = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const defaultTime = "10:00";
-    return `${day}/${month}/${year} ${defaultTime}`;
-  };
-
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const { nombre, apellido, telefono, correo, servicio, mensaje } = formData;
-    if (!nombre || !apellido || !telefono || !correo || !servicio || !mensaje) {
-      alert("Por favor completa todos los campos");
+    // Solo validar campos obligatorios (nombre, apellido, telefono, correo)
+    if (!nombre || !apellido || !telefono || !correo) {
+      alert("Por favor completa todos los campos obligatorios");
       return;
     }
 
@@ -140,16 +139,15 @@ export default function ContactPage() {
       return;
     }
 
-    const payload: AppointmentWebhookPayload = {
+    const payload: ContactFormWebhookPayload = {
       name: nombre,
       lastName: apellido,
       email: correo,
       phone: telefono,
-      service: servicio,
-      appointment_date: generateAppointmentDate(),
-      message: mensaje,
+      service: servicio || "Consulta general",
+      message: mensaje || "Sin mensaje adicional",
       receivePromotion: formData.promociones,
-      source: "web",
+      source: AppointmentSource.CONTACT_FORM,
     };
 
     try {
@@ -188,6 +186,13 @@ export default function ContactPage() {
     const officesSection = document.getElementById("offices");
     if (officesSection) {
       officesSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  // Función para abrir el modal de urgencia
+  const handleOpenUrgencyModal = () => {
+    if (appointmentBaseRef.current) {
+      appointmentBaseRef.current.openUrgencyModal();
     }
   };
 
@@ -295,7 +300,14 @@ export default function ContactPage() {
                   <p className="mt-3 grow text-sm leading-relaxed text-neutral-600">
                     {option.description}
                   </p>
-                  {option.isVideocall || option.isAgenda ? (
+                  {option.isVideocall ? (
+                    <button
+                      onClick={handleOpenUrgencyModal}
+                      className="mt-6 mb-8 inline-flex w-full items-center justify-center rounded-full bg-neutral-100 px-4 py-3 text-sm font-bold text-primary-700 transition hover:bg-primary-800 hover:text-white duration-200"
+                    >
+                      {option.action}
+                    </button>
+                  ) : option.isAgenda ? (
                     <button
                       onClick={() => setShowAppointmentDialog(true)}
                       className="mt-6 mb-8 inline-flex w-full items-center justify-center rounded-full bg-neutral-100 px-4 py-3 text-sm font-bold text-primary-700 transition hover:bg-primary-800 hover:text-white duration-200"
@@ -351,13 +363,13 @@ export default function ContactPage() {
               experiencia única, pensada exclusivamente para ti.
             </p>
           </div>
-
+          {/* Contact Form */}
           <form
             onSubmit={handleFormSubmit}
             className="rounded-3xl bg-white p-8 shadow-lg ring-1 ring-primary-100 sm:p-10 h-auto overflow-y-auto"
           >
             <h3 className="text-3xl font-bold text-primary-700">
-              Envíenos un mensaje
+              Envíanos un mensaje
             </h3>
 
             <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -413,41 +425,6 @@ export default function ContactPage() {
                   className="h-12 w-full rounded-lg border border-primary-200 bg-primary-50 px-4 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition"
                 />
               </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                  Servicio
-                </label>
-                <input
-                  type="text"
-                  name="servicio"
-                  value={formData.servicio}
-                  onChange={handleFormChange}
-                  maxLength={20}
-                  placeholder="Asesoría de viajes"
-                  className="h-12 w-full rounded-lg border border-primary-200 bg-primary-50 px-4 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition"
-                />
-                <p className="text-xs text-neutral-400 text-right mt-1">
-                  {formData.servicio.length}/20
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <label className="block text-sm font-semibold text-neutral-900 mb-2">
-                Mensaje
-              </label>
-              <textarea
-                name="mensaje"
-                value={formData.mensaje}
-                onChange={handleFormChange}
-                maxLength={100}
-                placeholder="Cuéntenos sobre el viaje de sus sueños..."
-                className="h-40 w-full rounded-lg border border-primary-200 bg-primary-50 px-4 py-3 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition resize-none"
-              />
-              <p className="text-xs text-neutral-400 text-right mt-1">
-                {formData.mensaje.length}/100
-              </p>
             </div>
 
             <div className="mt-6 flex items-center">
@@ -459,7 +436,10 @@ export default function ContactPage() {
                 onChange={handleFormChange}
                 className="w-4 h-4 rounded border-primary-200 text-primary-600 focus:ring-primary-600"
               />
-              <label htmlFor="promociones" className="ml-3 text-sm text-neutral-700">
+              <label
+                htmlFor="promociones"
+                className="ml-3 text-sm text-neutral-700"
+              >
                 Deseo recibir promociones y descuentos en mi correo
               </label>
             </div>
@@ -564,6 +544,14 @@ export default function ContactPage() {
         isOpen={showAppointmentDialog}
         onClose={() => setShowAppointmentDialog(false)}
       />
+      <div className="hidden">
+        {/* AppointmentBase oculto para manejar el modal de urgencia de Videollamada */}
+        <AppointmentBase
+          ref={appointmentBaseRef}
+          showUrgencia={false}
+          appointmentSource={AppointmentSource.URGENCY}
+        />
+      </div>
     </>
   );
 }
