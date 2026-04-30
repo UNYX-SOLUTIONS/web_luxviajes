@@ -53,7 +53,7 @@ export default function ContactPage() {
   const { data: redes } = useRedSocial();
   const { data: contactData, loading, error } = useContactData();
   const [showAppointmentDialog, setShowAppointmentDialog] = useState(false);
-  const [showUrgencyDialog, setShowUrgencyDialog] = useState(false);
+  const [showUrgencyModal, setShowUrgencyModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     nombre: "",
@@ -192,9 +192,15 @@ export default function ContactPage() {
 
   // Función para abrir el modal de urgencia
   const handleOpenUrgencyModal = () => {
+    setShowUrgencyModal(true);
+    // Si quieres resetear el modal cada vez, puedes usar el ref aquí si es necesario
     if (appointmentBaseRef.current) {
       appointmentBaseRef.current.openUrgencyModal();
     }
+  };
+
+  const handleCloseUrgencyModal = () => {
+    setShowUrgencyModal(false);
   };
 
   if (loading) {
@@ -544,13 +550,15 @@ export default function ContactPage() {
       <AppointmentDialog
         isOpen={showAppointmentDialog}
         onClose={() => setShowAppointmentDialog(false)}
-      /> 
-        {/* AppointmentBase oculto para manejar el modal de urgencia de Videollamada */}
-        <AppointmentBase
-          ref={appointmentBaseRef}
-          showUrgencia={false}
-          appointmentSource={AppointmentSource.URGENCY}
-        /> 
+      />
+      {/* Modal de urgencia para videollamada */}
+      <AppointmentBase
+        ref={appointmentBaseRef}
+        showUrgencia={showUrgencyModal}
+        appointmentSource={AppointmentSource.URGENCY}
+        onCancel={handleCloseUrgencyModal}
+        onSuccess={handleCloseUrgencyModal}
+      />
     </>
   );
 }
