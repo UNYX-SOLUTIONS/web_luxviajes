@@ -16,13 +16,26 @@ export const metadata: Metadata = {
   keywords: 'viajes, agencia de viajes, paquetes internacionales, turismo',
   authors: [{ name: COMPANY_INFO.name }],
   icons: {
-    icon: '/images/svg/logo2.svg',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/images/svg/logo2.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
   openGraph: {
     type: 'website',
     locale: 'es_ES',
     url: 'https://luxviajes.com',
     siteName: COMPANY_INFO.name,
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: COMPANY_INFO.name,
+      },
+    ],
   },
 };
 
@@ -41,6 +54,10 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
+        {/* Favicon adicional por si acaso */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/images/svg/logo2.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="min-h-screen flex flex-col antialiased">
         <Header />
