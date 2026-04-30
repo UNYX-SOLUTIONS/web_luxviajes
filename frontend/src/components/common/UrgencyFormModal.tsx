@@ -24,7 +24,6 @@ interface AppointmentWebhookPayload {
   email: string;
   phone: string;
   appointment_date: string;
-  appointment_iso: string;
   receivePromotion: boolean;
   source: AppointmentSource;
 }
@@ -45,17 +44,6 @@ function getLocalISOString(): string {
   const seconds = String(now.getSeconds()).padStart(2, "0");
   
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${offsetSign}${String(offsetHours).padStart(2, "0")}:${String(offsetMinutes).padStart(2, "0")}`;
-}
-
-// Función para obtener la fecha en formato legible
-function getFormattedDate(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
 export function UrgencyFormModal({ 
@@ -96,8 +84,7 @@ export function UrgencyFormModal({
       lastName: apellido,
       email: correo,
       phone: telefono,
-      appointment_date: getFormattedDate(),
-      appointment_iso: getLocalISOString(),
+      appointment_date: getLocalISOString(),
       receivePromotion: promociones,
       source: appointmentSource,
     };
@@ -109,7 +96,10 @@ export function UrgencyFormModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!response.ok) throw new Error(`Webhook respondió con estado ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Webhook respondió con estado ${response.status}: ${errorText}`);
+      }
       
       alert("Solicitud de asesoría enviada correctamente");
       setFormData({

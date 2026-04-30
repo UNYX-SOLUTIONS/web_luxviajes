@@ -33,7 +33,6 @@ interface AppointmentWebhookPayload {
   email: string;
   phone: string;
   appointment_date: string;
-  appointment_iso: string;
   receivePromotion: boolean;
   source: AppointmentSource;
 }
@@ -62,7 +61,7 @@ function parseStyledText(text: string): string {
   return parsed;
 }
 
-// Función para obtener la fecha local en formato ISO con offset
+// Función para obtener la fecha local en formato ISO con offset (2026-05-05T09:00:00-05:00)
 function getLocalISOStringFromDate(date: Date, time: string): string {
   const [hours, minutes] = time.split(":").map(Number);
   const dateWithTime = new Date(date);
@@ -268,13 +267,6 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
     setFormData((prev) => ({ ...prev, [name]: nextValue }));
   };
 
-  const formatAppointmentDate = (date: Date, time: string) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day} ${time}`;
-  };
-
   const handleSubmit = async () => {
     const { nombre, apellido, telefono, correo, promociones } = formData;
     if (!nombre || !apellido || !telefono || !correo) {
@@ -301,13 +293,15 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
       currentSource = AppointmentSource.NOW;
     }
 
+    // Usar el mismo formato ISO para appointment_date
+    const isoDateString = getLocalISOStringFromDate(selectedDate, selectedTime);
+
     const payload: AppointmentWebhookPayload = {
       name: nombre,
       lastName: apellido,
       email: correo,
       phone: telefono,
-      appointment_date: formatAppointmentDate(selectedDate, selectedTime),
-      appointment_iso: getLocalISOStringFromDate(selectedDate, selectedTime),
+      appointment_date: isoDateString, // Ahora usa el formato ISO
       receivePromotion: promociones,
       source: currentSource,
     };
@@ -319,7 +313,10 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!response.ok) throw new Error(`Webhook respondió con estado ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Webhook respondió con estado ${response.status}: ${errorText}`);
+      }
       alert("Cita procesada correctamente");
       setShowModal(false);
       if (onSuccess) onSuccess();

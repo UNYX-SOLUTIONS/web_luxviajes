@@ -37,12 +37,31 @@ interface ContactFormWebhookPayload {
   phone: string;
   service: string;
   message: string;
+  appointment_date: string;
   receivePromotion: boolean;
   source: AppointmentSource.CONTACT_FORM;
 }
 
 const CONTACT_WEBHOOK_URL =
   "https://flow.agencialuxviajes.com/webhook/de1e3a16-857f-48ec-a863-3eaf2aed41cc";
+
+// Función para obtener la fecha local en formato ISO con offset (2026-05-05T09:00:00-05:00)
+function getLocalISOString(): string {
+  const now = new Date();
+  const offset = -now.getTimezoneOffset(); // offset en minutos
+  const offsetHours = Math.floor(Math.abs(offset) / 60);
+  const offsetMinutes = Math.abs(offset) % 60;
+  const offsetSign = offset >= 0 ? "+" : "-";
+  
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+  
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${offsetSign}${String(offsetHours).padStart(2, "0")}:${String(offsetMinutes).padStart(2, "0")}`;
+}
 
 export default function ContactPage() {
   const { data: redes } = useRedSocial();
@@ -139,6 +158,7 @@ export default function ContactPage() {
       phone: telefono,
       service: servicio || "Consulta general",
       message: mensaje || "Sin mensaje adicional",
+      appointment_date: getLocalISOString(),
       receivePromotion: formData.promociones,
       source: AppointmentSource.CONTACT_FORM,
     };
@@ -154,7 +174,8 @@ export default function ContactPage() {
       });
 
       if (!response.ok) {
-        throw new Error(`Webhook respondio con estado ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`Webhook respondio con estado ${response.status}: ${errorText}`);
       }
 
       alert("Mensaje enviado correctamente. Nos pondremos en contacto pronto.");
