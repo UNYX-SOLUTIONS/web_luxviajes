@@ -53,6 +53,7 @@ export default function ContactPage() {
   const { data: redes } = useRedSocial();
   const { data: contactData, loading, error } = useContactData();
   const [showAppointmentDialog, setShowAppointmentDialog] = useState(false);
+  const [showUrgencyDialog, setShowUrgencyDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     nombre: "",
@@ -543,15 +544,13 @@ export default function ContactPage() {
       <AppointmentDialog
         isOpen={showAppointmentDialog}
         onClose={() => setShowAppointmentDialog(false)}
-      />
-      <div className="hidden">
+      /> 
         {/* AppointmentBase oculto para manejar el modal de urgencia de Videollamada */}
         <AppointmentBase
           ref={appointmentBaseRef}
           showUrgencia={false}
           appointmentSource={AppointmentSource.URGENCY}
-        />
-      </div>
+        /> 
     </>
   );
 }

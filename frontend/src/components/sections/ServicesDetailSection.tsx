@@ -15,40 +15,6 @@ interface ServiceDetail {
   description: string;
 }
 
-const SERVICES_DETAILS: ServiceDetail[] = [
-  {
-    id: "packages",
-    title: "Paquetes turísticos",
-    label: "Paquetes turísticos",
-    image: "/images/services/packages.png",
-    description:
-      "Experiencias diseñadas a medida para vivir aventuras inolvidables en los destinos más hermosos del mundo.",
-  },
-  {
-    id: "visas",
-    title: "Visas y Pasaportes",
-    label: "Visas y Pasaportes",
-    image: "/images/services/visas.png",
-    description:
-      "Gestión rápida y profesional de tus trámites migratorios sin complicaciones.",
-  },
-  {
-    id: "flights",
-    title: "Boletos Aéreos",
-    label: "Boletos Aéreos",
-    image: "/images/services/flights.png",
-    description:
-      "Acceso a los mejores precios y aerolíneas premium para tu viaje perfecto.",
-  },
-  {
-    id: "hotels",
-    title: "Reservas de Hoteles",
-    label: "Reservas de Hoteles",
-    image: "/images/services/hotels.png",
-    description:
-      "Alojamientos de lujo seleccionados en los destinos más deseados del mundo.",
-  },
-];
 
 interface ServicesDetailSectionProps {
   services?: ServiceDetail[];
@@ -88,7 +54,7 @@ export function ServicesDetailSection({
   const sectionRef = useRef<HTMLElement | null>(null);
 
   // Usar servicios de props o fallback a datos por defecto
-  const displayServices = services && services.length > 0 ? services : SERVICES_DETAILS;
+  const displayServices = services && services.length > 0 ? services : [ ];
 
   useEffect(() => {
     const sectionElement = sectionRef.current;
@@ -112,8 +78,14 @@ export function ServicesDetailSection({
 
   // Función para manejar el clic en la card
   const handleCardClick = (serviceId: string) => {
-    // Navegar a /packages para cualquier card
-    router.push("/packages");
+
+    if (serviceId === "Visas y Pasaportes") {
+    router.push("/visas"); 
+    }
+    else    {
+    router.push("/packages"); 
+    } 
+
   };
 
   // Función para manejar el clic en el botón (evita la propagación)
@@ -201,7 +173,7 @@ export function ServicesDetailSection({
               >
                 {/* Card Container - Ahora clickeable */}
                 <div 
-                  onClick={() => handleCardClick(service.id)}
+                  onClick={() => handleCardClick(service.title)}
                   className="relative h-64 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group hover:-translate-y-1 cursor-pointer"
                 >
                   {/* Background Image */}
