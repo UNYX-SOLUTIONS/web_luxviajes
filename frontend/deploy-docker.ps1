@@ -3,7 +3,7 @@
 
 param(
     [string]$Branch = "main",
-    [string]$ProjectPath = "C:\Trabajo\Lux Viajes\web_luxviajes"
+    [string]$ProjectPath = "C:\Trabajo\Luxviajes\web_luxviajes"
 )
 
 # Configuración
@@ -27,7 +27,7 @@ function Write-Error {
 }
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "Deployment Lux Viajes - Docker (PowerShell)" -ForegroundColor Cyan
+Write-Host "Deployment Luxviajes - Docker (PowerShell)" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 # 1. Verificar conexión SSH a Hostinger

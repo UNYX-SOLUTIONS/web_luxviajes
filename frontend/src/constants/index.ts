@@ -1,7 +1,7 @@
 // Constantes de la aplicación
 
 export const COMPANY_INFO = {
-  name: "Lux Viajes",
+  name: "Luxviajes",
   tagline: "Agencia de Viajes Premium",
   description: "Experiencias de viaje inolvidables a destinos internacionales",
   // DEPRECATED: Use useRedSocial() hook para obtener datos actualizados desde Strapi

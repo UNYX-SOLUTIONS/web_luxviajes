@@ -241,7 +241,7 @@ export default function AboutPage() {
             <div className="pointer-events-auto">
               <Image
                 src="/images/about/about2.png"
-                alt="Asesora Lux Viajes"
+                alt="Asesora Luxviajes"
                 width={600}
                 height={900}
                 className="w-full object-cover max-w-md"

@@ -1,4 +1,4 @@
-# Estructura de Paginas - Lux Viajes Frontend
+# Estructura de Paginas - Luxviajes Frontend
 
 Documento que detalla la estructura jerarquica de componentes y datos de todas las paginas del proyecto.
 

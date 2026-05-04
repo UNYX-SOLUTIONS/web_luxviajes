@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Cheat Sheet: Comandos Docker para Lux Viajes
+# Cheat Sheet: Comandos Docker para Luxviajes
 # Usar como referencia rápida
 
 # ============================================

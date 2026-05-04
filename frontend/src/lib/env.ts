@@ -3,7 +3,7 @@ export const env = {
   // Public variables
   apiUrl:
     process.env.NEXT_PUBLIC_API_URL || "https://cms.agencialuxviajes.com/api",
-  appName: process.env.NEXT_PUBLIC_APP_NAME || "Lux Viajes",
+  appName: process.env.NEXT_PUBLIC_APP_NAME || "Luxviajes",
   appDomain: process.env.NEXT_PUBLIC_APP_DOMAIN || "agencialuxviajes.com",
   enableAnalytics: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === "true",
   enableBetaFeatures: process.env.NEXT_PUBLIC_ENABLE_BETA_FEATURES === "true",

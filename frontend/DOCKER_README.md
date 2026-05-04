@@ -1,4 +1,4 @@
-# 🐳 Docker Configuration para Lux Viajes - Hostinger VPS
+# 🐳 Docker Configuration para Luxviajes - Hostinger VPS
 
 Este directorio contiene la configuración completa para deployar la aplicación Next.js en Hostinger VPS usando Docker.
 

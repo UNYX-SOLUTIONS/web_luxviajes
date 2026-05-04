@@ -1,6 +1,6 @@
-# ✈️ Lux Viajes - Frontend
+# ✈️ Luxviajes - Frontend
 
-Aplicación web moderna para la agencia de viajes **Lux Viajes**. Construida con Next.js 16, React 19, TypeScript y Tailwind CSS.
+Aplicación web moderna para la agencia de viajes **Luxviajes**. Construida con Next.js 16, React 19, TypeScript y Tailwind CSS.
 
 ## 🚀 Inicio Rápido
 
@@ -158,7 +158,7 @@ Cuando contribuyas, sigue:
 
 ## 📞 Contacto
 
-**Lux Viajes - Agencia de Viajes Premium**
+**Luxviajes - Agencia de Viajes Premium**
 
 - 📞 Teléfono: +593 98 422 0600
 - 💬 WhatsApp: +593 98 422 0600
@@ -166,7 +166,7 @@ Cuando contribuyas, sigue:
 
 ## 📄 Licencia
 
-Proyecto privado de Lux Viajes. Todos los derechos reservados.
+Proyecto privado de Luxviajes. Todos los derechos reservados.
 
 ---
 

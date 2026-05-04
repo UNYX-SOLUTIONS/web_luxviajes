@@ -1,6 +1,6 @@
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                  LUX VIAJES - ARQUITECTURA FRONTEND             │
+│                  Luxviajes - ARQUITECTURA FRONTEND             │
 │                    Next.js 16 + React 19 + TypeScript           │
 └─────────────────────────────────────────────────────────────────┘
 

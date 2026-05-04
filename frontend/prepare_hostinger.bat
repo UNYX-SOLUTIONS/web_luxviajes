@@ -4,7 +4,7 @@ REM Crea un archivo comprimido con todo lo necesario
 
 setlocal enabledelayedexpansion
 
-set WORKSPACE=c:\Users\yosto\Documents\Trabajos\Lux Viajes\web\web_luxviajes\frontend
+set WORKSPACE=c:\Users\yosto\Documents\Trabajos\Luxviajes\web\web_luxviajes\frontend
 
 echo.
 echo ========================================

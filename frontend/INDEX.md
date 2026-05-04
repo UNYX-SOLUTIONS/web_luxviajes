@@ -1,4 +1,4 @@
-# 📚 Índice de Documentación - Lux Viajes Frontend
+# 📚 Índice de Documentación - Luxviajes Frontend
 
 ## 📖 Documentación Disponible
 

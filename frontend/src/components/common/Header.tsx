@@ -26,7 +26,7 @@ export function Header({ activeLink }: HeaderProps) {
             <div className="relative w-45 h-17.5 md:w-55 md:h-15 lg:w-65 lg:h-25">
               <Image
                 src="/images/logo_white.png"
-                alt="Lux Viajes Logo"
+                alt="Luxviajes Logo"
                 fill
                 className="object-contain"
                 loading="eager"

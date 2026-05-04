@@ -1,4 +1,4 @@
-# 🚀 Guía Rápida de Desarrollo - Lux Viajes
+# 🚀 Guía Rápida de Desarrollo - Luxviajes
 
 ## Inicio Rápido
 

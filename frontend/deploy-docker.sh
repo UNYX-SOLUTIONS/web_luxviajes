@@ -14,7 +14,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 echo -e "${YELLOW}========================================${NC}"
-echo -e "${YELLOW}Deployment Lux Viajes - Docker${NC}"
+echo -e "${YELLOW}Deployment Luxviajes - Docker${NC}"
 echo -e "${YELLOW}========================================${NC}"
 
 # Variables

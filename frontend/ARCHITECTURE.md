@@ -1,6 +1,6 @@
-# Lux Viajes - Frontend
+# Luxviajes - Frontend
 
-Proyecto Next.js profesional para la agencia de viajes Lux Viajes.
+Proyecto Next.js profesional para la agencia de viajes Luxviajes.
 
 ## Stack Tecnológico
 

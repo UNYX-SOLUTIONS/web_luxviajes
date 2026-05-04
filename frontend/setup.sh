@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Development setup script
-echo "🚀 Setting up Lux Viajes Frontend..."
+echo "🚀 Setting up Luxviajes Frontend..."
 
 # Install dependencies
 echo "📦 Installing dependencies..."

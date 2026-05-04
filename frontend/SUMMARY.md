@@ -1,5 +1,5 @@
 🎉 #════════════════════════════════════════════════════════════════╗
-   #  ✅ PROYECTO NEXT.JS COMPLETADO - LUX VIAJES                   ║
+   #  ✅ PROYECTO NEXT.JS COMPLETADO - Luxviajes                   ║
    #════════════════════════════════════════════════════════════════╝
 
 📊 RESUMEN DEL PROYECTO
@@ -280,7 +280,7 @@ Ahora puedes:
 4. Hacer deploy a producción
 5. Expandir con nuevos servicios
 
-¡Éxito en tu proyecto Lux Viajes! 🚀
+¡Éxito en tu proyecto Luxviajes! 🚀
 
 ═══════════════════════════════════════════════════════════════════
 Creado por: GitHub Copilot (Advanced Architecture Design)

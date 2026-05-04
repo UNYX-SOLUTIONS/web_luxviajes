@@ -27,7 +27,7 @@ export function Hero({
       <div className="absolute inset-0">
         <Image
           src={heroImage || "/images/hero/about.png"}
-          alt="Equipo Lux Viajes"
+          alt="Equipo Luxviajes"
           fill
           priority
           className="object-fill"

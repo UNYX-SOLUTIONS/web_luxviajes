@@ -1,4 +1,4 @@
-# 📦 Archivos Creados - Lux Viajes Frontend
+# 📦 Archivos Creados - Luxviajes Frontend
 
 ## 📊 Resumen
 
@@ -122,7 +122,7 @@ src/hooks/
 ```
 src/constants/
 └── index.ts                     [Constantes de la aplicación:]
-    ├── COMPANY_INFO             [Info de Lux Viajes]
+    ├── COMPANY_INFO             [Info de Luxviajes]
     ├── NAVIGATION_LINKS         [Links de navegación]
     ├── STATS                    [Estadísticas]
     ├── ROUTES                   [Rutas disponibles]

@@ -1,4 +1,4 @@
-# 🎯 Docker Setup para Lux Viajes - Resumen Visual
+# 🎯 Docker Setup para Luxviajes - Resumen Visual
 
 ## 📊 Estructura Deployada
 

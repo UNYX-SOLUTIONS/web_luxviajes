@@ -1,4 +1,4 @@
-// Types para la aplicación Lux Viajes
+// Types para la aplicación Luxviajes
 
 // Destino Soñado (Dream Destination)
 export interface DestinoSonado {

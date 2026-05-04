@@ -230,7 +230,7 @@ nano /etc/systemd/system/luxviajes.service
 
 ```ini
 [Unit]
-Description=Lux Viajes Next.js Application
+Description=Luxviajes Next.js Application
 After=network.target
 
 [Service]

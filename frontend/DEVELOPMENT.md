@@ -1,4 +1,4 @@
-# 📚 Development Setup for Lux Viajes Frontend
+# 📚 Development Setup for Luxviajes Frontend
 
 ## ✅ Requirements
 

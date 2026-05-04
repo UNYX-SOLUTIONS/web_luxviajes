@@ -1,6 +1,6 @@
 # ✅ Next.js Setup Complete
 
-Your Lux Viajes frontend is now fully configured with Next.js best practices!
+Your Luxviajes frontend is now fully configured with Next.js best practices!
 
 ## 📦 What Was Added
 
