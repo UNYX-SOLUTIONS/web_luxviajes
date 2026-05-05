@@ -101,7 +101,7 @@ export function UrgencyModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[1001]">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-1001 rounded-lg">
       <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full flex flex-col max-h-[90vh]">
         <div className="px-6 pt-6 shrink-0 flex items-start justify-between gap-4">
           <div>

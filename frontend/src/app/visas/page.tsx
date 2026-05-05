@@ -18,21 +18,21 @@ import { APPOINTMENT_WEBHOOK_URL, AppointmentSource } from "@/components/common/
 const steps = [
   {
     id: "01",
-    title: "Diagnostico Inicial",
+    title: "Consultoria Personalizada",
     description:
-      "Evaluamos tu perfil y proposito de viaje para determinar la mejor estrategia de solicitud.",
+      "Analizamos tu perfil y destino para ofrecerte una ruta de visado optimizada y sin contratiempos.",
   },
   {
     id: "02",
-    title: "Gestion Documental",
+    title: "Gestion de Documentos",
     description:
-      "Recoleccion, revision tecnica y digitalizacion de todos los soportes necesarios.",
+      "Nos encargamos de cada detalle, desde la recopilación de requisitos hasta la presentación ante las embajadas, garantizando una experiencia sin estrés.",
   },
   {
     id: "03",
-    title: "Acompanamiento VIP",
+    title: "Seguimiento Proactivo",
     description:
-      "Te preparamos para entrevistas y realizamos el seguimiento ante embajadas.",
+      "Te mantenemos informado en cada etapa del proceso, anticipándonos a cualquier eventualidad para asegurar que tu visado sea aprobado sin sorpresas.",
   },
 ];
 
@@ -251,9 +251,9 @@ export default function VisasPage() {
             <div className="flex flex-col gap-4">
               <article className="overflow-hidden rounded-3xl h-80">
                 <img
-                  src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=500&fit=crop"
+                  src="/images/visa/imagen1.jpeg"
                   alt="Consultoria"
-                  className="h-full w-full object-cover"
+                  className=""
                 />
               </article>
               <article className="flex items-center justify-center rounded-3xl bg-primary-700 text-white h-64">
@@ -277,7 +277,7 @@ export default function VisasPage() {
 
           <div>
             <h3 className="text-5xl font-bold text-neutral-900">
-              Paso a Paso hacia tu Destino
+              Gestionamos tu visado paso a paso
             </h3>
 
             <div className="mt-10 space-y-8">

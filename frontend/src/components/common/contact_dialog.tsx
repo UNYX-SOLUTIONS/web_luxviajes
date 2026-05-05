@@ -106,14 +106,14 @@ export function ContactDialog({
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-[999] bg-black transition-opacity duration-200 ${
+        className={`fixed inset-0 z-999 bg-black transition-opacity duration-200 rounded-lg ${
           isClosing ? 'opacity-0' : 'opacity-50'
         }`}
         onClick={handleClose}
       />
 
       {/* Dialog */}
-      <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-1000 flex items-center justify-center p-4 rounded-lg">
         <div
           className={`relative w-full max-w-md rounded-3xl bg-white shadow-2xl transition-all duration-200 ${
             isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'

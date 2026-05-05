@@ -22,10 +22,27 @@ export default function ServicesPage() {
   const { data: servicioData } = useServicioData();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showContactDialog, setShowContactDialog] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-   useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
-  }, []); // Esto fuerza el scroll al cargar la página
+  }, []);
+
+  // Auto-advance de testimonios cada 4 segundos
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => {
+          const items = servicioData?.testimonios || [];
+          return items.length > 0 ? (prev + 1) % items.length : 0;
+        });
+        setIsTransitioning(false);
+      }, 300);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [servicioData?.testimonios]);
 
   const getVisibleTestimonials = () => {
     const items = servicioData?.testimonios || [];
@@ -38,15 +55,23 @@ export default function ServicesPage() {
   };
 
   const nextTestimonial = () => {
-    const items = servicioData?.testimonios || [];
-    setCurrentIndex((prev) => (prev + 1) % items.length);
+    setIsTransitioning(true);
+    setTimeout(() => {
+      const items = servicioData?.testimonios || [];
+      setCurrentIndex((prev) => (prev + 1) % items.length);
+      setIsTransitioning(false);
+    }, 300);
   };
 
   const prevTestimonial = () => {
-    const items = servicioData?.testimonios || [];
-    setCurrentIndex(
-      (prev) => (prev - 1 + items.length) % items.length,
-    );
+    setIsTransitioning(true);
+    setTimeout(() => {
+      const items = servicioData?.testimonios || [];
+      setCurrentIndex(
+        (prev) => (prev - 1 + items.length) % items.length,
+      );
+      setIsTransitioning(false);
+    }, 300);
   };
   return (
     <>
@@ -183,29 +208,30 @@ export default function ServicesPage() {
               <ArrowLeftIcon className="h-4 w-4" />
             </button>
 
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-3 w-full max-w-6xl">
-              
-              {getVisibleTestimonials().map((item: Testimonio, position: number) => {
+            <div className={`transition-all duration-300 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+              <div className="grid grid-cols-1 gap-10 md:grid-cols-3 w-full max-w-6xl">
+                
+                {getVisibleTestimonials().map((item: Testimonio, position: number) => {
                 const rating = item.calificacion || 5;
                 const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
                 
                 return (
                   <article
                     key={`testimonio-${item.id}-${position}`}
-                    className={`relative rounded-2xl shadow-lg transition-all duration-500   ${
-                      position === 1 ? "md:scale-105 h-80" : "md:scale-90 h-56"
+                    className={`relative rounded-2xl shadow-lg transition-all duration-1000 ease-out ${
+                      position === 1 ? "md:scale-105 h-80 opacity-100" : "md:scale-90 h-56 opacity-75"
                     }`}
                   >
                     <img
                       src={item.imagen }
                       alt={item.titulo }
-                      className={`w-full object-cover rounded-2xl ${
+                      className={`w-full object-cover rounded-2xl transition-all duration-1000 ease-out ${
                         position === 1 ? "h-80" : "h-56"
                       }`}
                     />
                     <div
-                      className={`absolute rounded-xl p-4 text-white right-4 w-48
-                        ${position === 1 ? "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/95" : "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/85"}
+                      className={`absolute rounded-xl p-4 text-white right-4 w-48 transition-all ${position === 1 ? "duration-1000 delay-300" : "duration-1000"} ease-out
+                        ${position === 1 ? "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/95 opacity-100" : "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/85 opacity-90"}
                       `}
                     >
                       <p className="text-xs font-semibold uppercase tracking-wider text-white!">
@@ -219,6 +245,7 @@ export default function ServicesPage() {
                   </article>
                 );
               })}
+              </div>
             </div>
 
             <button

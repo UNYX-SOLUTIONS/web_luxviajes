@@ -80,9 +80,9 @@ export function Footer() {
               <Image
                 src="/images/footer/footer.png"
                 alt={COMPANY_INFO.name}
-                width={160}
-                height={80}
-                className="h-auto w-auto"
+                width={220}
+                height={120}
+                className="object-contain"
               />
             </Link>
           </div>
