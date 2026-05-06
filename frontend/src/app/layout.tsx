@@ -1,46 +1,64 @@
-import type { Metadata, Viewport } from 'next';
-import { Manrope } from 'next/font/google';
-import { Header, Footer } from '@/components/common';
-import { COMPANY_INFO } from '@/constants';
-import './globals.css';
+import type { Metadata, Viewport } from "next";
+import { Manrope } from "next/font/google";
+import { Header, Footer } from "@/components/common";
+import { COMPANY_INFO } from "@/constants";
+import "./globals.css";
 
 const manrope = Manrope({
-  variable: '--font-manrope',
-  subsets: ['latin'],
-  weight: ['200', '300', '400', '500', '600', '700', '800'],
+  variable: "--font-manrope",
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: `${COMPANY_INFO.name} - ${COMPANY_INFO.tagline}`,
+  title: "Luxviajes - Agencia de Viajes Premium",
   description: COMPANY_INFO.description,
-  keywords: 'viajes, agencia de viajes, paquetes internacionales, turismo',
-  authors: [{ name: COMPANY_INFO.name }],
+
+  applicationName: "Luxviajes",
+
+  keywords: [
+    "luxviajes",
+    "agencia de viajes",
+    "viajes internacionales",
+    "visas",
+    "turismo",
+  ],
+
+  authors: [{ name: "Luxviajes" }],
+
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/images/svg/logo2.svg', type: 'image/svg+xml' },
-    ],
-    shortcut: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
+
   openGraph: {
-    type: 'website',
-    locale: 'es_ES',
-    url: 'https://luxviajes.com',
-    siteName: COMPANY_INFO.name,
+    type: "website",
+    locale: "es_ES",
+    url: "https://luxviajes.com",
+    siteName: "Luxviajes",
+    title: "Luxviajes - Agencia de Viajes Premium",
+    description: COMPANY_INFO.description,
     images: [
       {
-        url: '/og-image.jpg',
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: COMPANY_INFO.name,
+        alt: "Luxviajes",
       },
     ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Luxviajes - Agencia de Viajes Premium",
+    description: COMPANY_INFO.description,
+    images: ["/og-image.jpg"],
   },
 };
 
 export const viewport: Viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
 };
 
@@ -54,9 +72,11 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
+        <meta name="application-name" content="Luxviajes" />
+        <meta name="apple-mobile-web-app-title" content="Luxviajes" />
+        <meta name="og:site_name" content="Luxviajes" />
         {/* Favicon adicional por si acaso */}
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/images/svg/logo2.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="min-h-screen flex flex-col antialiased">
