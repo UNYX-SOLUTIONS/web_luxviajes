@@ -1,3 +1,5 @@
+// DEPRECATED
+
 "use client";
 
 import { useState } from "react";

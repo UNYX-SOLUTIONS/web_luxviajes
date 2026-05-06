@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect, useMemo, forwardRef, useImperativeHandle } from "react";
-import { useRedSocial } from "@/hooks";
 import { UrgencyFormModal } from "./UrgencyFormModal";
 
 // Enum para los tipos de origen de la cita
 export enum AppointmentSource {
   CALENDAR = "calendar",
-  NOW = "now",
+  VIDEOLLAMADA = "videocall",
   URGENCY = "urgency",
   MAIL_MARKETING = "mailMarketing",
   CONTACT_FORM = "contactForm",
@@ -290,7 +289,7 @@ export const AppointmentBase = forwardRef<AppointmentBaseRef, AppointmentBasePro
 
     let currentSource = appointmentSource;
     if (isDialogMode) {
-      currentSource = AppointmentSource.NOW;
+      currentSource = AppointmentSource.CALENDAR;
     }
 
     // Usar el mismo formato ISO para appointment_date
