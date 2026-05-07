@@ -122,7 +122,7 @@ export const DreamDestinationsSection: FC<
               Escapa, Explora, Disfruta
             </p>
             <h2 className="mt-1 text-4xl font-bold text-primary-700">
-              Top Destinos del Mes
+        Top Destinos de la Semana
             </h2>
           </div>
 
