@@ -7,7 +7,7 @@ import {
 import { ClockIcon, DocumentArrowDownIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import type { FC } from "react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { PremiumPackage } from "../data/packages-data";
 
 interface PremiumPackagesSectionProps {
@@ -22,10 +22,9 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
   onDetalles,
 }) => {
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const maxIndex = Math.max(0, packages.length - ITEMS_PER_VIEW);
- 
 
-  
   const handleDownloadPDF = (pdfUrl?: string, title?: string) => {
     if (!pdfUrl) return;
     
@@ -36,13 +35,62 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
     link.click();
   };
 
+  const handlePageChange = (newIndex: number) => {
+    if (newIndex === carouselIndex) return;
+
+    const sectionTop =
+      sectionRef.current?.getBoundingClientRect().top ?? 0;
+
+    setCarouselIndex(newIndex);
+
+    requestAnimationFrame(() => {
+      window.scrollBy({
+        top: sectionTop - 100,
+        behavior: "instant",
+      });
+    });
+  };
 
   const handlePrev = () => {
-    setCarouselIndex((prev) => Math.max(0, prev - 1));
+    handlePageChange(Math.max(0, carouselIndex - 1));
   };
 
   const handleNext = () => {
-    setCarouselIndex((prev) => Math.min(maxIndex, prev + 1));
+    handlePageChange(Math.min(maxIndex, carouselIndex + 1));
+  };
+
+  const getPaginationItems = () => {
+    const totalPages = maxIndex + 1;
+    const currentPage = carouselIndex + 1;
+    const delta = 2;
+    const range: number[] = [];
+    const rangeWithDots: (number | string)[] = [];
+
+    for (
+      let i = Math.max(2, currentPage - delta);
+      i <= Math.min(totalPages - 1, currentPage + delta);
+      i++
+    ) {
+      range.push(i);
+    }
+
+    rangeWithDots.push(1);
+
+    if (range.length > 0 && range[0] > 2) {
+      rangeWithDots.push("...");
+    }
+
+    rangeWithDots.push(...range);
+
+    if (range.length > 0 && range[range.length - 1] < totalPages - 1) {
+      rangeWithDots.push("...");
+    }
+
+    if (totalPages > 1) {
+      rangeWithDots.push(totalPages);
+    }
+
+    return rangeWithDots;
   };
 
   const visiblePackages = packages.slice(
@@ -52,7 +100,7 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
 
   return (
     <section className="bg-neutral-100 py-16 md:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div ref={sectionRef} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
             <h2 className="text-4xl font-bold text-primary-700 mb-2">
@@ -62,22 +110,6 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
               Nuestra seleccion exclusiva de itinerarios curados para ofrecer el
               maximo confort y experiencias autenticas.
             </p>
-          </div>
-          <div className="hidden items-center gap-2 md:flex">
-            <button
-              onClick={handlePrev}
-              disabled={carouselIndex === 0}
-              className="h-9 w-9 rounded-full border border-neutral-300 text-neutral-600 transition hover:border-primary-400 hover:text-primary-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              <ChevronLeftIcon className="h-5 w-5" />
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={carouselIndex === maxIndex}
-              className="h-9 w-9 bg-primary-600 hover:bg-primary-500 rounded-full border border-primary-800 text-neutral-50 transition hover:border-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              <ChevronRightIcon className="h-5 w-5" />
-            </button>
           </div>
         </div>
 
@@ -144,6 +176,57 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
             </article>
           ))}
         </div>
+
+        {/* PAGINACIÓN */}
+        {maxIndex > 0 && (
+          <div className="mt-8 flex justify-center items-center gap-2">
+            <button
+              onClick={handlePrev}
+              disabled={carouselIndex === 0}
+              className={`p-2 rounded-full transition ${
+                carouselIndex === 0
+                  ? "bg-neutral-200 text-neutral-400"
+                  : "bg-neutral-200 hover:bg-neutral-300"
+              }`}
+            >
+              <ChevronLeftIcon className="h-4 w-4" />
+            </button>
+
+            {getPaginationItems().map(
+              (item, index) => (
+                <button
+                  key={index}
+                  onClick={() =>
+                    typeof item === "number" &&
+                    handlePageChange(item - 1)
+                  }
+                  disabled={typeof item !== "number"}
+                  className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
+                    item === carouselIndex + 1
+                      ? "bg-primary-700 text-white"
+                      : typeof item === "number"
+                      ? "bg-neutral-200 hover:bg-neutral-300"
+                      : "text-neutral-500 cursor-default"
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            )}
+
+            <button
+              onClick={handleNext}
+              disabled={carouselIndex === maxIndex}
+              className={`p-2 rounded-full transition ${
+                carouselIndex === maxIndex
+                  ? "bg-neutral-200 text-neutral-400"
+                  : "bg-neutral-200 hover:bg-neutral-300"
+              }`}
+            >
+              <ChevronRightIcon className="h-4 w-4" />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -42,12 +42,12 @@ export default function Home() {
     (destino) => ({
       title: destino.titulo,
       image: destino.imagen || "",
-      description: destino.descripcion,
+      description: destino.descripcion || "",
       duration: destino.duracion,
       nights: destino.subtitulo,
       season: destino.disponibilidad,
-      included: destino.descripcion.split("\n").filter((line) => line.trim()), // Para las cards
-      detailIncluded: destino.descripcionDetallada
+      included: (destino.descripcion || "").split("\n").filter((line) => line.trim()), // Para las cards
+      detailIncluded: (destino.descripcionDetallada || "")
         .split("\n")
         .filter((line) => line.trim()), // Para el diálogo
       price: destino.precio,

@@ -35,13 +35,13 @@ function mapDestinoToDestination(destino: TopDestinosMes): DreamDestination {
   return {
     title: destino.titulo,
     image: destino.imagen || "",
-    description: destino.descripcion,
+    description: destino.descripcion || "",
     duration: destino.duracion,
     nights: destino.subtitulo,
     season: destino.disponibilidad,
     price: destino.precio,
-    included: destino.descripcion.split("\n").filter(line => line.trim()), // Para las cards
-    detailIncluded: destino.descripcionDetallada.split("\n").filter(line => line.trim()), // Para el diálogo
+    included: (destino.descripcion || "").split("\n").filter(line => line.trim()), // Para las cards
+    detailIncluded: (destino.descripcionDetallada || "").split("\n").filter(line => line.trim()), // Para el diálogo
     pdf: destino.pdf || undefined,
   };
 }
