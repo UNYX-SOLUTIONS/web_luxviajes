@@ -106,13 +106,13 @@ export async function GET() {
     );
 
     // console.log("Query generada:", query);
-    // console.log("URL completa:", `${STRAPI_URL}/contacto?${query}`);
+    console.log("URL completa:", `${STRAPI_URL}/contacto?${query}`);
 
     const response = await fetch(`${STRAPI_URL}/contacto?${query}`, {
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 3600 }, // Revalidar cada hora
+      cache: "no-store",
     });
 
     if (!response.ok) {
