@@ -24,7 +24,7 @@ function parseStyledText(text: string): string {
 
 interface MailMarketingDialogProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (type: "close" | "dontShow") => void;
   titulo?: string;
   descripcion?: string;
 }
@@ -50,11 +50,11 @@ export function MailMarketingDialog({
     }
   }, [isOpen]);
 
-  const handleClose = () => {
+  const handleClose = (closeType: "close" | "dontShow" = "close") => {
     setIsAnimating(false);
     setTimeout(() => {
       setShouldShowDialog(false);
-      onClose();
+      onClose(closeType);
     }, 300); // Duración de la animación de cierre
   };
 
@@ -94,7 +94,7 @@ export function MailMarketingDialog({
       
       setTimeout(() => {
         setMessage(null);
-        handleClose();
+        handleClose("close");
       }, 3000);
       
     } catch (error) {
@@ -114,7 +114,7 @@ export function MailMarketingDialog({
         className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
           isAnimating ? "opacity-100" : "opacity-0"
         }`}
-        onClick={handleClose}
+        onClick={() => handleClose("close")}
       />
 
       {/* Dialog con fade y scale suave */}
@@ -124,20 +124,20 @@ export function MailMarketingDialog({
         }`}
       >
         <div
-          className="relative w-full max-w-2xl rounded-3xl bg-gradient-to-r from-primary-600 to-primary-800 shadow-2xl overflow-hidden pointer-events-auto"
+          className="relative w-full max-w-2xl rounded-3xl bg-linear-to-r from-primary-600 to-primary-800 shadow-2xl overflow-hidden pointer-events-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close Button */}
           <button
-            onClick={handleClose}
-            className="absolute right-6 top-6 z-10 rounded-full bg-white/20 p-2 hover:bg-white/30 transition backdrop-blur-sm"
+            onClick={() => handleClose("close")}
+            className="absolute right-4 top-4 z-10 rounded-full bg-white/20 p-1.5 hover:bg-white/30 transition backdrop-blur-sm"
             aria-label="Cerrar diálogo"
           >
-            <XMarkIcon className="h-6 w-6 text-white!" />
+            <XMarkIcon className="h-6 w-6 text-white" />
           </button>
 
           {/* Content */}
-          <div className="px-8 py-12 text-center text-white! sm:px-12 sm:py-16">
+          <div className="px-8 py-10 text-center text-white! sm:px-12 sm:py-12">
           <h3
             className="text-3xl sm:text-4xl font-bold"
             dangerouslySetInnerHTML={{ __html: parseStyledText(titulo) }}
@@ -177,6 +177,16 @@ export function MailMarketingDialog({
                 {message.text}
               </div>
             )}
+
+          {/* No volver a mostrar button */}
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={() => handleClose("dontShow")}
+              className="text-sm text-white/70 hover:text-white transition"
+            >
+              No volver a mostrar
+            </button>
+          </div>
           </div>
         </div>
       </div>

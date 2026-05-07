@@ -104,25 +104,32 @@ export default function Home() {
     };
   }, []);
 
-  // Mail Marketing Dialog - Mostrar apenas haya scroll
+  // Mail Marketing Dialog - Mostrar después de 2 segundos
   useEffect(() => {
-    const handleScroll = () => {
-      if (!showMailMarketingDialog && window.scrollY > 20) {
-        // Verificar cooldown de 10 minutos
-        const lastShownTime = localStorage.getItem("lastMailMarketingShown");
+    const timer = setTimeout(() => {
+      // Verificar si el usuario marcó "No volver a mostrar" en las últimas 24 horas
+      const dontShowTime = localStorage.getItem("mailMarketingDontShow");
+      if (dontShowTime) {
         const now = Date.now();
-        const TEN_MINUTES = 2 * 60 * 1000;
-        
-        if (!lastShownTime || now - parseInt(lastShownTime) > TEN_MINUTES) {
-          setShowMailMarketingDialog(true);
-          localStorage.setItem("lastMailMarketingShown", now.toString());
+        const ONE_DAY = 24 * 60 * 60 * 1000;
+        if (now - parseInt(dontShowTime) < ONE_DAY) {
+          return; // No mostrar si está dentro del período de 24 horas
         }
       }
-    };
 
-    window.addEventListener("scroll", handleScroll, { once: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [showMailMarketingDialog]);
+      // Verificar cooldown de 2 minutos (para cierre normal con X)
+      const lastShownTime = localStorage.getItem("lastMailMarketingShown");
+      const now = Date.now();
+      const TWO_MINUTES = 1 * 60 * 1000;
+      
+      if (!lastShownTime || now - parseInt(lastShownTime) > TWO_MINUTES) {
+        setShowMailMarketingDialog(true);
+        localStorage.setItem("lastMailMarketingShown", now.toString());
+      }
+    }, 2000); // 2 segundos
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <>
@@ -203,7 +210,15 @@ export default function Home() {
       {/* Mail Marketing Dialog */}
       <MailMarketingDialog
         isOpen={showMailMarketingDialog}
-        onClose={() => setShowMailMarketingDialog(false)}
+        onClose={(closeType) => {
+          setShowMailMarketingDialog(false);
+          
+          if (closeType === "dontShow") {
+            // Guardar que no quiere ver por 24 horas
+            localStorage.setItem("mailMarketingDontShow", Date.now().toString());
+          }
+          // Si es "close", el cooldown de 2 minutos ya se guardó en la lógica de mostrar
+        }}
       />
 
       {/* Details Dialog */}
