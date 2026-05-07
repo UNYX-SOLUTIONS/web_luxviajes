@@ -24,7 +24,7 @@ interface Banner {
   };
 }
 
-interface DestinoSonado {
+interface TopDestinosMes {
   id: number;
   documentId: string;
   titulo: string;
@@ -74,7 +74,7 @@ interface StrapiInitioResponse {
     id: number;
     documentId: string;
     banners?: Banner[];
-    destino_sonados?: DestinoSonado[];
+    topDestinosMes?: TopDestinosMes[];
     tarjetasServicio?: TarjetaServicio[];
     clientesFrecuentes?: string;
     experiencia?: string;
@@ -117,7 +117,7 @@ function transformBanners(banners: Banner[]) {
 }
 
 function getImageUrl(
-  imagen?: DestinoSonado["imagen"] | TarjetaServicio["imagen"],
+  imagen?: TopDestinosMes["imagen"] | TarjetaServicio["imagen"],
 ): string {
   if (!imagen) return "";
 
@@ -132,7 +132,7 @@ function getImageUrl(
   return url.startsWith("http") ? url : `${STRAPI_ORIGIN}${url}`;
 }
 
-function getPdfUrl(pdf?: DestinoSonado["pdf"]): string {
+function getPdfUrl(pdf?: TopDestinosMes["pdf"]): string {
   if (!pdf?.url) return "";
   return pdf.url.startsWith("http") ? pdf.url : `${STRAPI_ORIGIN}${pdf.url}`;
 }
@@ -169,7 +169,7 @@ export async function GET() {
           banners: {
             populate: ["imagen"], // Poblar imagen dentro de banners
           },
-          destino_sonados: {
+          topDestinosMes: {
             populate: ["imagen", "pdf"], // Poblar imagen y pdf dentro de destinos
           },
           tarjetasServicio: {
@@ -190,13 +190,13 @@ export async function GET() {
     }
 
     const data: StrapiInitioResponse = await response.json();
-    console.log(
-      "Datos de /inicio desde Strapi:",
-      JSON.stringify(data, null, 2),
-    );
+    // console.log(
+    //   "Datos de /inicio desde Strapi:",
+    //   JSON.stringify(data, null, 2),
+    // );
 
     // Transformar destinos agregando URLs completas de imágenes y PDFs
-    const destinosTransformados = (data.data.destino_sonados || []).map(
+    const destinosTransformados = (data.data.topDestinosMes || []).map(
       (destino) => ({
         ...destino,
         imagen: getImageUrl(destino.imagen),

@@ -105,8 +105,8 @@ export async function GET() {
       { encodeValuesOnly: true },
     );
 
-    console.log("Query generada:", query);
-    console.log("URL completa:", `${STRAPI_URL}/contacto?${query}`);
+    // console.log("Query generada:", query);
+    // console.log("URL completa:", `${STRAPI_URL}/contacto?${query}`);
 
     const response = await fetch(`${STRAPI_URL}/contacto?${query}`, {
       headers: {
@@ -128,7 +128,7 @@ export async function GET() {
     }
 
     const data: StrapiContactoResponse = await response.json();
-    console.log("Respuesta de Strapi:", JSON.stringify(data, null, 2));
+    // console.log("Respuesta de Strapi:", JSON.stringify(data, null, 2));
 
     if (!data.data) {
       return NextResponse.json(
@@ -160,10 +160,10 @@ export async function GET() {
       publishedAt: data.data.publishedAt,
     };
 
-    console.log(
-      "Datos transformados:",
-      JSON.stringify(transformedData, null, 2),
-    );
+    // console.log(
+    //   "Datos transformados:",
+    //   JSON.stringify(transformedData, null, 2),
+    // );
 
     return NextResponse.json(transformedData);
   } catch (error) {

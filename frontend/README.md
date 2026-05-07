@@ -142,7 +142,7 @@ Cuando contribuyas, sigue:
 
 1. Las convenciones en [ARCHITECTURE.md](./ARCHITECTURE.md)
 2. El tipo de cambio debe compilar sin errores (`pnpm build`)
-3. No incluir `console.log` en producción
+3. No incluir `// console.log` en producción
 4. Mantener la estructura modular
 
 ## 📦 Próximas Mejoras

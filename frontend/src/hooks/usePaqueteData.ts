@@ -23,7 +23,7 @@ export function usePaqueteData(): UsePaqueteDataResult {
         }
 
         const result: Paquete = await response.json();
-        console.log("Data paquete:", result);
+        // console.log("Data paquete:", result);
 
         setData(result);
       } catch (err) {

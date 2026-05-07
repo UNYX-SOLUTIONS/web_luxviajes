@@ -431,7 +431,7 @@ interface PaquetePremium extends PaqueteBase {
   precio: texto;
 }
 
-interface DestinoSonado extends PaqueteBase {
+interface TopDestinosMes extends PaqueteBase {
   noches: texto;
   temporada: texto;
 }

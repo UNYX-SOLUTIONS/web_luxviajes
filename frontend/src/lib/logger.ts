@@ -13,7 +13,7 @@ const colors = {
 
 export const logger = {
     info: (message: string, data?: any) => {
-        console.log(
+        // console.log(
             `${colors.info}[INFO]${colors.reset} ${message}`,
             data ? JSON.stringify(data) : ''
         );

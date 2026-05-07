@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { XMarkIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { ContactDialog } from "@/components/common/contact_dialog";
 import { usePaqueteData } from "@/hooks";
-import type { DestinoSonado, PaquetePremium, ParqueTematico } from "@/types";
+import type { TopDestinosMes, PaquetePremium, ParqueTematico } from "@/types";
 import {
   HeroSection,
   DreamDestinationsSection,
@@ -29,8 +29,8 @@ interface PackageDetails {
 }
 
 // Funciones de mapeo para convertir datos del API a interfaces locales
-function mapDestinoToDestination(destino: DestinoSonado): DreamDestination {
-   
+function mapDestinoToDestination(destino: TopDestinosMes): DreamDestination {
+  // console.log("Mapeando destino:", destino);
 
   return {
     title: destino.titulo,
@@ -40,9 +40,9 @@ function mapDestinoToDestination(destino: DestinoSonado): DreamDestination {
     nights: destino.subtitulo,
     season: destino.disponibilidad,
     price: destino.precio,
-      included: destino.descripcion.split("\n").filter(line => line.trim()), // Para las cards
+    included: destino.descripcion.split("\n").filter(line => line.trim()), // Para las cards
     detailIncluded: destino.descripcionDetallada.split("\n").filter(line => line.trim()), // Para el diálogo
-   pdf: destino.pdf,
+    pdf: destino.pdf || undefined,
   };
 }
 
@@ -66,7 +66,7 @@ function mapPaqueteToPremium(paquete: PaquetePremium): PremiumPackage {
     season: paquete.etiqueta,
     highlights: lines,
     included: lines,
-    pdf: paquete.pdf,
+    pdf: paquete.pdf || undefined,
   };
 }
 
@@ -80,19 +80,19 @@ function mapParqueToThemePark(parque: ParqueTematico) {
 }
 
 export default function PackagesPage() {
-  const { data: paqueteData } = usePaqueteData();
+  const { data: paqueteData, loading, error } = usePaqueteData();
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<PackageDetails | null>(null);
 
   // Mapear datos del API a interfaces locales usando useMemo
   const dreamDestinations = useMemo(() => {
-    return paqueteData?.destinosSonados?.map(mapDestinoToDestination) || [];
-  }, [paqueteData?.destinosSonados]);
+    return paqueteData?.topDestinosMes?.map(mapDestinoToDestination) || [];
+  }, [paqueteData?.topDestinosMes]);
 
   const premiumPackages = useMemo(() => {
-    return paqueteData?.paquetesPremium?.map(mapPaqueteToPremium) || [];
-  }, [paqueteData?.paquetesPremium]);
+    return paqueteData?.paquete_premiums?.map(mapPaqueteToPremium) || [];
+  }, [paqueteData?.paquete_premiums]);
 
   const themeParks = useMemo(() => {
     return paqueteData?.parquesTematicos?.map(mapParqueToThemePark) || [];
@@ -120,30 +120,63 @@ export default function PackagesPage() {
     <>
       <HeroSection />
 
-      <DreamDestinationsSection
-        destinations={dreamDestinations}
-        onDetalles={(destination) => handleOpenDetails(destination)}
-        maxCards={8}
-        showScrollControls={true}
-      />
+      {/* Dream Destinations Section with Loading */}
+      {loading ? (
+        <div className="w-full py-20 flex items-center justify-center bg-neutral-50">
+          <div className="text-center">
+            <div className="mb-4 flex justify-center">
+              <div className="h-12 w-12 border-4 border-primary-200 border-t-primary-700 rounded-full animate-spin"></div>
+            </div>
+            <p className="text-lg text-neutral-700">Cargando destinos...</p>
+          </div>
+        </div>
+      ) : error ? (
+        <div className="w-full py-20 flex items-center justify-center bg-neutral-50">
+          <div className="text-center">
+            <p className="text-lg text-neutral-900 mb-2">Error al cargar los destinos</p>
+            <p className="text-sm text-neutral-600">Por favor, recarga la página</p>
+          </div>
+        </div>
+      ) : dreamDestinations.length > 0 ? (
+        <DreamDestinationsSection
+          destinations={dreamDestinations}
+          onDetalles={(destination) => handleOpenDetails(destination)}
+          maxCards={8}
+          showScrollControls={true}
+        />
+      ) : null}
 
-      <PremiumPackagesSection
-        packages={premiumPackages}
-        onDetalles={(pkg) => handleOpenDetails(pkg)}
-      />
+      {/* Premium Packages Section with Loading */}
+      {!loading && error ? (
+        <div className="w-full py-20 flex items-center justify-center bg-neutral-50">
+          <div className="text-center">
+            <p className="text-lg text-neutral-900 mb-2">Error al cargar los paquetes</p>
+            <p className="text-sm text-neutral-600">Por favor, recarga la página</p>
+          </div>
+        </div>
+      ) : !loading && premiumPackages.length > 0 ? (
+        <PremiumPackagesSection
+          packages={premiumPackages}
+          onDetalles={(pkg) => handleOpenDetails(pkg)}
+        />
+      ) : null}
 
-      <ThemeParksSection parks={themeParks} />
+      {!loading && <ThemeParksSection parks={themeParks} />}
 
-      <CtaSection 
-        onContactClick={() => setShowContactDialog(true)}
-        titulo={paqueteData?.llamadaTitulo}
-        subtitulo={paqueteData?.llamadaSubtitulo}
-      />
+      {!loading && (
+        <>
+          <CtaSection 
+            onContactClick={() => setShowContactDialog(true)}
+            titulo={paqueteData?.llamadaTitulo}
+            subtitulo={paqueteData?.llamadaSubtitulo}
+          />
 
-      <NewsletterSection 
-        titulo={paqueteData?.boletinTitulo}
-        descripcion={paqueteData?.boletinDescripcion}
-      />
+          <NewsletterSection 
+            titulo={paqueteData?.boletinTitulo}
+            descripcion={paqueteData?.boletinDescripcion}
+          />
+        </>
+      )}
 
       {/* Details Dialog */}
       {showDetailsDialog && selectedPackage && (

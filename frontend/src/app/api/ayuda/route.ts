@@ -1,6 +1,18 @@
 import { NextResponse } from "next/server";
 import qs from "qs";
 
+interface StrapiFormat {
+  name: string;
+  hash: string;
+  ext: string;
+  mime: string;
+  path?: string | null;
+  width: number;
+  height: number;
+  size: number;
+  url: string;
+}
+
 const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
 const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com";
 
@@ -12,7 +24,7 @@ interface StrapiPDF {
   caption?: string | null;
   width?: number | null;
   height?: number | null;
-  formats?: any | null;
+  formats?: Record<string, StrapiFormat> | null;
   hash: string;
   ext: string;
   mime: string;
@@ -20,7 +32,7 @@ interface StrapiPDF {
   url: string;
   previewUrl?: string | null;
   provider: string;
-  provider_metadata?: any | null;
+  provider_metadata?: unknown | null;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
@@ -77,8 +89,8 @@ export async function GET() {
       { encodeValuesOnly: true },
     );
 
-    console.log("Query generada:", query);
-    console.log("URL completa:", `${STRAPI_URL}/ayuda?${query}`);
+    // console.log("Query generada:", query);
+    // console.log("URL completa:", `${STRAPI_URL}/ayuda?${query}`);
 
     const response = await fetch(`${STRAPI_URL}/ayuda?${query}`, {
       headers: {
@@ -100,7 +112,7 @@ export async function GET() {
     }
 
     const data: StrapiAyudaResponse = await response.json();
-    console.log("Respuesta de Strapi:", JSON.stringify(data, null, 2));
+    // console.log("Respuesta de Strapi:", JSON.stringify(data, null, 2));
 
     if (!data.data) {
       return NextResponse.json(
@@ -131,10 +143,10 @@ export async function GET() {
       publishedAt: data.data.publishedAt,
     };
 
-    console.log(
-      "Datos transformados:",
-      JSON.stringify(transformedData, null, 2),
-    );
+    // console.log(
+    //   "Datos transformados:",
+    //   JSON.stringify(transformedData, null, 2),
+    // );
 
     return NextResponse.json(transformedData);
   } catch (error) {

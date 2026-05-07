@@ -25,7 +25,7 @@ export function useServicios(): UseServiciosReturn {
         }
 
         const result: TarjetaServicio[] = await response.json();
-        console.log("Servicios obtenidos:", result);
+        // console.log("Servicios obtenidos:", result);
 
         if (isMounted) {
           setServicios(result);

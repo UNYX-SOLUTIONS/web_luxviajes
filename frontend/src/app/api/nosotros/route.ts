@@ -35,7 +35,7 @@ interface StrapiNosotrosResponse {
     quienesSomosDescripcion?: string;
     numExpertos?: string;
     ciudades?: string;
-    asesors?: Asesor[];
+    asesores?: Asesor[];
     createdAt: string;
     updatedAt: string;
     publishedAt: string;
@@ -94,7 +94,7 @@ export async function GET() {
           heroImagen: {
             populate: "*",
           },
-          asesors: {
+          asesores: {
             populate: {
               imagen: {
                 populate: "*",
@@ -102,13 +102,13 @@ export async function GET() {
             },
           },
         },
-        "pagination[asesors][pageSize]": 100,
+        "pagination[asesores][pageSize]": 100,
       },
       { encodeValuesOnly: true },
     );
 
-    console.log("Query generada:", query);
-    console.log("URL completa:", `${STRAPI_URL}/nosotros?${query}`);
+    // console.log("Query generada:", query);
+    // console.log("URL completa:", `${STRAPI_URL}/nosotros?${query}`);
 
     const response = await fetch(`${STRAPI_URL}/nosotros?${query}`, {
       headers: {
@@ -123,13 +123,13 @@ export async function GET() {
 
     const data: StrapiNosotrosResponse = await response.json();
 
-    console.log("Respuesta completa de Strapi:", JSON.stringify(data, null, 2));
-    console.log(
-      `Total de asesores recibidos: ${data.data.asesors?.length || 0}`,
-    );
+    // console.log("Respuesta completa de Strapi:", JSON.stringify(data, null, 2));
+    // console.log(
+    //   `Total de asesores recibidos: ${data.data.asesores?.length || 0}`,
+    // );
 
     // Transformar asesores con sus imágenes
-    const asesoresTransformados = (data.data.asesors || []).map((asesor) => ({
+    const asesoresTransformados = (data.data.asesores || []).map((asesor) => ({
       id: asesor.id,
       documentId: asesor.documentId,
       nombre: asesor.nombre,
@@ -140,26 +140,26 @@ export async function GET() {
       publishedAt: asesor.publishedAt,
     }));
 
-    console.log(
-      `Total de asesores transformados: ${asesoresTransformados.length}`,
-    );
-    console.log("Asesores por sede:");
+    // console.log(
+    //   `Total de asesores transformados: ${asesoresTransformados.length}`,
+    // );
+    // console.log("Asesores por sede:");
     const sedes: { [key: string]: number } = {};
     asesoresTransformados.forEach((a) => {
       sedes[a.sede] = (sedes[a.sede] || 0) + 1;
     });
-    console.log(sedes);
+    // console.log(sedes);
 
     // Transformar los datos
     const transformedData = {
       ...data.data,
       heroImagen: getImageUrl(data.data.heroImagen),
-      asesors: asesoresTransformados,
+      asesores: asesoresTransformados,
     };
 
-    console.log(
-      `Datos finales - Total asesores: ${transformedData.asesors?.length || 0}`,
-    );
+    // console.log(
+    //   `Datos finales - Total asesores: ${transformedData.asesores?.length || 0}`,
+    // );
 
     return NextResponse.json(transformedData, {
       headers: {

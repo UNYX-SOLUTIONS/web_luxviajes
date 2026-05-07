@@ -23,7 +23,7 @@ import { motion, AnimatePresence } from "framer-motion";
 }
  
 export const DreamDestinationsSection: FC<
-  DreamDestinationsSectionProps
+  DreamDestinationsSectionProps 
 > = ({
   destinations,
   onDetalles,

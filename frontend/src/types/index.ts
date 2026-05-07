@@ -1,7 +1,7 @@
 // Types para la aplicación Luxviajes
 
 // Destino Soñado (Dream Destination)
-export interface DestinoSonado {
+export interface TopDestinosMes {
   id: number;
   documentId: string;
   titulo: string;
@@ -136,7 +136,7 @@ export interface Home {
   banners: Banner[];
   redes?: RedSocial; // Objeto único con todas las redes sociales
   stats?: StatCard[] | null;
-  destinos?: DestinoSonado[];
+  destinos?: TopDestinosMes[];
   servicios?: TarjetaServicio[];
   serviciosTitulo?: string;
   serviciosDescripcion?: string;
@@ -187,7 +187,7 @@ export interface About {
   quienesSomosDescripcion?: string;
   numExpertos?: string;
   ciudades?: string;
-  asesors?: Asesor[];
+  asesores?: Asesor[];
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
@@ -270,8 +270,8 @@ export interface Paquete {
   boletinTitulo?: string;
   boletinDescripcion?: string;
   imagen?: string; // URL completa de la imagen (para Hero)
-  destinosSonados?: DestinoSonado[]; // Reutilizamos la interfaz existente
-  paquetesPremium?: PaquetePremium[];
+  topDestinosMes?: TopDestinosMes[]; // Reutilizamos la interfaz existente
+  paquete_premiums?: PaquetePremium[];
   parquesTematicos?: ParqueTematico[];
   createdAt: string;
   updatedAt: string;

@@ -1,14 +1,14 @@
-import { DestinoSonado } from "@/types";
+import { TopDestinosMes } from "@/types";
 import { useEffect, useState } from "react";
 
 interface UseDestinosReturn {
-  destinos: DestinoSonado[];
+  destinos: TopDestinosMes[];
   loading: boolean;
   error: Error | null;
 }
 
 export function useDestinos(): UseDestinosReturn {
-  const [destinos, setDestinos] = useState<DestinoSonado[]>([]);
+  const [destinos, setDestinos] = useState<TopDestinosMes[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -24,8 +24,8 @@ export function useDestinos(): UseDestinosReturn {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const result: DestinoSonado[] = await response.json();
-        console.log("Destinos obtenidos:", result);
+        const result: TopDestinosMes[] = await response.json();
+        // console.log("Destinos obtenidos:", result);
 
         if (isMounted) {
           setDestinos(result);

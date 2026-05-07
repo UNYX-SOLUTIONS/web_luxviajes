@@ -1,20 +1,20 @@
-import { DestinoSonado, TarjetaServicio } from "@/types";
+import { TopDestinosMes, TarjetaServicio } from "@/types";
 import { useEffect, useState } from "react";
 
 interface DestinationsServicesData {
-  destinos: DestinoSonado[];
+  destinos: TopDestinosMes[];
   servicios: TarjetaServicio[];
 }
 
 interface UseDestinationsServicesReturn {
-  destinos: DestinoSonado[];
+  destinos: TopDestinosMes[];
   servicios: TarjetaServicio[];
   loading: boolean;
   error: Error | null;
 }
 
 export function useDestinationsServices(): UseDestinationsServicesReturn {
-  const [destinos, setDestinos] = useState<DestinoSonado[]>([]);
+  const [destinos, setDestinos] = useState<TopDestinosMes[]>([]);
   const [servicios, setServicios] = useState<TarjetaServicio[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -32,7 +32,7 @@ export function useDestinationsServices(): UseDestinationsServicesReturn {
         }
 
         const result: DestinationsServicesData = await response.json();
-        console.log("Destinos y servicios obtenidos:", result);
+        // console.log("Destinos y servicios obtenidos:", result);
 
         if (isMounted) {
           setDestinos(result.destinos || []);

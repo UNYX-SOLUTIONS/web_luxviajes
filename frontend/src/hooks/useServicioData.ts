@@ -23,7 +23,7 @@ export function useServicioData(): UseServicioDataResult {
         }
 
         const result: Servicio = await response.json();
-        console.log("Data servicio:", result);
+        // console.log("Data servicio:", result);
 
         setData(result);
       } catch (err) {

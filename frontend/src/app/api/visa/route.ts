@@ -97,7 +97,7 @@ export async function GET() {
       { encodeValuesOnly: true },
     );
 
-    console.log("🛂 Fetching visas page data from Strapi...");
+    // console.log("🛂 Fetching visas page data from Strapi...");
     const response = await fetch(`${STRAPI_URL}/visa?${query}`, {
       headers: {
         "Content-Type": "application/json",
@@ -110,8 +110,8 @@ export async function GET() {
     }
 
     const strapiData: StrapiVisasPageResponse = await response.json();
-    console.log("✅ Visas page data received");
-    console.log(`📊 Total visas: ${strapiData.data.visa_items?.length || 0}`);
+    // console.log("✅ Visas page data received");
+    // console.log(`📊 Total visas: ${strapiData.data.visa_items?.length || 0}`);
 
     // Transformar datos
     const transformedData: VisasPage = {

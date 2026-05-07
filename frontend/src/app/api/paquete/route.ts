@@ -17,7 +17,7 @@ interface StrapiPdf {
   url?: string;
 }
 
-interface DestinoSonado {
+interface TopDestinosMes {
   id: number;
   documentId: string;
   titulo: string;
@@ -72,8 +72,8 @@ interface StrapiPaqueteResponse {
     boletinTitulo?: string;
     boletinDescripcion?: string;
     imagen?: StrapiImagen;
-    destinosSonados?: DestinoSonado[];
-    paquetesPremium?: PaquetePremium[];
+    topDestinosMes?: TopDestinosMes[];
+    paquete_premiums?: PaquetePremium[];
     parquesTematicos?: ParqueTematico[];
     createdAt: string;
     updatedAt: string;
@@ -109,7 +109,7 @@ export async function GET() {
           imagen: {
             populate: "*",
           },
-          destinosSonados: {
+          topDestinosMes: {
             populate: {
               imagen: {
                 populate: "*",
@@ -119,7 +119,7 @@ export async function GET() {
               },
             },
           },
-          paquetesPremium: {
+          paquete_premiums: {
             populate: {
               imagen: {
                 populate: "*",
@@ -141,7 +141,7 @@ export async function GET() {
       { encodeValuesOnly: true },
     );
 
-    console.log("📦 Fetching paquete data from Strapi...");
+    // console.log("📦 Fetching paquete data from Strapi... ");
     const response = await fetch(`${STRAPI_URL}/paquete?${query}`, {
       headers: {
         "Content-Type": "application/json",
@@ -154,20 +154,18 @@ export async function GET() {
     }
 
     const strapiData: StrapiPaqueteResponse = await response.json();
-    console.log("✅ Paquete data received");
-    console.log(
-      `📊 Destinos soñados: ${strapiData.data.destinosSonados?.length || 0}`,
-    );
-    console.log(
-      `📊 Paquetes premium: ${strapiData.data.paquetesPremium?.length || 0}`,
-    );
-    console.log(
-      `📊 Parques temáticos: ${strapiData.data.parquesTematicos?.length || 0}`,
-    );
+    // console.log("✅ Paquete data received");
+    // console.log(   `📊 Top destinos del mes: ${strapiData.data.topDestinosMes?.length || 0}`,);
+    // console.log(      `📊 Paquetes premium: ${strapiData.data.paquete_premiums?.length || 0}`, );
+    // console.log(      `📊 Parques temáticos: ${strapiData.data.parquesTematicos?.length || 0}`,);
 
-    // Transformar destinosSonados
-    const transformedDestinosSonados =
-      strapiData.data.destinosSonados?.map((destino) => ({
+    // console.log( "🔍 Sample paquete premium:", strapiData.data.paquete_premiums?.[0])
+    // console.log( "🔍 Sample destino del mes:", strapiData.data.topDestinosMes?.[0]    );
+    // console.log( "🔍 Sample parque temático:", strapiData.data.parquesTematicos?.[0] );
+
+    // Transformar topDestinosMes
+    const transformedTopDestinosMes =
+      strapiData.data.topDestinosMes?.map((destino) => ({
         ...destino,
         imagen: getImageUrl(destino.imagen),
         pdf: getPdfUrl(destino.pdf),
@@ -175,7 +173,7 @@ export async function GET() {
 
     // Transformar paquetesPremium
     const transformedPaquetesPremium =
-      strapiData.data.paquetesPremium?.map((paquete) => ({
+      strapiData.data.paquete_premiums?.map((paquete) => ({
         ...paquete,
         imagen: getImageUrl(paquete.imagen),
         pdf: getPdfUrl(paquete.pdf),
@@ -199,8 +197,8 @@ export async function GET() {
       boletinTitulo: strapiData.data.boletinTitulo,
       boletinDescripcion: strapiData.data.boletinDescripcion,
       imagen: getImageUrl(strapiData.data.imagen),
-      destinosSonados: transformedDestinosSonados,
-      paquetesPremium: transformedPaquetesPremium,
+      topDestinosMes: transformedTopDestinosMes,
+      paquete_premiums: transformedPaquetesPremium,
       parquesTematicos: transformedParquesTematicos,
       createdAt: strapiData.data.createdAt,
       updatedAt: strapiData.data.updatedAt,

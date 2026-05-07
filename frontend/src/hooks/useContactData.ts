@@ -23,7 +23,7 @@ export function useContactData(): UseContactDataResult {
         }
 
         const result: Contact = await response.json();
-        console.log("Contact Data:", result);
+        // console.log("Contact Data:", result);
 
         setData(result);
       } catch (err) {

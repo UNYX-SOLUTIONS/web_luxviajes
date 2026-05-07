@@ -124,8 +124,8 @@ export async function GET() {
       { encodeValuesOnly: true },
     );
 
-    console.log("Query generada para servicio:", query);
-    console.log("URL completa:", `${STRAPI_URL}/servicio?${query}`);
+    // console.log("Query generada para servicio:", query);
+    // console.log("URL completa:", `${STRAPI_URL}/servicio?${query}`);
 
     const response = await fetch(`${STRAPI_URL}/servicio?${query}`, {
       headers: {
@@ -140,14 +140,14 @@ export async function GET() {
 
     const data: StrapiServicioResponse = await response.json();
 
-    console.log(
+    // console.log(
       "Respuesta completa de Strapi servicio:",
       JSON.stringify(data, null, 2),
     );
-    console.log(
+    // console.log(
       `Total de tarjetas de servicio: ${data.data.tarjeta_servicios?.length || 0}`,
     );
-    console.log(`Total de testimonios: ${data.data.testimonios?.length || 0}`);
+    // console.log(`Total de testimonios: ${data.data.testimonios?.length || 0}`);
 
     // Transformar tarjetas de servicio con sus imágenes
     const tarjetasTransformadas = (data.data.tarjeta_servicios || []).map(
@@ -178,8 +178,8 @@ export async function GET() {
       }),
     );
 
-    console.log(`Tarjetas transformadas: ${tarjetasTransformadas.length}`);
-    console.log(
+    // console.log(`Tarjetas transformadas: ${tarjetasTransformadas.length}`);
+    // console.log(
       `Testimonios transformados: ${testimoniosTransformados.length}`,
     );
 
@@ -191,7 +191,7 @@ export async function GET() {
       testimonios: testimoniosTransformados,
     };
 
-    console.log(
+    // console.log(
       `Datos finales - Tarjetas: ${transformedData.tarjeta_servicios?.length || 0}, Testimonios: ${transformedData.testimonios?.length || 0}`,
     );
 

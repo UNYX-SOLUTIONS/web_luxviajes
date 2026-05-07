@@ -32,10 +32,10 @@ export async function GET() {
     }
 
     const data: StrapiRedSocialResponse = await response.json();
-    console.log(
-      "Datos de /red-social desde Strapi:",
-      JSON.stringify(data, null, 2),
-    );
+    // console.log(
+    //   "Datos de /red-social desde Strapi:",
+    //   JSON.stringify(data, null, 2),
+    // );
 
     // Retornar solo el data sin el wrapper
     return NextResponse.json(data.data, {

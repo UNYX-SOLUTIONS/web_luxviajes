@@ -23,7 +23,7 @@ export function useHelpData(): UseHelpDataResult {
         }
 
         const result: Help = await response.json();
-        console.log("Help Data:", result);
+        // console.log("Help Data:", result);
 
         setData(result);
       } catch (err) {

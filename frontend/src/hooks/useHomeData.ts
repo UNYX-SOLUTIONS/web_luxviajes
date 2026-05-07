@@ -17,7 +17,7 @@ export function useHomeData(): UseHomeDataReturn {
 
     const fetchHomeData = async () => {
       try {
-        console.log("ENTRANDO:...");
+        // console.log("ENTRANDO:...");
         setLoading(true);
         const response = await fetch("/api/inicio");
 
@@ -26,7 +26,7 @@ export function useHomeData(): UseHomeDataReturn {
         }
 
         const result = await response.json();
-        console.log("Respuesta de /api/inicio:", result);
+        // console.log("Respuesta de /api/inicio:", result);
 
         // Extraer los datos si vienen envueltos en { data: { ... } }
         const homeData: Home = result.data || result;
@@ -36,7 +36,7 @@ export function useHomeData(): UseHomeDataReturn {
           setError(null);
         }
       } catch (err) {
-        console.log(err);
+        // console.log(err);
         if (isMounted) {
           setError(err instanceof Error ? err : new Error("Unknown error"));
           setData(null);

@@ -23,7 +23,7 @@ export function useAboutData(): UseAboutDataResult {
         }
 
         const result: About = await response.json();
-        console.log("Data ", result);
+        // console.log("Data ", result);
 
         setData(result);
       } catch (err) {

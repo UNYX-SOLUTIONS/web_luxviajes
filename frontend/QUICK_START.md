@@ -218,7 +218,7 @@ pnpm lint
 ### Ver en Dev con logs
 
 ```typescript
-console.log('Debug:', valor);
+// console.log('Debug:', valor);
 ```
 
 ## Estructura para Nueva Sección en Home
@@ -276,7 +276,7 @@ pnpm start
 - [ ] Archivos organizados en carpeta correcta
 - [ ] Barrel exports actualizados
 - [ ] Mensajes de commit claros
-- [ ] Sin console.log en producción
+- [ ] Sin // console.log en producción
 
 ## Links Útiles
 

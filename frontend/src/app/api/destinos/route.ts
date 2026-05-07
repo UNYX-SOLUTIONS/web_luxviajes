@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
 
-interface DestinoSonadoResponse {
+interface TopDestinosMesResponse {
   id: number;
   documentId: string;
   titulo: string;
@@ -21,7 +21,7 @@ interface StrapiInicioResponse {
   data: {
     id: number;
     documentId: string;
-    destino_sonados?: DestinoSonadoResponse[];
+    topDestinosMes?: TopDestinosMesResponse[];
     createdAt: string;
     updatedAt: string;
     publishedAt: string;
@@ -32,7 +32,7 @@ export async function GET() {
   try {
     // Realizar petición a Strapi con populate solo de destinos
     const response = await fetch(
-      `${STRAPI_URL}/inicio?populate=destino_sonados`,
+      `${STRAPI_URL}/inicio?populate=topDestinosMes`,
       {
         next: {
           revalidate: 3600, // Revalidar cada hora
@@ -48,10 +48,10 @@ export async function GET() {
     }
 
     const data: StrapiInicioResponse = await response.json();
-    console.log("Datos de destinos desde Strapi:", data);
+    // console.log("Datos de destinos desde Strapi:", data);
 
     // Retornar solo destinos
-    const destinos = data.data.destino_sonados || [];
+    const destinos = data.data.topDestinosMes || [];
 
     return NextResponse.json(destinos, {
       headers: {

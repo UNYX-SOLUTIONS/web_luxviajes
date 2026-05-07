@@ -136,15 +136,15 @@ export default function AboutPage() {
 
   // Agrupar asesores por sede
   const teamByOffice = useMemo(() => {
-    if (!aboutData?.asesors) return [];
+    if (!aboutData?.asesores) return [];
 
-    console.log("=== INICIO AGRUPACIÓN ===");
-    console.log("Total de asesores recibidos en frontend:", aboutData.asesors.length);
-    console.log("Asesores completos:", aboutData.asesors);
+    // console.log("=== INICIO AGRUPACIÓN ===");
+    // console.log("Total de asesores recibidos en frontend:", aboutData.asesores.length);
+    // console.log("Asesores completos:", aboutData.asesores);
 
     const grouped: { [key: string]: Asesor[] } = {};
     
-    aboutData.asesors.forEach((asesor, index) => {
+    aboutData.asesores.forEach((asesor, index) => {
       // Normalizar sede a minúsculas y quitar espacios/acentos
       const sedeOriginal = asesor.sede || 'sin-sede';
       const sedeNormalizada = sedeOriginal
@@ -153,20 +153,20 @@ export default function AboutPage() {
         .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
         .trim();
       
-      console.log(`[${index}] Asesor: ${asesor.nombre}`);
-      console.log(`     Sede RAW: "${asesor.sede}"`);
-      console.log(`     Sede Original: "${sedeOriginal}"`);
-      console.log(`     Sede Normalizada: "${sedeNormalizada}"`);
+      // console.log(`[${index}] Asesor: ${asesor.nombre}`);
+      // console.log(`     Sede RAW: "${asesor.sede}"`);
+      // console.log(`     Sede Original: "${sedeOriginal}"`);
+      // console.log(`     Sede Normalizada: "${sedeNormalizada}"`);
       
       if (!grouped[sedeNormalizada]) {
-        console.log(`     -> Creando nuevo grupo: "${sedeNormalizada}"`);
+        // console.log(`     -> Creando nuevo grupo: "${sedeNormalizada}"`);
         grouped[sedeNormalizada] = [];
       } else {
-        console.log(`     -> Agregando a grupo existente: "${sedeNormalizada}"`);
+        // console.log(`     -> Agregando a grupo existente: "${sedeNormalizada}"`);
       }
       
       grouped[sedeNormalizada].push(asesor);
-      console.log(`     -> Total en grupo "${sedeNormalizada}": ${grouped[sedeNormalizada].length}`);
+      // console.log(`     -> Total en grupo "${sedeNormalizada}": ${grouped[sedeNormalizada].length}`);
     });
 
     // Mapear nombres de sedes
@@ -177,12 +177,12 @@ export default function AboutPage() {
       'guayaquil': 'Sede Guayaquil',
     };
 
-    console.log("=== RESULTADO AGRUPACIÓN ===");
-    console.log("Grupos creados:", Object.keys(grouped));
-    Object.entries(grouped).forEach(([sede, asesores]) => {
-      console.log(`Sede "${sede}": ${asesores.length} asesores`);
-      asesores.forEach(a => console.log(`  - ${a.nombre}`));
-    });
+    // console.log("=== RESULTADO AGRUPACIÓN ===");
+    // console.log("Grupos creados:", Object.keys(grouped));
+    // Object.entries(grouped).forEach(([sede, asesores]) => {
+    //   // console.log(`Sede "${sede}": ${asesores.length} asesores`);
+    //   asesores.forEach(a => console.log(`  - ${a.nombre}`));
+    // });
 
     return Object.entries(grouped).map(([sede, members]) => ({
       office: sedeNames[sede] || sede,

@@ -43,7 +43,7 @@ export async function GET() {
     }
 
     const data: StrapiInicioResponse = await response.json();
-    console.log("Datos de servicios desde Strapi:", data);
+    // console.log("Datos de servicios desde Strapi:", data);
 
     // Retornar solo servicios
     const servicios = data.data.tarjetasServicio || [];

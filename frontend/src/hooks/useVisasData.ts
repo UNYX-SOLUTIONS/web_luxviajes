@@ -23,7 +23,7 @@ export function useVisasData(): UseVisasDataResult {
         }
 
         const result: VisasPage = await response.json();
-        console.log("Data visas page:", result);
+        // console.log("Data visas page:", result);
 
         setData(result);
       } catch (err) {
