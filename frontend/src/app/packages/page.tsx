@@ -215,7 +215,7 @@ export default function PackagesPage() {
                 </div>
                 <div className="rounded-lg bg-tertiary-50 p-4">
                   <p className="text-xs font-semibold text-tertiary-700 uppercase tracking-wider">
-                    Precio
+                    Precio desde
                   </p>
                   <p className="mt-2 text-lg font-bold text-neutral-900">
                     ${selectedPackage.price} USD

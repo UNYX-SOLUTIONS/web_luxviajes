@@ -7,3 +7,4 @@ export { Footer } from "./Footer";
 export { HeroCarousel } from "./HeroCarousel";
 export { ContactDialog } from "./contact_dialog";
 export { AppointmentDialog } from "./appointment_dialog";
+export { MailMarketingDialog } from "./mailMarketing_dialog";

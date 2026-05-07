@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { ContactDialog, HeroCarousel } from "@/components/common";
+import { ContactDialog, HeroCarousel, MailMarketingDialog } from "@/components/common";
 import {
   StatsSection,
   ServicesDetailSection,
@@ -26,6 +26,7 @@ interface PackageDetails {
 export default function Home() {
   const { data: homeData, loading, error } = useHomeData();
   const [showStats, setShowStats] = useState(false);
+  const [showMailMarketingDialog, setShowMailMarketingDialog] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
@@ -103,6 +104,26 @@ export default function Home() {
     };
   }, []);
 
+  // Mail Marketing Dialog - Mostrar apenas haya scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!showMailMarketingDialog && window.scrollY > 20) {
+        // Verificar cooldown de 10 minutos
+        const lastShownTime = localStorage.getItem("lastMailMarketingShown");
+        const now = Date.now();
+        const TEN_MINUTES = 2 * 60 * 1000;
+        
+        if (!lastShownTime || now - parseInt(lastShownTime) > TEN_MINUTES) {
+          setShowMailMarketingDialog(true);
+          localStorage.setItem("lastMailMarketingShown", now.toString());
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { once: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [showMailMarketingDialog]);
+
   return (
     <>
       {/* Hero Section */}
@@ -179,6 +200,12 @@ export default function Home() {
         onClose={() => setShowContactDialog(false)}
       />
 
+      {/* Mail Marketing Dialog */}
+      <MailMarketingDialog
+        isOpen={showMailMarketingDialog}
+        onClose={() => setShowMailMarketingDialog(false)}
+      />
+
       {/* Details Dialog */}
       {showDetailsDialog && selectedPackage && (
         <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/50 p-4 rounded-lg">
@@ -216,7 +243,7 @@ export default function Home() {
                 </div>
                 <div className="rounded-lg bg-tertiary-50 p-4">
                   <p className="text-xs font-semibold text-tertiary-700 uppercase tracking-wider">
-                    Precio
+                    Precio desde
                   </p>
                   <p className="mt-2 text-lg font-bold text-neutral-900">
                     ${selectedPackage.price} USD
