@@ -276,63 +276,6 @@ export const DreamDestinationsSection: FC<
             </button>
           </div>
         )}
-
-        {/* PAGINACIÓN */}
-        {showScrollControls && totalPages > 1 && (
-          <div className="mt-8 flex justify-center items-center gap-2">
-            <button
-              onClick={() =>
-                handlePageChange(Math.max(0, page - 1))
-              }
-              disabled={page === 0}
-              className={`p-2 rounded-full transition ${
-                page === 0
-                  ? "bg-neutral-200 text-neutral-400"
-                  : "bg-neutral-200 hover:bg-neutral-300"
-              }`}
-            >
-              <ChevronLeftIcon className="h-4 w-4" />
-            </button>
-
-            {getPaginationItems(page, totalPages).map(
-              (item, index) => (
-                <button
-                  key={index}
-                  onClick={() =>
-                    typeof item === "number" &&
-                    handlePageChange(item - 1)
-                  }
-                  disabled={typeof item !== "number"}
-                  className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
-                    item === page + 1
-                      ? "bg-primary-700 text-white"
-                      : typeof item === "number"
-                      ? "bg-neutral-200 hover:bg-neutral-300"
-                      : "text-neutral-500 cursor-default"
-                  }`}
-                >
-                  {item}
-                </button>
-              )
-            )}
-
-            <button
-              onClick={() =>
-                handlePageChange(
-                  Math.min(totalPages - 1, page + 1)
-                )
-              }
-              disabled={page === totalPages - 1}
-              className={`p-2 rounded-full transition ${
-                page === totalPages - 1
-                  ? "bg-neutral-200 text-neutral-400"
-                  : "bg-neutral-200 hover:bg-neutral-300"
-              }`}
-            >
-              <ChevronRightIcon className="h-4 w-4" />
-            </button>
-          </div>
-        )}
       </div>
     </section>
   );

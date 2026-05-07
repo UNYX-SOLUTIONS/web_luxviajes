@@ -106,9 +106,8 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
             <h2 className="text-4xl font-bold text-primary-700 mb-2">
               Paquetes Premium
             </h2>
-            <p className="mt-2 max-w-xl text-sm text-neutral-600">
-              Nuestra seleccion exclusiva de itinerarios curados para ofrecer el
-              maximo confort y experiencias autenticas.
+            <p className="mt-2 max-w-4xl text-sm text-neutral-600">
+              Nuestra seleccion exclusiva de itinerarios curados para ofrecer el maximo confort y experiencias autenticas.
             </p>
           </div>
         </div>
