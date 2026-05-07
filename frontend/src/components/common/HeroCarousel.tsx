@@ -7,11 +7,16 @@ import { cn } from "@/utils/cn";
 import { trackWhatsAppClick, trackPhoneClick } from "@/lib/analytics";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRedSocial } from "@/hooks";
+import type { MediaObject } from "@/types";
 
 interface BannerSlide {
-  image: string;
-  title: string;
-  subtitle: string;
+  image?: string | MediaObject;
+  title?: string;
+  subtitle?: string;
+  // Para compatibilidad con datos del backend
+  titulo?: string;
+  subtitulo?: string;
+  imagen?: string | MediaObject;
 }
 
 interface HeroCarouselProps {
@@ -21,27 +26,48 @@ interface HeroCarouselProps {
   className?: string;
 }
 
+// Función helper para extraer URL y tipo de media
+function getMediaInfo(media: string | MediaObject | undefined): {
+  url: string;
+  isVideo: boolean;
+  type: string;
+} {
+  if (!media) {
+    return { url: "", isVideo: false, type: "" };
+  }
+
+  if (typeof media === "string") {
+    const isVideo = /\.(mp4|webm|ogg)$/i.test(media);
+    return { url: media, isVideo, type: isVideo ? "video" : "image" };
+  }
+
+  // Es un MediaObject
+  const isVideo = media.mime?.startsWith("video/") || /\.(mp4|webm|ogg)$/i.test(media.ext);
+  const url = media.url || "";
+  return { url, isVideo, type: isVideo ? "video" : "image" };
+}
+
 export function HeroCarousel({
   slides = [
     {
-      image: "/images/hero/banner1.png",
-      title: "MALDIVAS",
-      subtitle: "Un amanecer sereno en villas sobre el agua turquesa",
+      imagen: "/images/hero/banner1.png",
+      titulo: "MALDIVAS",
+      subtitulo: "Un amanecer sereno en villas sobre el agua turquesa",
     },
     {
-      image: "/images/hero/banner2.png",
-      title: "ITALIA",
-      subtitle: "Una vista clásica y lujosa de la Costa Amalfitana",
+      imagen: "/images/hero/banner2.png",
+      titulo: "ITALIA",
+      subtitulo: "Una vista clásica y lujosa de la Costa Amalfitana",
     },
     {
-      image: "/images/hero/banner3.png",
-      title: "JAPÓN",
-      subtitle: "Un jardín zen otoñal que transmite una paz absoluta",
+      imagen: "/images/hero/banner3.png",
+      titulo: "JAPÓN",
+      subtitulo: "Un jardín zen otoñal que transmite una paz absoluta",
     },
     {
-      image: "/images/hero/banner4.png",
-      title: "TAILANDIA",
-      subtitle: "Un paisaje de aventura y felicidad en aguas cristalinas",
+      imagen: "/images/hero/banner4.png",
+      titulo: "TAILANDIA",
+      subtitulo: "Un paisaje de aventura y felicidad en aguas cristalinas",
     },
   ],
   ctaText = "Explorar",
@@ -63,9 +89,6 @@ export function HeroCarousel({
 
   // Cachear los slides con useMemo
   const cachedSlides = useMemo(() => slides, [slides]);
-
-  // El componente Image de Next.js ya cachea automáticamente
-  // No necesitamos precargar manualmente
 
   // Auto-rotate carousel
   useEffect(() => {
@@ -91,11 +114,17 @@ export function HeroCarousel({
     }, 800);
   }, []);
 
+  // Helper para obtener título
+  const getTitle = (slide: BannerSlide) => slide.titulo || slide.title || "";
+  
+  // Helper para obtener subtítulo
+  const getSubtitle = (slide: BannerSlide) => slide.subtitulo || slide.subtitle || "";
+
   return (
     <section
       className={cn("relative h-screen w-full overflow-hidden", className)}
     >
-      {/* Carousel Container - All images side by side */}
+      {/* Carousel Container - All images/videos side by side */}
       <div
         className="absolute inset-0 flex transition-transform"
         style={{
@@ -103,22 +132,41 @@ export function HeroCarousel({
           transitionDuration: isTransitioning ? "800ms" : "0ms",
         }}
       >
-        {cachedSlides.map((slide, index) => (
-          <div
-            key={`${slide.image || "slide"}-${slide.title}-${index}`}
-            className="relative w-full h-full shrink-0"
-          >
-            <Image
-              src={slide.image}
-              alt={slide.title}
-              fill
-              className="object-cover"
-              priority={index === 0}
-              quality={85}
-              sizes="100vw"
-            />
-          </div>
-        ))}
+        {cachedSlides.map((slide, index) => {
+          const media = slide.imagen || slide.image;
+          const { url, isVideo } = getMediaInfo(media);
+
+          return (
+            <div
+              key={`${url || "slide"}-${getTitle(slide)}-${index}`}
+              className="relative w-full h-full shrink-0"
+            >
+              {url && isVideo ? (
+                <video
+                  src={url}
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                />
+              ) : url ? (
+                <Image
+                  src={url}
+                  alt={getTitle(slide)}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                  quality={85}
+                  sizes="100vw"
+                />
+              ) : (
+                <div className="w-full h-full bg-linear-to-br from-[#500088]/50 to-[#500088]/30" />
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Overlay */}
@@ -152,10 +200,10 @@ export function HeroCarousel({
         {/* Text Content */}
         <div className="flex-1">
           <div className="text-[2rem] sm:text-[3rem] md:text-[4rem] lg:text-[5rem] xl:text-[6rem] 2xl:text-[6rem] font-bold font-manrope mb-4 leading-none">
-            {cachedSlides[currentImageIndex].title}
+            {getTitle(cachedSlides[currentImageIndex])}
           </div>
           <p className="text-lg md:text-xl mb-8 max-w-2xl text-white!">
-            {cachedSlides[currentImageIndex].subtitle}
+            {getSubtitle(cachedSlides[currentImageIndex])}
           </p>
           <Link href={ctaHref}>
             <Button

@@ -34,7 +34,13 @@ export default function Home() {
   );
 
   // Usar banners de la API o fallback a datos locales
-  const heroSlides = homeData?.banners || [];
+  // Transformar estructura de Strapi a componente HeroCarousel
+  const heroSlides = (homeData?.banners || []).map((banner: any) => ({
+    // Pasar el objeto completo para que HeroCarousel extraiga la información
+    imagen: banner.imagen || banner.image,
+    titulo: banner.titulo || banner.title,
+    subtitulo: banner.subtitulo || banner.subtitle,
+  }));
 
   // Transformar destinos de Strapi a formato DreamDestination
   const dreamDestinations: DreamDestination[] = (homeData?.destinos || []).map(

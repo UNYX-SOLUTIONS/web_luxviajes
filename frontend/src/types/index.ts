@@ -90,13 +90,38 @@ export interface Service {
   icon: string;
 }
 
+// Media object from Strapi
+export interface MediaObject {
+  id: number;
+  documentId: string;
+  name: string;
+  hash: string;
+  ext: string;
+  mime: string;
+  size: number;
+  url: string;
+  width?: number;
+  height?: number;
+  formats?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
 export interface Banner {
   id: number;
-  title: string;
-  subtitle: string;
-  image: string;
+  documentId?: string;
+  titulo?: string;
+  title?: string;
+  subtitulo?: string;
+  subtitle?: string;
+  imagen?: string | MediaObject;
+  image?: string | MediaObject;
   order?: number;
   active?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  publishedAt?: string;
 }
 
 export interface RedSocial {
