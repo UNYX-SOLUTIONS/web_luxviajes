@@ -107,6 +107,21 @@ function transformBanners(banners: Banner[]) {
         ? banner.imagen.formats.large.url
         : `${STRAPI_ORIGIN}${banner.imagen.formats.large.url}`;
     }
+    if (!imageUrl && banner.imagen?.formats?.medium?.url) {
+      imageUrl = banner.imagen.formats.medium.url.startsWith("http")
+        ? banner.imagen.formats.medium.url
+        : `${STRAPI_ORIGIN}${banner.imagen.formats.medium.url}`;
+    }
+    if (!imageUrl && banner.imagen?.formats?.small?.url) {
+      imageUrl = banner.imagen.formats.small.url.startsWith("http")
+        ? banner.imagen.formats.small.url
+        : `${STRAPI_ORIGIN}${banner.imagen.formats.small.url}`;
+    }
+    if (!imageUrl && banner.imagen?.url) {
+      imageUrl = banner.imagen.url.startsWith("http")
+        ? banner.imagen.url
+        : `${STRAPI_ORIGIN}${banner.imagen.url}`;
+    }
     return {
       id: banner.id,
       title: banner.titulo,

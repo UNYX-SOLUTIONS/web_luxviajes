@@ -9,7 +9,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRedSocial } from "@/hooks";
 
 interface BannerSlide {
-  image: string;
+  image: string; // Puede ser imagen o video
   title: string;
   subtitle: string;
 }
@@ -19,35 +19,24 @@ interface HeroCarouselProps {
   ctaText?: string;
   ctaHref?: string;
   className?: string;
+  onAllMediaLoaded?: () => void;
 }
 
 export function HeroCarousel({
   slides = [
-    {
-      image: "/images/hero/banner1.png",
-      title: "MALDIVAS",
-      subtitle: "Un amanecer sereno en villas sobre el agua turquesa",
-    },
-    {
-      image: "/images/hero/banner2.png",
-      title: "ITALIA",
-      subtitle: "Una vista clásica y lujosa de la Costa Amalfitana",
-    },
-    {
-      image: "/images/hero/banner3.png",
-      title: "JAPÓN",
-      subtitle: "Un jardín zen otoñal que transmite una paz absoluta",
-    },
-    {
-      image: "/images/hero/banner4.png",
-      title: "TAILANDIA",
-      subtitle: "Un paisaje de aventura y felicidad en aguas cristalinas",
-    },
+    
   ],
   ctaText = "Explorar",
   ctaHref = "packages",
   className,
 }: HeroCarouselProps) {
+  // Función para detectar si es un video
+  const isVideo = (media: string | undefined): boolean => {
+    if (!media) return false;
+    const videoExtensions = [".mp4", ".webm", ".ogg", ".mov", ".avi", ".mkv"];
+    return videoExtensions.some((ext) => media.toLowerCase().endsWith(ext));
+  };
+
   const { data: redes } = useRedSocial();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -77,7 +66,7 @@ export function HeroCarousel({
         );
         setIsTransitioning(false);
       }, 800);
-    }, 7000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [cachedSlides.length]);
@@ -103,22 +92,38 @@ export function HeroCarousel({
           transitionDuration: isTransitioning ? "800ms" : "0ms",
         }}
       >
-        {cachedSlides.map((slide, index) => (
-          <div
-            key={`${slide.image || "slide"}-${slide.title}-${index}`}
-            className="relative w-full h-full shrink-0"
-          >
-            <Image
-              src={slide.image}
-              alt={slide.title}
-              fill
-              className="object-cover"
-              priority={index === 0}
-              quality={85}
-              sizes="100vw"
-            />
-          </div>
-        ))}
+        {cachedSlides.map((slide, index) => {
+          const mediaSource = slide.image;
+          const videoFile = isVideo(mediaSource);
+
+          return (
+            <div
+              key={`${mediaSource}-${slide.title}-${index}`}
+              className="relative w-full h-full shrink-0"
+            >
+              {videoFile ? (
+                <video
+                  src={mediaSource} 
+                  className="object-cover w-full h-full"
+                  autoPlay={index === 0}
+                  muted
+                  loop
+                  preload="auto"
+                />
+              ) : (
+                <Image
+                  src={mediaSource}
+                  alt={slide.title}
+                  fill
+                  className="object-cover"
+                  priority={index === 0}
+                  quality={85}
+                  sizes="100vw"
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Overlay */}
