@@ -17,7 +17,7 @@ export function Footer() {
     { label: 'Destinos', href: '/packages' },
     { label: 'Servicios', href: '/services' },
     { label: 'Paquetes Internacionales', href: '/packages' },
-    { label: 'Visas y Documentación', href: '/visas' },
+    { label: 'Visas y Requisitos', href: '/visas' },
   ];
 
   const supportLinks = [

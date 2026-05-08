@@ -19,22 +19,23 @@ import {
 
 const helpTopics = [
   {
-    title: "Visas y Documentacion",
+    title: "Visas y Requisitos",
     description:
-      "Asesoria integral, validez de pasaportes y solicitudes de visa.",
+      "Requisitos de entrada, restricciones de viaje y recomendaciones para destinos específicos.",
     icon: DocumentTextIcon,
+    href: "/visas",
   },
   {
-    title: "Politicas de Agencia",
+    title: "Politicas de Visas",
     description:
-      "Informacion sobre nuestras politicas de reserva, precios y condiciones.",
+      "Informacion detallada sobre politicas de visas, procesos de solicitud y consejos para viajeros internacionales.",
     icon: CreditCardIcon,
     downloadKey: "pdfPoliticasAgencia",
   },
   {
     title: "Politicas de Viaje",
     description:
-      "Requisitos de entrada, restricciones de viaje y recomendaciones para destinos específicos.",
+      "Informacion detallada sobre politicas de viaje, procesos de reserva y condiciones.",
     icon: CalendarDaysIcon,
     downloadKey: "pdfPoliticasViaje",
   },
@@ -53,8 +54,9 @@ const helpTopics = [
   {
     title: "Guias de Destino",
     description:
-      "Informacion local, itinerarios curados y tesoros ocultos en todo el mundo.",
+      "Informacion esencial sobre destinos populares, atracciones turísticas y consejos de viaje.",
     icon: MapIcon,
+    href: "/packages",
   },
 ];
 
@@ -201,7 +203,17 @@ export default function HelpPage() {
                       <p className="text-sm leading-relaxed text-white! text-center">
                         {topic.description}
                       </p>
-                      {topic.downloadKey && helpData && helpData[topic.downloadKey as keyof typeof helpData] ? (
+                      {topic.href ? (
+                        <Link
+                          href={topic.href}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                          className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-tertiary-500 px-4 py-2.5 text-sm font-bold text-tertiary-950 transition hover:bg-tertiary-400"
+                        >
+                          Ver detalles
+                        </Link>
+                      ) : topic.downloadKey && helpData && helpData[topic.downloadKey as keyof typeof helpData] ? (
                         <a
                           href={helpData[topic.downloadKey as keyof typeof helpData] as string}
                           target="_blank"
@@ -220,7 +232,7 @@ export default function HelpPage() {
                             setShowContactDialog(true);
                             toggleFlip(topic.title);
                           }}
-                          className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-tertiary-500 px-4 py-2.5 text-sm font-bold text-tertiary-950 transition hover:bg-tertiary-400"
+                          className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-tertiary-500 px-4 py-2.5 text-sm font-bold text-tertiary-950 transition hover:bg-tertiary-400 cursor-pointer"
                         >
                           Consultar
                         </button>
