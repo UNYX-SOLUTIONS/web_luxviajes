@@ -129,10 +129,11 @@ export function HeroCarousel({
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40" />
 
-      {/* Content - Contains Vertical Selector and Text */}
-      <div className="absolute z-10 text-left text-white flex items-center justify-start h-full gap-18 pl-8 md:pl-16 py-10">
-        {/* Vertical Selector */}
-        <div className="flex flex-col items-center gap-8 h-64 shrink-0">
+      {/* Content - Contains Vertical Selector and Text - Centered */}
+      <div className="absolute z-10 text-left text-white flex items-center justify-start h-full gap-18 pl-8 md:pl-16 py-10 max-w-xl px-10">
+        
+        {/* Timeline - Vertical on Desktop, Horizontal at Bottom on Mobile */}
+        <div className="hidden md:flex md:flex-col items-center gap-8 h-64 shrink-0">
           <div className="relative w-0.5 h-full bg-white/30 rounded-full">
             {cachedSlides.map((_, index) => (
               <button
@@ -154,36 +155,61 @@ export function HeroCarousel({
           </div>
         </div>
 
-        {/* Text Content */}
-        <div className="flex-1">
-          <div className="text-[2rem] sm:text-[3rem] md:text-[4rem] lg:text-[5rem] xl:text-[6rem] 2xl:text-[6rem] font-bold font-manrope mb-4 leading-none">
-            {cachedSlides[currentImageIndex].title}
-          </div>
-          <p className="text-lg md:text-xl mb-8 max-w-2xl text-white!">
-            {cachedSlides[currentImageIndex].subtitle}
-          </p>
-          <Link href={ctaHref}>
-            <Button
-              size="lg"
-              variant="primary"
-              className="flex items-center gap-2"
-            >
-              {ctaText}
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        {/* Main Content Container - Mobile Centered */}
+        <div className="flex-1 md:flex-none flex flex-col items-left md:items-start justify-center max-w-2xl">
+          <div className="text-left">
+            <div className="text-[3rem] sm:text-[4rem] md:text-[5rem] lg:text-[6rem] xl:text-[6rem] 2xl:text-[6rem] font-bold font-manrope mb-4 leading-none">
+              {cachedSlides[currentImageIndex].title}
+            </div>
+            <p className="text-lg md:text-xl mb-8 max-w-2xl text-white!">
+              {cachedSlides[currentImageIndex].subtitle}
+            </p>
+            <Link href={ctaHref}>
+              <Button
+                size="lg"
+                variant="primary"
+                className="flex items-center gap-2"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-            </Button>
-          </Link>
+                {ctaText}
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                  />
+                </svg>
+              </Button>
+            </Link>
+          </div>
+
+          {/* Timeline - Mobile Bottom (Horizontal) */}
+          <div className="md:hidden flex items-center gap-8 w-full mt-14 justify-center shrink-0">
+            <div className="relative w-full h-0.5 bg-white/30 rounded-full max-w-xs">
+              {cachedSlides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleDotClick(index)}
+                 className={cn(
+                  "absolute left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300",
+                  currentImageIndex === index
+                    ? "w-12 h-12 bg-white/80 flex items-center justify-center text-[#500088] font-bold text-sm"
+                    : "w-3 h-3 bg-white/60 hover:bg-white/70",
+                )}
+                  style={{
+                    left: `${(index / (cachedSlides.length - 1)) * 100}%`,
+                  }}
+                >
+                  {currentImageIndex === index && index + 1}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -210,7 +236,7 @@ export function HeroCarousel({
       </div> */}
 
       {/* Top Right CTA Buttons - WhatsApp and Contact */}
-      <div className="absolute top-48 right-8 z-20 flex flex-col sm:flex-row items-center gap-3">
+      <div className="absolute top-24 sm:top-28 md:top-48 right-3 sm:right-6 md:right-8 z-20 flex flex-col sm:flex-row items-end gap-2 sm:gap-3">
         {/* Contact Button */}
         <button
           onClick={() => {
@@ -218,7 +244,7 @@ export function HeroCarousel({
             const phoneNumber = redes?.llamada || "+593964220600";
             window.location.href = `tel:${phoneNumber}`;
           }}
-          className="bg-[#D9D9D9]/40 text-white font-bold h-12 py-0 flex items-center justify-center text-base px-6 rounded-full hover:bg-white hover:text-[#500088] transition-all"
+          className="bg-[#D9D9D9]/40 text-white font-bold h-10 sm:h-12 py-0 flex items-center justify-center text-xs sm:text-base px-4 sm:px-6 rounded-full hover:bg-white hover:text-[#500088] transition-all whitespace-nowrap"
         >
           Llámanos {redes?.llamada || "+593 96 422 0600"}
         </button>
@@ -230,14 +256,15 @@ export function HeroCarousel({
             const whatsappNumber = redes?.whatsapp?.replace(/[^0-9]/g, '') || "593964220600";
             window.open(`https://wa.me/${whatsappNumber}`, "_blank");
           }}
-          className="w-12 h-12 rounded-full bg-[#D9D9D9]/40 hover:bg-white transition-all text-white hover:text-[#500088] flex items-center justify-center"
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#D9D9D9]/40 hover:bg-white transition-all text-white hover:text-[#500088] flex items-center justify-center flex-shrink-0"
         >
           <svg
-            width="20"
-            height="20"
+            width="18"
+            height="18"
             viewBox="0 0 28 28"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            className="sm:w-5 sm:h-5"
           >
             <g clipPath="url(#clip0_292_749)">
               <path

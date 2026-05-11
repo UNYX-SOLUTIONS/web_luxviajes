@@ -73,32 +73,32 @@ export function Footer() {
     <footer className="bg-white text-neutral-900 border-t border-neutral-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 py-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-12 py-10 sm:py-12 md:py-16">
           {/* Brand Column */}
-          <div className="md:col-span-1">
+          <div className="col-span-2 md:col-span-1">
             <Link href="/" onClick={handleScrollToTop} className="inline-block mb-4">
               <Image
                 src="/images/footer/footer.png"
                 alt={COMPANY_INFO.name}
                 width={220}
                 height={120}
-                className="object-contain"
+                className="object-contain max-w-full"
               />
             </Link>
           </div>
 
           {/* Services Column */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest mb-6 text-primary-700">
+            <h4 className="text-xs font-bold uppercase tracking-widest mb-3 sm:mb-6 text-primary-700">
               Servicios
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2 sm:space-y-3">
               {servicesLinks.map((link, index) => (
                 <li key={`service-${index}`}>
                   <Link
                     href={link.href}
                     onClick={handleScrollToTop}
-                    className="text-sm text-neutral-700 hover:text-primary-600 transition-colors duration-200"
+                    className="text-xs sm:text-sm text-neutral-700 hover:text-primary-600 transition-colors duration-200"
                   >
                     {link.label}
                   </Link>
@@ -109,16 +109,16 @@ export function Footer() {
 
           {/* Support Column */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest mb-6 text-primary-700">
+            <h4 className="text-xs font-bold uppercase tracking-widest mb-3 sm:mb-6 text-primary-700">
               Soporte
             </h4>
-            <ul className="space-y-3">
+            <ul className="space-y-2 sm:space-y-3">
               {supportLinks.map((link, index) => (
                 <li key={`support-${index}`}>
                   <Link
                     href={link.href}
                     onClick={handleScrollToTop}
-                    className="text-sm text-neutral-700 hover:text-primary-600 transition-colors duration-200"
+                    className="text-xs sm:text-sm text-neutral-700 hover:text-primary-600 transition-colors duration-200"
                   >
                     {link.label}
                   </Link>
@@ -127,22 +127,43 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Experience Column */}
-          <div>
+          {/* Experience Column - Hidden on small screens, visible at md and above */}
+          <div className="hidden md:block">
             <h4 className="text-xs font-bold uppercase tracking-widest mb-6 text-primary-700">
               Síguenos
             </h4>
-            <p className="text-sm text-neutral-700 mb-6 leading-relaxed">
+            <p className="text-xs md:text-sm text-neutral-700 mb-4 md:mb-6 leading-relaxed">
               Sigue nuestros viajes en redes sociales para inspiración diaria.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {socialLinks.map((social, index) => (
                 <a
                   key={`social-${index}`}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-neutral-100 hover:bg-primary-600 flex items-center justify-center transition-colors duration-200 text-primary-600 hover:text-white"
+                  className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-neutral-100 hover:bg-primary-600 flex items-center justify-center transition-colors duration-200 text-primary-600 hover:text-white"
+                  aria-label={social.name}
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Social Links on mobile - shown as 2x2 grid */}
+          <div className="col-span-2 md:hidden">
+            <h4 className="text-xs font-bold uppercase tracking-widest mb-3 text-primary-700">
+              Síguenos
+            </h4>
+            <div className="grid grid-cols-4 gap-2">
+              {socialLinks.map((social, index) => (
+                <a
+                  key={`social-${index}`}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-primary-600 flex items-center justify-center transition-colors duration-200 text-primary-600 hover:text-white"
                   aria-label={social.name}
                 >
                   {social.icon}
@@ -156,9 +177,9 @@ export function Footer() {
         <div className="border-t border-neutral-200" />
 
         {/* Bottom Footer */}
-        <div className="flex flex-col md:flex-row justify-between items-center py-6 text-xs text-neutral-500">
-          <p>© {currentYear} {COMPANY_INFO.name}. Todos los derechos reservados | Diseñado por UNYX SOLUTIONS</p>
-          <div className="flex gap-6 mt-4 md:mt-0">
+        <div className="flex flex-col gap-4 sm:gap-6 md:flex-row md:justify-between md:items-center py-6 text-xs text-neutral-500">
+          <p className="text-center md:text-left">© {currentYear} {COMPANY_INFO.name}. Todos los derechos reservados | Diseñado por UNYX SOLUTIONS</p>
+          <div className="flex gap-4 sm:gap-6 justify-center md:justify-end">
             <Link href="/privacy" onClick={handleScrollToTop} className="hover:text-primary-600 transition-colors">
               Privacidad
             </Link>

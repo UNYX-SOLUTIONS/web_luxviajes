@@ -205,16 +205,16 @@ export default function AboutPage() {
       /> 
       <section className="bg-white relative">
         {/* Quiénes somos */}
-        <div className="min-h-[80vh] flex py-16 md:py-24">
-          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8 w-full">
+        <div className="min-h-auto md:min-h-[80vh] flex py-8 md:py-24">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 md:gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8 w-full">
             <div />
 
             <div>
-              <p className="text-base font-semibold uppercase tracking-wide mb-3 text-[#880000]!">
+              <p className="text-xs md:text-base font-semibold uppercase tracking-wide mb-1.5 md:mb-3 text-[#880000]!">
                 Quienes somos
               </p>
               <h2 
-                className="mt-4 text-4xl font-bold leading-tight text-neutral-900"
+                className="mt-1.5 md:mt-4 text-xl! sm:text-2xl md:text-4xl font-bold leading-tight text-neutral-900"
                 dangerouslySetInnerHTML={{
                   __html: parseStyledText(
                     aboutData?.quienesSomosTitulo || "Expertos en hacer *realidad* <br/> tus sueños de viaje"
@@ -222,7 +222,7 @@ export default function AboutPage() {
                 }}
               />
               <div 
-                className="mt-6 space-y-4 text-neutral-700"
+                className="mt-3 md:mt-6 space-y-2.5 md:space-y-4 text-xs md:text-base text-neutral-700"
                 dangerouslySetInnerHTML={{
                   __html: parseStyledText(
                     aboutData?.quienesSomosDescripcion || 
@@ -242,41 +242,41 @@ export default function AboutPage() {
               <Image
                 src="/images/about/about2.png"
                 alt="Asesora Luxviajes"
-                width={600}
-                height={900}
-                className="w-full object-cover max-w-md"
+                width={400}
+                height={600}
+                className="w-full object-contain max-w-md h-auto"
               />
             </div>
           </div>
         </div>
       </section>
  
-      <section className="bg-neutral-100 py-14 text-white">
+      <section className="bg-neutral-100 py-8 md:py-14 text-white">
         {/* Por qué elegirnos */}
-        <div className="py-16 md:py-20">
+        <div className="py-8 md:py-16 lg:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-base font-bold uppercase tracking-wider text-primary-700!">
+              <p className="text-xs md:text-base font-bold uppercase tracking-wider text-primary-700!">
                 Por qué elegirnos
               </p>
-              <h3 className="mt-2 text-3xl font-bold text-neutral-900">
+              <h3 className="mt-1 md:mt-2 text-xl sm:text-2xl md:text-3xl font-bold text-neutral-900">
                 La diferencia está en el detalle
               </h3>
             </div>
 
-            <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-5 md:mt-10 grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {highlights.map((item) => (
                 <article
                   key={item.title}
-                  className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-neutral-200"
+                  className="rounded-lg md:rounded-2xl bg-white p-3 md:p-6 shadow-sm ring-1 ring-neutral-200"
                 >
-                  <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-primary-700">
+                  <div className="mb-2 md:mb-4 inline-flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-full bg-primary-100 text-primary-700">
                     {item.icon}
                   </div>
-                  <h4 className="text-lg font-semibold text-neutral-900">
+                  <h4 className="text-sm md:text-lg font-semibold text-neutral-900">
                     {item.title}
                   </h4>
-                  <p className="mt-2 text-sm leading-relaxed text-[#4C4452]">
+                  <p className="mt-0.5 md:mt-2 text-xs md:text-sm leading-relaxed text-[#4C4452]">
                     {item.description}
                   </p>
                 </article>
@@ -285,101 +285,104 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-      <section className="bg-[#500088] py-14 text-white">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 md:grid-cols-2 lg:px-8">
+      <section className="bg-[#500088] py-8 md:py-14 text-white">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-3 md:gap-8 px-4 sm:px-6 md:grid-cols-2 lg:px-8">
           <div>
-            <h3 className="text-3xl font-extrabold leading-tight">
-              Un equipo en expansión,una
-            </h3>{" "}
-            <h3 className="text-3xl font-extrabold leading-tight">
+            <h3 className="text-lg sm:text-xl md:text-3xl font-extrabold leading-tight">
+              Un equipo en
+            </h3>
+            <h3 className="text-lg sm:text-xl md:text-3xl font-extrabold leading-tight">
+              expansión
+            </h3>
+            <h3 className="text-lg sm:text-xl md:text-3xl font-extrabold leading-tight mt-1">
               confianza que cruza fronteras
             </h3>
-            <p className="mt-3 max-w-2xl text-[#DFB7FF]!">
+            <p className="mt-1.5 md:mt-3 max-w-2xl text-xs md:text-base text-[#DFB7FF]!">
               Crecemos para estar más cerca de ti, manteniendo siempre la
               esencia humana.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="rounded-2xl bg-white/10! px-6 py-5 min-h-25 flex flex-col justify-center">
-              <p className="text-4xl font-extrabold text-[#FFDDBB]!">{aboutData?.numExpertos || "+16"}</p>
-              <p className="mt-1 text-xs uppercase tracking-wider text-white!">
-                Expertos en el equipo
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-6">
+            <div className="rounded-lg md:rounded-2xl bg-white/10! px-3 md:px-6 py-3 md:py-5 min-h-16 md:min-h-25 flex flex-col justify-center">
+              <p className="text-xl sm:text-2xl md:text-4xl font-extrabold text-[#FFDDBB]!">{aboutData?.numExpertos || "+16"}</p>
+              <p className="mt-0.5 md:mt-1 text-xs uppercase tracking-wider text-white!">
+                Expertos
               </p>
             </div>
-            <div className="rounded-2xl bg-white/10! px-6 py-5 min-h-25 flex flex-col justify-center">
-              <p className="text-4xl font-extrabold text-[#FFDDBB]!">{aboutData?.ciudades || "3"}</p>
-              <p className="mt-1 text-xs uppercase tracking-wider text-white!">
-                Ciudades (Gye, Uio, Cue)
+            <div className="rounded-lg md:rounded-2xl bg-white/10! px-3 md:px-6 py-3 md:py-5 min-h-16 md:min-h-25 flex flex-col justify-center">
+              <p className="text-xl sm:text-2xl md:text-4xl font-extrabold text-[#FFDDBB]!">{aboutData?.ciudades || "3"}</p>
+              <p className="mt-0.5 md:mt-1 text-xs uppercase tracking-wider text-white!">
+                Ciudades
               </p>
             </div>
           </div>
         </div>
       </section>
  
-      <section className="bg-white py-16">
+      <section className="bg-white py-8 md:py-16">
         <div className="mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-md font-bold uppercase tracking-wider text-[#4E2D00]!">
+          <p className="text-xs md:text-md font-bold uppercase tracking-wider text-[#4E2D00]!">
             Nuestros valores
           </p>
-          <h3 className="mt-2 text-4xl font-bold text-neutral-900">
+          <h3 className="mt-1 md:mt-2 text-xl sm:text-2xl md:text-4xl font-bold text-neutral-900">
             Lo que nos mueve
           </h3>
 
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-5 md:mt-10 grid grid-cols-1 gap-3 md:gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {values.map((value) => (
               <div key={value.title}>
-                <h4 className="text-lg font-semibold text-primary-700">
+                <h4 className="text-sm md:text-lg font-semibold text-primary-700">
                   {value.title}
                 </h4>
-                <p className="mt-1 text-sm text-[#4C4452]!">
+                <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-[#4C4452]!">
                   {value.description}
                 </p>
               </div>
             ))}
           </div>
 
-          <blockquote className="mx-auto mt-14 max-w-3xl text-4xl font-extrabold leading-tight text-[#4C4452]!">
+          <blockquote className="mx-auto mt-6 md:mt-14 max-w-3xl text-lg sm:text-2xl md:text-4xl font-extrabold leading-tight text-[#4C4452]!">
             &quot;Viajar es la única cosa que compras que te hace más rico&quot;
           </blockquote>
         </div>
       </section>
 
-      <section className="bg-primary-50 py-16 md:py-20"> 
+      <section className="bg-primary-50 py-8 md:py-16 lg:py-20"> 
         <div className="mx-auto max-w-7xl rounded-t-3xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <h3 className="text-4xl font-bold text-neutral-900">
+          <div className="mb-4 md:mb-8">
+            <h3 className="text-xl sm:text-2xl md:text-4xl font-bold text-neutral-900">
               Conoce a tus cómplices
             </h3>
-            <p className="mt-2 text-neutral-600">
+            <p className="mt-0.5 md:mt-2 text-xs md:text-base text-neutral-600">
               El talento detrás de cada itinerario perfecto.
             </p>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-primary-100 bg-white/50">
+          <div className="overflow-hidden rounded-lg md:rounded-2xl border border-primary-100 bg-white/50">
             {teamByOffice.map((office) => (
               <div
                 key={office.office}
-                className="grid grid-cols-1 gap-6 border-b border-primary-100 px-6 py-8 last:border-b-0 md:grid-cols-[220px_1fr] md:gap-10"
+                className="grid grid-cols-1 gap-2 md:gap-6 border-b border-primary-100 px-3 md:px-6 py-4 md:py-8 last:border-b-0 md:grid-cols-[150px_1fr] lg:grid-cols-[220px_1fr] md:gap-10"
               >
                 <div className="flex items-center">
-                  <h4 className="text-3xl font-semibold text-primary-700">
+                  <h4 className="text-sm sm:text-base md:text-3xl font-semibold text-primary-700 leading-tight">
                     {office.office}
                   </h4>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                <div className="grid grid-cols-2 gap-1.5 md:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                   {office.members.map((member) => (
                     <article
                       key={member.name}
-                      className="relative overflow-hidden rounded-2xl"
+                      className="relative overflow-hidden rounded-lg md:rounded-2xl"
                     >
                       <img
                         src={member.photo}
                         alt={member.name}
                         className="aspect-square w-full object-cover"
                       />
-                      <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-neutral-950/90 via-neutral-900/45 to-transparent px-3 py-2">
-                        <p className="text-sm font-bold text-white!">
+                      <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-neutral-950/90 via-neutral-900/45 to-transparent px-1.5 md:px-3 py-1 md:py-2">
+                        <p className="text-xs md:text-sm font-bold text-white! line-clamp-2">
                           {member.name}
                         </p>
                       </div>
@@ -392,26 +395,26 @@ export default function AboutPage() {
         </div>
       </section>
  
-      <section className="bg-white py-16 md:py-20">
+      <section className="bg-white py-8 md:py-14 lg:py-18">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl bg-linear-to-r from-primary-800 to-primary-700 px-8 py-14 text-center shadow-2xl">
-            <h3 className="text-4xl font-extrabold text-white">
+          <div className="rounded-lg md:rounded-3xl bg-linear-to-r from-primary-800 to-primary-700 px-3 md:px-8 py-6 md:py-12 text-center shadow-2xl">
+            <h3 className="text-lg sm:text-2xl md:text-4xl font-extrabold text-white">
               ¿Listo para tu próximo viaje?
             </h3>
-            <p className="mx-auto mt-3 max-w-2xl text-primary-100!">
+            <p className="mx-auto mt-1.5 md:mt-3 max-w-2xl text-xs md:text-sm text-primary-100!">
               Estamos aquí para convertir tus planes en recuerdos inolvidables.
               Hablemos hoy mismo.
             </p>
-            <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+            <div className="mt-4 md:mt-6 flex flex-col justify-center gap-2.5 md:gap-4 sm:flex-row">
               <button
                 onClick={() => setShowContactDialog(true)}
-                className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
+                className="inline-flex items-center justify-center rounded-full bg-white px-4 md:px-7 py-2 md:py-3 text-xs md:text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
               >
                 Hablar con un asesor
               </button>
               <Link
                 href="/services"
-                className="inline-flex items-center justify-center rounded-full border border-primary-300 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-primary-300 px-4 md:px-7 py-2 md:py-3 text-xs md:text-sm font-semibold text-white transition hover:bg-white/10"
               >
                 Ver nuestros servicios
               </Link>

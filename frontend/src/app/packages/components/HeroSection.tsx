@@ -14,7 +14,7 @@ export function HeroSection() {
   const { data: paqueteData } = usePaqueteData();
 
   return (
-    <section className="relative overflow-hidden bg-neutral-900 h-screen">
+    <section className="relative overflow-hidden bg-neutral-900 min-h-screen md:h-screen flex items-center">
       <div className="absolute inset-0">
         <Image
           src={paqueteData?.imagen || "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=1800&h=900&fit=crop"}
@@ -23,19 +23,19 @@ export function HeroSection() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-linear-to-r from-primary-950/80 via-primary-900/45 to-primary-900/25" />
+        <div className="absolute inset-0 bg-linear-to-r from-primary-950/85 via-primary-900/60 to-primary-900/40 md:from-primary-950/80 md:via-primary-900/45 md:to-primary-900/25" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-14 py-24 sm:px-6 lg:px-8 lg:pb-20 lg:py-32 flex flex-col items-center justify-center h-full">
-        <div className="mx-auto max-w-3xl text-center text-white">
+      <div className="relative w-full mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 md:px-8 md:py-24 lg:py-32 flex flex-col items-center justify-center">
+        <div className="mx-auto max-w-2xl md:max-w-3xl text-center text-white! space-y-4 md:space-y-6">
           <h1 
-            className="text-4xl font-extrabold md:text-6xl"
+            className="text-2xl font-bold leading-tight sm:text-3xl md:text-5xl lg:text-6xl"
             dangerouslySetInnerHTML={{
               __html: parseStyledText(paqueteData?.heroTitulo || "")
             }}
           />
           <p 
-            className="mx-auto mt-4 max-w-xl text-base text-white! md:text-lg lg:text-xl"
+            className="mx-auto text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed text-neutral-100! px-2"
             dangerouslySetInnerHTML={{
               __html: parseStyledText(paqueteData?.heroSubtitulo || "")
             }}

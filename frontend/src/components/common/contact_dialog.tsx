@@ -1,8 +1,8 @@
 'use client';
 
-import { XMarkIcon, ChatBubbleLeftIcon, PhoneIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
+import { XMarkIcon, PhoneIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
 import { useState, useEffect } from 'react';
-
+import { FaWhatsapp } from 'react-icons/fa';
 interface ContactDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -60,7 +60,7 @@ export function ContactDialog({
   const contactOptions = [
     {
       id: 'whatsapp',
-      icon: ChatBubbleLeftIcon,
+      icon: FaWhatsapp,
       title: 'WhatsApp',
       description: 'Mensaje instantáneo',
       color: 'from-green-500 to-green-600',

@@ -68,18 +68,18 @@ export function AppointmentSection({
   // porque AppointmentBase ya maneja todo internamente
 
   return (
-    <section id="Agendar-Cita" className="py-16 md:py-20 bg-white">
+    <section id="Agendar-Cita" className="py-12 sm:py-16 md:py-20 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-12 text-center">
+        <div className="mb-8 sm:mb-12 text-center">
           <h2
-            className="text-3xl md:text-4xl font-bold mb-4 text-primary-900"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 text-primary-900"
             dangerouslySetInnerHTML={{
               __html: parseStyledText(citaTitulo || "Agendar Cita"),
             }}
           />
           <p
-            className="text-lg text-neutral-700 max-w-2xl mx-auto"
+            className="text-sm sm:text-base md:text-lg text-neutral-700 max-w-2xl mx-auto px-2"
             dangerouslySetInnerHTML={{
               __html: parseStyledText(
                 citaSubtitulo ||

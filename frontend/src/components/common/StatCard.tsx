@@ -11,8 +11,8 @@ interface StatCardComponentProps {
 export function StatCard({ stat, className }: StatCardComponentProps) {
   return (
     <div className={cn("text-center", className)}>
-      <div className="mb-2 text-3xl font-bold text-primary">{stat.value}</div>
-      <div className="text-sm font-medium text-gray-600">{stat.label}</div>
+      <div className="mb-1 md:mb-2 text-2xl md:text-3xl font-bold text-primary">{stat.value}</div>
+      <div className="text-xs md:text-sm font-medium text-gray-600">{stat.label}</div>
     </div>
   );
 }

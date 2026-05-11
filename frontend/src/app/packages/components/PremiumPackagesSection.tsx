@@ -99,26 +99,26 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
   );
 
   return (
-    <section className="bg-neutral-100 py-16 md:py-20">
+    <section className="bg-neutral-100 py-12 sm:py-16 md:py-20">
       <div ref={sectionRef} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-start justify-between gap-4">
+        <div className="mb-6 sm:mb-8 flex flex-col items-start justify-between gap-3 sm:gap-4">
           <div>
-            <h2 className="text-4xl font-bold text-primary-700 mb-2">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary-700 mb-1 sm:mb-2">
               Paquetes Premium
             </h2>
-            <p className="mt-2 max-w-4xl text-sm text-neutral-600">
+            <p className="mt-1 sm:mt-2 max-w-4xl text-xs sm:text-sm text-neutral-600">
               Nuestra seleccion exclusiva de itinerarios curados para ofrecer el maximo confort y experiencias autenticas.
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {visiblePackages.map((item) => (
             <article
               key={item.title}
-              className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200"
+              className="overflow-hidden rounded-lg sm:rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200"
             >
-              <div className="relative h-80 w-full">
+              <div className="relative h-44 sm:h-56 md:h-80 w-full">
                 <Image
                   src={item.image}
                   alt={item.title}
@@ -126,34 +126,34 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
                   className="object-cover"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-primary-900 via-primary-900/10 to-transparent" />
-                <span className="absolute left-3 top-3 rounded-full bg-neutral-900/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">
+                <div className="absolute inset-0 bg-gradient-to-t from-primary-900 via-primary-900/10 to-transparent" />
+                <span className="absolute left-2 sm:left-3 top-2 sm:top-3 rounded-full bg-neutral-900/60 px-2 sm:px-3 py-0.5 sm:py-1 text-[8px] sm:text-[10px] font-semibold uppercase tracking-wider text-white">
                   {item.tag}
                 </span>
-                <div className="absolute bottom-3 left-3 right-3 text-white">
+                <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 text-white">
                   <div className="flex text-center items-center gap-1">
-                    <ClockIcon className="h-3 w-3 inline-block mr-1" />
-                    <p className="text-xs text-white!">{item.days}</p>
+                    <ClockIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 inline-block mr-1" />
+                    <p className="text-[10px] sm:text-xs text-white">{item.days}</p>
                   </div>
-                  <h4 className="font-bold">{item.title}</h4>
+                  <h4 className="font-bold text-sm sm:text-base">{item.title}</h4>
                 </div>
               </div>
 
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-3">
+              <div className="p-3 sm:p-4">
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider text-neutral-500! font-semibold">
+                    <p className="text-[8px] sm:text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">
                       Desde
                     </p>
-                    <p className="text-xl font-bold text-primary-700!">
+                    <p className="text-lg sm:text-xl font-bold text-primary-700">
                       ${item.price} USD
                     </p>
                   </div>
                 </div>
-                <div className="mt-3 flex gap-2">
+                <div className="mt-2.5 sm:mt-3 flex gap-2">
                   <button
                     onClick={() => onDetalles(item)}
-                    className="flex-1 rounded-full bg-primary-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-800"
+                    className="flex-1 rounded-full bg-primary-700 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-800"
                   >
                     Ver detalles
                   </button>
@@ -163,10 +163,10 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
                               onClick={() =>
                                 handleDownloadPDF(item.pdf, item.title)
                               }
-                              className="flex-1 rounded-full border-2 border-primary-700 p-2.5 text-primary-700 transition hover:bg-primary-50 flex items-center justify-center gap-2 text-sm font-semibold"
+                              className="flex-1 rounded-full border-2 border-primary-700 p-2 sm:p-2.5 text-primary-700 transition hover:bg-primary-50 flex items-center justify-center gap-1 text-xs sm:text-sm font-semibold"
                             >
-                              <DocumentArrowDownIcon className="h-4 w-4" />
-                              Descargar
+                              <DocumentArrowDownIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <span className="hidden sm:inline">Descargar</span>
                             </button>
                           )}
                   

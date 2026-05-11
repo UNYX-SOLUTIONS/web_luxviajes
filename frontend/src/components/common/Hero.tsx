@@ -30,7 +30,7 @@ export function Hero({
           alt="Equipo Luxviajes"
           fill
           priority
-          className="object-fill"
+          className="object-cover object-center sm:object-fill"
         />
       </div>
 

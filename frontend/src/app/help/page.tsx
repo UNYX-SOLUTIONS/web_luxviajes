@@ -40,9 +40,9 @@ const helpTopics = [
     downloadKey: "pdfPoliticasViaje",
   },
   {
-    title: "Programa de Lealtad",
+    title: "Vuelos internacionales",
     description:
-      "Beneficios para miembros, acumulacion de puntos y acceso a recompensas exclusivas.",
+      "Consejos para reservar vuelos internacionales, incluyendo mejores prácticas, opciones de aerolíneas y cómo encontrar las mejores ofertas.",
     icon: StarIcon,
   },
   {
