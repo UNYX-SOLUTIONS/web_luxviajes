@@ -40,7 +40,7 @@ export function Hero({
       <div className="absolute z-10 text-left text-white flex items-center justify-start h-full gap-18 pl-8 md:pl-16">
         {/* Text Content */}
         <div className="flex-1 pl-0 md:pl-16">
-          <h1 className="mb-4 max-w-xl md:max-w-2xl text-3xl! font-extrabold leading-tight text-white md:text-6xl">
+          <h1 className="mb-4 max-w-xl md:max-w-2xl text-3xl! font-extrabold leading-tight text-white md:text-6xl!">
             {title}
           </h1>
           <p className="text-lg md:text-xl mb-8 max-w-2xl text-white!">
