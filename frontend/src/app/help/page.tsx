@@ -39,12 +39,12 @@ const helpTopics = [
     icon: CalendarDaysIcon,
     downloadKey: "pdfPoliticasViaje",
   },
-  {
+ /*  {
     title: "Vuelos internacionales",
     description:
       "Consejos para reservar vuelos internacionales, incluyendo mejores prácticas, opciones de aerolíneas y cómo encontrar las mejores ofertas.",
     icon: StarIcon,
-  },
+  }, */
   {
     title: "Seguro de Viaje",
     description:
@@ -52,9 +52,9 @@ const helpTopics = [
     icon: ShieldCheckIcon,
   },
   {
-    title: "Guias de Destino",
+    title: "Paquetes internacionales",
     description:
-      "Informacion esencial sobre destinos populares, atracciones turísticas y consejos de viaje.",
+      "Informacion sobre nuestros paquetes internacionales, destinos populares, itinerarios personalizados y como reservar tu proximo viaje.",
     icon: MapIcon,
     href: "/packages",
   },
