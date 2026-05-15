@@ -12,6 +12,7 @@ import { XMarkIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { DreamDestinationsSection } from "./packages/components";
 import { type DreamDestination } from "./packages/data/packages-data";
 import { useHomeData } from "@/hooks";
+import KommoChat from "@/components/common/KommoChat";
 
 interface PackageDetails {
   title: string;
@@ -133,6 +134,7 @@ export default function Home() {
 
   return (
     <>
+    
       {/* Hero Section */}
       <div ref={heroRef}>
         {loading ? (
