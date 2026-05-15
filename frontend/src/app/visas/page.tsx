@@ -136,19 +136,19 @@ export default function VisasPage() {
           <div className="absolute inset-0 bg-linear-to-r from-primary-950/85 via-neutral-900/50 to-neutral-900/25" />
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="max-w-2xl text-white">
-            <span className="inline-flex rounded-full bg-primary-500/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-22">
+          <div className="max-w-2xl text-white!">
+            <span className="inline-flex rounded-full bg-primary-500/80 px-3 py-1 text-xs! font-semibold uppercase tracking-wider">
               Servicio White-Glove
             </span>
             <h1
-              className="mt-5 text-5xl font-extrabold leading-tight md:text-7xl"
+              className="mt-5 text-5xl! font-extrabold leading-tight md:text-6xl!"
               dangerouslySetInnerHTML={{
                 __html:
                   visasPageData?.heroTitulo || "Viaja Sin <br /> Fronteras",
               }}
             />
-            <h5 className="mt-5 max-w-xl text-base text-white md:text-lg">
+            <h5 className="mt-5 max-w-xl text-base! text-white! md:text-lg!">
               {visasPageData?.heroSubtitulo ||
                 "Gestionamos tu documentacion con la precision de un concierge digital. Disfruta de tramites sin estres mientras nosotros cuidamos cada detalle de tu visado."}
             </h5>
@@ -156,13 +156,13 @@ export default function VisasPage() {
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <button
                 onClick={() => setShowContactDialog(true)}
-                className="inline-flex rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-primary-700"
+                className="inline-flex rounded-full bg-primary-600 px-6 py-3 text-sm! font-semibold text-white shadow-lg transition hover:bg-primary-700"
               >
                 Iniciar Asesoria
               </button>
               <Link
                 href="/packages"
-                className="inline-flex rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
+                className="inline-flex rounded-full border border-white/40 bg-white/10 px-6 py-3 text-sm! font-semibold text-white transition hover:bg-white/20"
               >
                 Ver Destinos
               </Link>

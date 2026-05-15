@@ -52,14 +52,14 @@ function getLocalISOString(): string {
   const offsetHours = Math.floor(Math.abs(offset) / 60);
   const offsetMinutes = Math.abs(offset) % 60;
   const offsetSign = offset >= 0 ? "+" : "-";
-  
+
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
   const hours = String(now.getHours()).padStart(2, "0");
   const minutes = String(now.getMinutes()).padStart(2, "0");
   const seconds = String(now.getSeconds()).padStart(2, "0");
-  
+
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${offsetSign}${String(offsetHours).padStart(2, "0")}:${String(offsetMinutes).padStart(2, "0")}`;
 }
 
@@ -175,7 +175,9 @@ export default function ContactPage() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Webhook respondio con estado ${response.status}: ${errorText}`);
+        throw new Error(
+          `Webhook respondio con estado ${response.status}: ${errorText}`,
+        );
       }
 
       alert("Mensaje enviado correctamente. Nos pondremos en contacto pronto.");
@@ -253,11 +255,11 @@ export default function ContactPage() {
             <span className="inline-flex rounded-full bg-tertiary-800 px-3 py-2 text-xs font-semibold uppercase tracking-wider text-tertiary-100">
               Viaje Exclusivo
             </span>
-            <h1 className="mt-5 text-5xl font-extrabold leading-tight md:text-7xl sm:pb-2 md:pb-4">
+            <h1 className="mt-5 text-5xl! font-extrabold leading-tight md:text-6xl! sm:pb-2 md:pb-4">
               {heroTitle}
             </h1>
             <div className="sm:py-2 md:py-4">
-              <a className="text-2xl font-semibold text-primary-100">
+              <a className="text-2xl! font-semibold text-primary-100">
                 {heroSubtitle}
               </a>
             </div>
