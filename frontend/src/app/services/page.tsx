@@ -196,7 +196,7 @@ export default function ServicesPage() {
       </section>
       <section className="bg-primary-50 py-12 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-xs md:text-md font-semibold text-[#880000]!">Testimonios</p>
+          <p className="text-xs! md:text-md! lg:text-lg! font-semibold text-primary-600!">Testimonios</p>
           <h2 className="mt-1 text-2xl md:text-4xl font-bold text-neutral-900">
             Historias de Viajeros
           </h2>
@@ -209,8 +209,8 @@ export default function ServicesPage() {
               <ArrowLeftIcon className="h-3.5 w-3.5 md:h-4 md:w-4" />
             </button>
 
-            <div className={`transition-all duration-300 ease-in-out ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-              <div className="grid grid-cols-1 gap-10 md:grid-cols-3 w-full max-w-6xl">
+            <div className={`transition-all duration-300 ease-in-out ${isTransitioning ? "opacity-0" : "opacity-100"}`}>
+              <div className="grid grid-cols-1 gap-6 md:gap-10 md:grid-cols-3 w-full max-w-6xl">
                 
                 {getVisibleTestimonials().map((item: Testimonio, position: number) => {
                 const rating = item.calificacion || 5;
@@ -220,18 +220,18 @@ export default function ServicesPage() {
                   <article
                     key={`testimonio-${item.id}-${position}`}
                     className={`relative rounded-2xl shadow-lg transition-all duration-1000 ease-out ${
-                      position === 1 ? "md:scale-105 h-80 opacity-100" : "md:scale-90 h-56 opacity-75"
-                    }`}
+                      position === 1 ? "h-64 sm:h-72 md:h-80 opacity-100" : "h-48 sm:h-56 md:h-56 opacity-75"
+                    } ${position === 1 ? "block" : "hidden md:block"} ${position === 1 ? "md:scale-105" : "md:scale-90"}`}
                   >
                     <img
                       src={item.imagen }
                       alt={item.titulo }
                       className={`w-full object-cover rounded-2xl transition-all duration-1000 ease-out ${
-                        position === 1 ? "h-80" : "h-56"
+                        position === 1 ? "h-64 sm:h-72 md:h-80" : "h-48 sm:h-56 md:h-56"
                       }`}
                     />
                     <div
-                      className={`absolute rounded-xl p-4 text-white right-4 w-48 transition-all ${position === 1 ? "duration-1000 delay-300" : "duration-1000"} ease-out
+                      className={`absolute rounded-xl p-3 md:p-4 text-white right-3 md:right-4 w-40 sm:w-44 md:w-48 transition-all ${position === 1 ? "duration-1000 delay-300" : "duration-1000"} ease-out
                         ${position === 1 ? "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/95 opacity-100" : "bottom-0 translate-x-1/4 translate-y-1/6 bg-[#500088]/85 opacity-90"}
                       `}
                     >

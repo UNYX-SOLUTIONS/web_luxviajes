@@ -210,7 +210,7 @@ export default function AboutPage() {
             <div />
 
             <div>
-              <p className="text-xs md:text-base font-semibold uppercase tracking-wide mb-1.5 md:mb-3 text-[#880000]!">
+              <p className="text-xs md:text-base font-semibold uppercase tracking-wide mb-1.5 md:mb-3 text-primary-600!">
                 Quienes somos
               </p>
               <h2 

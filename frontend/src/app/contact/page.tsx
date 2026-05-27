@@ -358,13 +358,11 @@ export default function ContactPage() {
       <section id="contact-form" className="bg-secondary-50 py-14 md:py-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div className="column">
-            <a
-              href="#contact-form"
-              className="text-sm font-bold text-red-800 mb-1"
+            <p
+              className="text-sm! font-bold! text-primary-600! md:text-md! lg:text-lg!"
             >
               Contáctanos
-            </a>
-            <br />
+            </p>
             <h1 className="mt-3 text-5xl leading-none text-neutral-900 font-semibold py-2">
               Haz{" "}
               <span className="text-primary-700 italic font-black text-5xl leading-snug">

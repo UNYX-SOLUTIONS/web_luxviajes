@@ -106,7 +106,7 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary-700 mb-1 sm:mb-2">
               Paquetes Premium
             </h2>
-            <p className="mt-1 sm:mt-2 max-w-4xl text-xs sm:text-sm text-neutral-600">
+            <p className="mt-1 sm:mt-2 max-w-4xl text-xs sm:text-sm text-neutral-600 md:text-md lg:text-lg">
               Nuestra seleccion exclusiva de itinerarios curados para ofrecer el maximo confort y experiencias autenticas.
             </p>
           </div>
@@ -118,15 +118,15 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
               key={item.title}
               className="overflow-hidden rounded-lg sm:rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200"
             >
-              <div className="relative h-44 sm:h-56 md:h-80 w-full">
+              <div className="relative w-full aspect-4/3 sm:aspect-auto sm:h-56 md:h-80">
                 <Image
                   src={item.image}
                   alt={item.title}
                   fill
-                  className="object-cover"
+                  className="object-cover object-center"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary-900 via-primary-900/10 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-primary-900 via-primary-900/10 to-transparent" />
                 <span className="absolute left-2 sm:left-3 top-2 sm:top-3 rounded-full bg-neutral-900/60 px-2 sm:px-3 py-0.5 sm:py-1 text-[8px] sm:text-[10px] font-semibold uppercase tracking-wider text-white">
                   {item.tag}
                 </span>
