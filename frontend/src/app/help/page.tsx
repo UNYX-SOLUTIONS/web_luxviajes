@@ -132,7 +132,7 @@ export default function HelpPage() {
           </div>
 
           <div className="relative mx-auto max-w-3xl text-center text-neutral-900! mt-40 mb-3">
-            <h1 className="text-4xl! font-extrabold leading-tight md:text-5xl! lg:text-6xl!">
+            <h1 className="text-4xl! font-extrabold leading-tight md:text-5xl!">
               ¿Cómo podemos ayudarte hoy?
             </h1>
 

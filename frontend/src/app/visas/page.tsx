@@ -199,7 +199,7 @@ export default function VisasPage() {
               visasPageData.visa_items.map((visa) => (
                 <article
                   key={visa.documentId}
-                  className="flex flex-col rounded-3xl bg-white p-8 shadow-sm ring-1 ring-neutral-200 transition hover:shadow-md"
+                  className="flex flex-col rounded-3xl bg-white p-8 shadow-sm ring-1 ring-neutral-200 transition hover:shadow-md items-center text-center justify-center"
                 >
                   <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-neutral-100 overflow-hidden border border-neutral-400">
                     {visa.imagen ? (
@@ -219,7 +219,7 @@ export default function VisasPage() {
                     {visa.subtitulo}
                   </p>
 
-                  <div className="mt-auto">
+                  <div className="mt-auto w-full">
                     <button
                       onClick={() => setShowContactDialog(true)}
                       className="w-full rounded-full bg-secondary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 cursor-pointer"
@@ -249,23 +249,23 @@ export default function VisasPage() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-20 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-4">
-              <article className="overflow-hidden rounded-3xl h-80">
+              <article className="overflow-hidden rounded-3xl h-50 md:h-80">
                 <img
                   src="/images/visa/imagen1.jpeg"
                   alt="Consultoria"
-                  className=""
+                  className="object-cover"
                 />
               </article>
-              <article className="flex items-center justify-center rounded-3xl bg-primary-700 text-white h-64">
+              <article className="flex items-center justify-center rounded-3xl bg-primary-700 text-white h-40 md:h-64">
                 <CheckBadgeIcon className="h-16 w-16" />
               </article>
             </div>
 
             <div className="flex flex-col gap-4">
-              <article className="flex items-center justify-center rounded-3xl bg-tertiary-500 text-white h-64">
+              <article className="flex items-center justify-center rounded-3xl bg-tertiary-500 text-white h-40 md:h-64">
                 <AdjustmentsHorizontalIcon className="h-16 w-16" />
               </article>
-              <article className="overflow-hidden rounded-3xl h-80">
+              <article className="overflow-hidden rounded-3xl h-50 md:h-80">
                 <img
                   src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500&h=500&fit=crop"
                   alt="Revision de documentos"

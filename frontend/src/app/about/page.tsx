@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-'use client';
+"use client";
 
 import { Hero } from "@/components/common/Hero";
 import { ContactDialog } from "@/components/common/contact_dialog";
@@ -14,21 +14,24 @@ import type { Asesor } from "@/types";
  * - *texto* se convierte en <span className="...">texto</span>
  * - Soporta saltos de línea con <br/> o \n
  */
-function parseStyledText(text: string, className: string = "text-primary-700 italic"): string {
-  if (!text) return '';
-  
+function parseStyledText(
+  text: string,
+  className: string = "text-primary-700 italic",
+): string {
+  if (!text) return "";
+
   // Reemplazar *texto* con span estilizado
   let parsed = text.replace(
     /\*([^*]+)\*/g,
-    `<span class="${className}">$1</span>`
+    `<span class="${className}">$1</span>`,
   );
-  
+
   // Convertir <br> y <br/> a <br /> válido
-  parsed = parsed.replace(/<br\s*\/?>/gi, '<br />');
-  
+  parsed = parsed.replace(/<br\s*\/?>/gi, "<br />");
+
   // Convertir \n en <br />
-  parsed = parsed.replace(/\n/g, '<br />');
-  
+  parsed = parsed.replace(/\n/g, "<br />");
+
   return parsed;
 }
 
@@ -143,38 +146,38 @@ export default function AboutPage() {
     // console.log("Asesores completos:", aboutData.asesores);
 
     const grouped: { [key: string]: Asesor[] } = {};
-    
+
     aboutData.asesores.forEach((asesor, index) => {
       // Normalizar sede a minúsculas y quitar espacios/acentos
-      const sedeOriginal = asesor.sede || 'sin-sede';
+      const sedeOriginal = asesor.sede || "sin-sede";
       const sedeNormalizada = sedeOriginal
         .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Quitar acentos
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "") // Quitar acentos
         .trim();
-      
+
       // console.log(`[${index}] Asesor: ${asesor.nombre}`);
       // console.log(`     Sede RAW: "${asesor.sede}"`);
       // console.log(`     Sede Original: "${sedeOriginal}"`);
       // console.log(`     Sede Normalizada: "${sedeNormalizada}"`);
-      
+
       if (!grouped[sedeNormalizada]) {
         // console.log(`     -> Creando nuevo grupo: "${sedeNormalizada}"`);
         grouped[sedeNormalizada] = [];
       } else {
         // console.log(`     -> Agregando a grupo existente: "${sedeNormalizada}"`);
       }
-      
+
       grouped[sedeNormalizada].push(asesor);
       // console.log(`     -> Total en grupo "${sedeNormalizada}": ${grouped[sedeNormalizada].length}`);
     });
 
     // Mapear nombres de sedes
     const sedeNames: { [key: string]: string } = {
-      'samborondon': 'Sede Guayas Samborondón',
-      'quito': 'Sede Quito',
-      'cuenca': 'Sede Cuenca',
-      'guayaquil': 'Sede Guayaquil',
+      samborondon: "Sede Guayas Samborondón",
+      quito: "Sede Quito",
+      cuenca: "Sede Cuenca",
+      guayaquil: "Sede Guayaquil",
     };
 
     // console.log("=== RESULTADO AGRUPACIÓN ===");
@@ -186,9 +189,9 @@ export default function AboutPage() {
 
     return Object.entries(grouped).map(([sede, members]) => ({
       office: sedeNames[sede] || sede,
-      members: members.map(m => ({
+      members: members.map((m) => ({
         name: m.nombre,
-        photo: m.imagen || '/images/team/default.png',
+        photo: m.imagen || "/images/team/default.png",
       })),
     }));
   }, [aboutData]);
@@ -196,39 +199,45 @@ export default function AboutPage() {
   return (
     <>
       <Hero
-        title={aboutData?.heroTitulo || "Más que una agencia, somos tu aliado de viaje"}
-        subtitle={aboutData?.heroSubtitulo || "Creamos experiencias, no solo viajes."}
+        title={
+          aboutData?.heroTitulo ||
+          "Más que una agencia, somos tu aliado de viaje"
+        }
+        subtitle={
+          aboutData?.heroSubtitulo || "Creamos experiencias, no solo viajes."
+        }
         ctaText="Planifica tu viaje"
         ctaHref="#"
         onClick={() => setShowContactDialog(true)}
         heroImage={aboutData?.heroImagen}
-      /> 
+      />
       <section className="bg-white relative">
         {/* Quiénes somos */}
-        <div className="min-h-auto md:min-h-[80vh] flex py-8 md:py-24">
-          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 md:gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8 w-full">
+        <div className="min-h-auto md:min-h-[80vh] flex py-6 sm:py-8 md:py-24">
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-3 sm:gap-4 md:gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:px-8 w-full">
             <div />
 
             <div>
               <p className="text-xs md:text-base font-semibold uppercase tracking-wide mb-1.5 md:mb-3 text-primary-600!">
                 Quienes somos
               </p>
-              <h2 
-                className="mt-1.5 md:mt-4 text-xl! sm:text-2xl md:text-4xl font-bold leading-tight text-neutral-900"
+              <h2
+                className="mt-4 md:mt-4 text-2xl! md:text-4xl! font-bold leading-tight text-neutral-900"
                 dangerouslySetInnerHTML={{
                   __html: parseStyledText(
-                    aboutData?.quienesSomosTitulo || "Expertos en hacer *realidad* <br/> tus sueños de viaje"
-                  )
+                    aboutData?.quienesSomosTitulo ||
+                      "Expertos en hacer *realidad* <br/> tus sueños de viaje",
+                  ),
                 }}
               />
-              <div 
-                className="mt-3 md:mt-6 space-y-2.5 md:space-y-4 text-xs md:text-base text-neutral-700"
+              <div
+                className="mt-5 md:mt-6 space-y-2.5 md:space-y-4 text-sm! md:text-lg! text-neutral-700! mb-5"
                 dangerouslySetInnerHTML={{
                   __html: parseStyledText(
-                    aboutData?.quienesSomosDescripcion || 
-                    "Nuestra historia comenzó en 2016 como un sueño apasionado: transformar la manera en que los ecuatorianos descubren el mundo. Lo que empezó como una pequeña semilla de curiosidad, se convirtió en una visión clara de excelencia.\n\nA pesar de los desafíos globales, en 2021, tras la pandemia, Luxviajes nació oficialmente. Entendimos que el mundo había cambiado y que el viajero moderno buscaba algo más que un ticket: buscaba seguridad, personalización y, sobre todo, una mano experta que lo guiara.\n\nHoy, somos el referente del lujo y la confianza en Guayaquil, Quito y Cuenca.",
-                    "text-neutral-700"
-                  )
+                    aboutData?.quienesSomosDescripcion ||
+                      "Nuestra historia comenzó en 2016 como un sueño apasionado: transformar la manera en que los ecuatorianos descubren el mundo. Lo que empezó como una pequeña semilla de curiosidad, se convirtió en una visión clara de excelencia.\n\nA pesar de los desafíos globales, en 2021, tras la pandemia, Luxviajes nació oficialmente. Entendimos que el mundo había cambiado y que el viajero moderno buscaba algo más que un ticket: buscaba seguridad, personalización y, sobre todo, una mano experta que lo guiara.\n\nHoy, somos el referente del lujo y la confianza en Guayaquil, Quito y Cuenca.",
+                    "text-neutral-700",
+                  ),
                 }}
               />
             </div>
@@ -250,21 +259,21 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
- 
-      <section className="bg-neutral-100 py-8 md:py-14 text-white">
+
+      <section className="bg-neutral-100 py-6 sm:py-8 md:py-14 text-white">
         {/* Por qué elegirnos */}
-        <div className="py-8 md:py-16 lg:py-20">
+        <div className="py-6 sm:py-8 md:py-16 lg:py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-xs md:text-base font-bold uppercase tracking-wider text-primary-700!">
                 Por qué elegirnos
               </p>
-              <h3 className="mt-1 md:mt-2 text-xl sm:text-2xl md:text-3xl font-bold text-neutral-900">
+              <h3 className="mt-1 md:mt-2 text-xl! md:text-3xl! font-bold text-neutral-900">
                 La diferencia está en el detalle
               </h3>
             </div>
 
-            <div className="mt-5 md:mt-10 grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-4 sm:mt-5 md:mt-10 grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {highlights.map((item) => (
                 <article
                   key={item.title}
@@ -285,32 +294,36 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-      <section className="bg-[#500088] py-8 md:py-14 text-white">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-3 md:gap-8 px-4 sm:px-6 md:grid-cols-2 lg:px-8">
+      <section className="bg-[#500088] py-6 sm:py-8 md:py-14 text-white">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-3 sm:gap-4 md:gap-8 px-4 sm:px-6 md:grid-cols-2 lg:px-8">
           <div>
-            <h3 className="text-lg sm:text-xl md:text-3xl font-extrabold leading-tight">
+            <h3 className="text-base! sm:text-lg! md:text-4xl! font-extrabold leading-tight">
               Un equipo en
             </h3>
-            <h3 className="text-lg sm:text-xl md:text-3xl font-extrabold leading-tight">
+            <h3 className="text-base! sm:text-lg! md:text-4xl! font-extrabold leading-tight">
               expansión
             </h3>
-            <h3 className="text-lg sm:text-xl md:text-3xl font-extrabold leading-tight mt-1">
+            <h3 className="text-base! sm:text-lg! md:text-4xl! font-extrabold leading-tight mt-1">
               confianza que cruza fronteras
             </h3>
-            <p className="mt-1.5 md:mt-3 max-w-2xl text-xs md:text-base text-[#DFB7FF]!">
+            <p className="mt-1.5 md:mt-3 max-w-2xl text-xs! sm:text-sm! md:text-base! text-[#DFB7FF]!">
               Crecemos para estar más cerca de ti, manteniendo siempre la
               esencia humana.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-2 gap-2 md:gap-6">
-            <div className="rounded-lg md:rounded-2xl bg-white/10! px-3 md:px-6 py-3 md:py-5 min-h-16 md:min-h-25 flex flex-col justify-center">
-              <p className="text-xl sm:text-2xl md:text-4xl font-extrabold text-[#FFDDBB]!">{aboutData?.numExpertos || "+16"}</p>
+          <div className="grid grid-cols-2 md:grid-cols-2 gap-2 sm:gap-3 md:gap-6">
+            <div className="rounded-lg md:rounded-2xl bg-white/10! px-2.5 sm:px-3 md:px-6 py-2.5 sm:py-3 md:py-5 min-h-14 sm:min-h-16 md:min-h-25 flex flex-col justify-center">
+              <p className="text-lg sm:text-2xl md:text-4xl font-extrabold text-[#FFDDBB]!">
+                {aboutData?.numExpertos || "+16"}
+              </p>
               <p className="mt-0.5 md:mt-1 text-xs uppercase tracking-wider text-white!">
                 Expertos
               </p>
             </div>
-            <div className="rounded-lg md:rounded-2xl bg-white/10! px-3 md:px-6 py-3 md:py-5 min-h-16 md:min-h-25 flex flex-col justify-center">
-              <p className="text-xl sm:text-2xl md:text-4xl font-extrabold text-[#FFDDBB]!">{aboutData?.ciudades || "3"}</p>
+            <div className="rounded-lg md:rounded-2xl bg-white/10! px-2.5 sm:px-3 md:px-6 py-2.5 sm:py-3 md:py-5 min-h-14 sm:min-h-16 md:min-h-25 flex flex-col justify-center">
+              <p className="text-lg sm:text-2xl md:text-4xl font-extrabold text-[#FFDDBB]!">
+                {aboutData?.ciudades || "3"}
+              </p>
               <p className="mt-0.5 md:mt-1 text-xs uppercase tracking-wider text-white!">
                 Ciudades
               </p>
@@ -318,42 +331,42 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
- 
-      <section className="bg-white py-8 md:py-16">
-        <div className="mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-xs md:text-md font-bold uppercase tracking-wider text-[#4E2D00]!">
-            Nuestros valores
-          </p>
-          <h3 className="mt-1 md:mt-2 text-xl sm:text-2xl md:text-4xl font-bold text-neutral-900">
+
+      <section className="bg-white py-6 sm:py-8 md:py-16 items-center text-center lg:py-20">
+        <p className="text-xs! md:text-md! font-bold uppercase tracking-wider text-[#4E2D00]!">
+          Nuestros valores
+        </p>
+        <div className="mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8 flex flex-col gap-4 md:gap-4">
+          <h3 className="mt-1 md:mt-2 text-lg! sm:text-xl! md:text-4xl! font-bold text-neutral-900">
             Lo que nos mueve
           </h3>
 
-          <div className="mt-5 md:mt-10 grid grid-cols-1 gap-3 md:gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-4 sm:mt-5 md:mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:grid-cols-4">
             {values.map((value) => (
               <div key={value.title}>
-                <h4 className="text-sm md:text-lg font-semibold text-primary-700">
+                <h4 className="text-sm! md:text-2xl! font-semibold text-primary-700">
                   {value.title}
                 </h4>
-                <p className="mt-0.5 md:mt-1 text-xs md:text-sm text-[#4C4452]!">
+                <p className="mt-0.5 md:mt-1 text-xs! md:text-sm! text-[#4C4452]!">
                   {value.description}
                 </p>
               </div>
             ))}
           </div>
 
-          <blockquote className="mx-auto mt-6 md:mt-14 max-w-3xl text-lg sm:text-2xl md:text-4xl font-extrabold leading-tight text-[#4C4452]!">
+          <blockquote className="mx-auto mt-4 sm:mt-6 md:mt-14 max-w-3xl text-base sm:text-lg md:text-4xl font-extrabold leading-tight text-[#4C4452]!">
             &quot;Viajar es la única cosa que compras que te hace más rico&quot;
           </blockquote>
         </div>
       </section>
 
-      <section className="bg-primary-50 py-8 md:py-16 lg:py-20"> 
+      <section className="bg-primary-50 py-6 sm:py-8 md:py-16 lg:py-20">
         <div className="mx-auto max-w-7xl rounded-t-3xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-4 md:mb-8">
-            <h3 className="text-xl sm:text-2xl md:text-4xl font-bold text-neutral-900">
+          <div className="mb-3 sm:mb-4 md:mb-8">
+            <h3 className="text-lg sm:text-xl md:text-4xl font-bold text-neutral-900">
               Conoce a tus cómplices
             </h3>
-            <p className="mt-0.5 md:mt-2 text-xs md:text-base text-neutral-600">
+            <p className="mt-0.5 md:mt-2 text-xs sm:text-sm md:text-base text-neutral-600">
               El talento detrás de cada itinerario perfecto.
             </p>
           </div>
@@ -362,15 +375,15 @@ export default function AboutPage() {
             {teamByOffice.map((office) => (
               <div
                 key={office.office}
-                className="grid grid-cols-1 gap-2 md:gap-6 border-b border-primary-100 px-3 md:px-6 py-4 md:py-8 last:border-b-0 md:grid-cols-[150px_1fr] lg:grid-cols-[220px_1fr] md:gap-10"
+                className="grid grid-cols-1 gap-2 sm:gap-3 md:gap-6 border-b border-primary-100 px-2.5 sm:px-3 md:px-6 py-3 sm:py-4 md:py-8 last:border-b-0 md:grid-cols-[150px_1fr] lg:grid-cols-[220px_1fr] md:gap-10"
               >
                 <div className="flex items-center">
-                  <h4 className="text-sm sm:text-base md:text-3xl font-semibold text-primary-700 leading-tight">
+                  <h4 className="text-xs sm:text-sm md:text-3xl font-semibold text-primary-700 leading-tight">
                     {office.office}
                   </h4>
                 </div>
 
-                <div className="grid grid-cols-2 gap-1.5 md:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                <div className="grid grid-cols-2 gap-1 sm:gap-1.5 md:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
                   {office.members.map((member) => (
                     <article
                       key={member.name}
@@ -394,27 +407,27 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
- 
-      <section className="bg-white py-8 md:py-14 lg:py-18">
+
+      <section className="bg-white py-6 sm:py-8 md:py-14 lg:py-18">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-lg md:rounded-3xl bg-linear-to-r from-primary-800 to-primary-700 px-3 md:px-8 py-6 md:py-12 text-center shadow-2xl">
-            <h3 className="text-lg sm:text-2xl md:text-4xl font-extrabold text-white">
+          <div className="rounded-lg md:rounded-3xl bg-linear-to-r from-primary-800 to-primary-700 px-3 sm:px-4 md:px-8 py-5 sm:py-6 md:py-12 text-center shadow-2xl">
+            <h3 className="text-base sm:text-lg md:text-4xl font-extrabold text-white">
               ¿Listo para tu próximo viaje?
             </h3>
             <p className="mx-auto mt-1.5 md:mt-3 max-w-2xl text-xs md:text-sm text-primary-100!">
               Estamos aquí para convertir tus planes en recuerdos inolvidables.
               Hablemos hoy mismo.
             </p>
-            <div className="mt-4 md:mt-6 flex flex-col justify-center gap-2.5 md:gap-4 sm:flex-row">
+            <div className="mt-3 sm:mt-4 md:mt-6 flex flex-col justify-center gap-2 sm:gap-2.5 md:gap-4 sm:flex-row">
               <button
                 onClick={() => setShowContactDialog(true)}
-                className="inline-flex items-center justify-center rounded-full bg-white px-4 md:px-7 py-2 md:py-3 text-xs md:text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
+                className="inline-flex items-center justify-center rounded-full bg-white px-3 sm:px-4 md:px-7 py-2 md:py-3 text-xs md:text-sm font-semibold text-primary-800 transition hover:bg-primary-50"
               >
                 Hablar con un asesor
               </button>
               <Link
                 href="/services"
-                className="inline-flex items-center justify-center rounded-full border border-primary-300 px-4 md:px-7 py-2 md:py-3 text-xs md:text-sm font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-primary-300 px-3 sm:px-4 md:px-7 py-2 md:py-3 text-xs md:text-sm font-semibold text-white transition hover:bg-white/10"
               >
                 Ver nuestros servicios
               </Link>
@@ -425,7 +438,9 @@ export default function AboutPage() {
         <ContactDialog
           isOpen={showContactDialog}
           onClose={() => setShowContactDialog(false)}
-          whatsappNumber={redes?.whatsapp.replace(/[^0-9]/g, '') || "593964220600"}
+          whatsappNumber={
+            redes?.whatsapp.replace(/[^0-9]/g, "") || "593964220600"
+          }
           phoneNumber={redes?.llamada || "+593964220600"}
           videoCallUrl="/contact"
         />
