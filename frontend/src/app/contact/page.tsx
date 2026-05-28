@@ -358,16 +358,14 @@ export default function ContactPage() {
       <section id="contact-form" className="bg-secondary-50 py-14 md:py-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div className="column">
-            <a
-              href="#contact-form"
-              className="text-sm font-bold text-red-800 mb-1"
+            <p
+              className="text-sm! font-bold! text-primary-600! md:text-md! lg:text-lg!"
             >
               Contáctanos
-            </a>
-            <br />
-            <h1 className="mt-3 text-5xl leading-none text-neutral-900 font-semibold py-2">
+            </p>
+            <h1 className="mt-3 text-3xl! md:text-5xl! leading-none text-neutral-900 font-semibold py-2">
               Haz{" "}
-              <span className="text-primary-700 italic font-black text-5xl leading-snug">
+              <span className="text-primary-700 italic font-black text-3xl! md:text-5xl! leading-snug">
                 realidad
               </span>{" "}
               el viaje que siempre soñaste
@@ -382,7 +380,7 @@ export default function ContactPage() {
             onSubmit={handleFormSubmit}
             className="rounded-3xl bg-white p-8 shadow-lg ring-1 ring-primary-100 sm:p-10 h-auto overflow-y-auto"
           >
-            <h3 className="text-3xl font-bold text-primary-700">
+            <h3 className="text-2xl! md:text-3xl! font-bold text-primary-700">
               Déjanos tus datos y te contactamos
             </h3>
 
@@ -538,14 +536,14 @@ export default function ContactPage() {
           }}
         />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="rounded-t-3xl px-8 py-14 text-center text-white">
+          <div className="rounded-t-3xl px-4 sm:px-6 md:px-8 py-8 sm:py-10 md:py-14 text-center text-white">
             <div className="relative">
-              <h2 className="mx-auto min-w-md text-xl md:text-5xl font-extrabold leading-tight w-xl">
-                No espere más para vivir la experiencia Luxviajes
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight md:w-xl md:mx-auto">
+                No esperes más para vivir la experiencia Luxviajes
               </h2>
               <Link
                 href="/packages"
-                className="mt-7 inline-flex rounded-full bg-tertiary-500 px-8 py-3 text-sm font-semibold text-tertiary-950 transition hover:bg-tertiary-400 text-tertiary-900 shadow-lg hover:shadow-xl "
+                className="mt-5 sm:mt-6 md:mt-7 inline-flex rounded-full bg-tertiary-500 px-6 sm:px-7 md:px-8 py-2.5 sm:py-3 md:py-3 text-xs sm:text-sm md:text-sm font-semibold text-tertiary-950 transition hover:bg-tertiary-400 text-tertiary-900 shadow-lg hover:shadow-xl"
               >
                 Comenzar mi Planificación
               </Link>

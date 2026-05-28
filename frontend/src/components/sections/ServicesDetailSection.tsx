@@ -102,7 +102,7 @@ export function ServicesDetailSection({
           <div className="lg:sticky lg:top-36 lg:self-start h-fit">
             <div className="mb-8">
               <p
-                className={`text-base font-semibold uppercase tracking-wide mb-3 text-[#880000]! motion-safe:transition-all motion-safe:duration-1200 motion-safe:ease-out ${
+                className={`text-base font-semibold uppercase tracking-wide mb-3 text-primary-600! motion-safe:transition-all motion-safe:duration-1200 motion-safe:ease-out ${
                   isVisible
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-10"

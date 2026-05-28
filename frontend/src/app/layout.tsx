@@ -11,7 +11,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Luxviajes - Agencia de Viajes Premium",
+  title: "Luxviajes - Agencia de Viajes",
   description: COMPANY_INFO.description,
 
   applicationName: "Luxviajes",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     locale: "es_ES",
     url: "https://luxviajes.com",
     siteName: "Luxviajes",
-    title: "Luxviajes - Agencia de Viajes Premium",
+    title: "Luxviajes - Agencia de Viajes",
     description: COMPANY_INFO.description,
     images: [
       {
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Luxviajes - Agencia de Viajes Premium",
+    title: "Luxviajes - Agencia de Viajes",
     description: COMPANY_INFO.description,
     images: ["/og-image.jpg"],
   },

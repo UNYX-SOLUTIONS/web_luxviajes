@@ -46,7 +46,7 @@ export function Header({ activeLink }: HeaderProps) {
                   "font-medium transition-colors",
                   currentActiveLink === link.href
                     ? "text-white text-sm md:text-md lg:text-lg xl:text-xl font-black border-b-2 border-[#500088]"
-                    : "text-[#CCC6D0] text-sm md:text-md lg:text-lg xl:text-xl hover:text-purple-600",
+                    : "text-[#CCC6D0] text-sm md:text-md lg:text-lg xl:text-xl hover:text-purple-400",
                 )}
               >
                 {link.label}

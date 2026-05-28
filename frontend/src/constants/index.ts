@@ -17,6 +17,7 @@ export const NAVIGATION_LINKS = [
   { label: "Paquetes Internacionales", href: "/packages" },
   { label: "Visas", href: "/visas" },
   { label: "Contáctanos", href: "/contact" },
+  { label: "Trabaja con nosotros", href: "/help#trabaja-con-nosotros" },
   { label: "Ayuda", href: "/help" },
 ] as const;
 
@@ -38,6 +39,7 @@ export const ROUTES = {
   visas: "/visas",
   contact: "/contact",
   help: "/help",
+  workWithUs: "/work-with-us",
 } as const;
 
 export const CACHE_DURATION = {

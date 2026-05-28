@@ -132,7 +132,7 @@ export default function HelpPage() {
           </div>
 
           <div className="relative mx-auto max-w-3xl text-center text-neutral-900! mt-40 mb-3">
-            <h1 className="text-4xl font-extrabold leading-tight md:text-6xl">
+            <h1 className="text-4xl! font-extrabold leading-tight md:text-5xl!">
               ¿Cómo podemos ayudarte hoy?
             </h1>
 
@@ -351,10 +351,10 @@ export default function HelpPage() {
       </section>
 
       {/* Seccion de trabaje con nosotros */}
-      <section className="bg-white py-16 md:py-20">
+      <section className="bg-white py-16 md:py-20" id="trabaja-con-nosotros">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl bg-linear-to-r from-primary-800 to-primary-700 px-8 py-14 text-center shadow-2xl">
-            <h3 className="text-4xl font-extrabold text-white">
+            <h3 className="text-3xl! md:text-4xl! font-extrabold text-white">
               ¿Quieres ser parte de nuestro equipo?
             </h3>
             <p className="mt-4 text-lg text-white!">

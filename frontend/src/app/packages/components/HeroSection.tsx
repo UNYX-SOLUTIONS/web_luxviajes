@@ -29,13 +29,13 @@ export function HeroSection() {
       <div className="relative w-full mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 md:px-8 md:py-24 lg:py-32 flex flex-col items-center justify-center">
         <div className="mx-auto max-w-2xl md:max-w-3xl text-center text-white! space-y-4 md:space-y-6">
           <h1 
-            className="text-2xl! font-bold! leading-tight! sm:text-3xl! md:text-5xl! lg:text-6xl! shadow-lg!"
+            className="text-4xl! font-bold! leading-tight! sm:text-4xl! md:text-6xl! lg:text-6xl! xl:text-7xl! shadow-lg!"
             dangerouslySetInnerHTML={{
               __html: parseStyledText(paqueteData?.heroTitulo || "")
             }}
           />
           <p 
-            className="mx-auto text-sm! sm:text-base! md:text-lg! lg:text-xl! leading-relaxed! text-neutral-100! px-2 shadow-md!"
+            className="mx-auto text-md! sm:text-lg! md:text-xl! lg:text-xl! xl:text-2xl! leading-relaxed! text-neutral-100! px-2 shadow-md!"
             dangerouslySetInnerHTML={{
               __html: parseStyledText(paqueteData?.heroSubtitulo || "")
             }}

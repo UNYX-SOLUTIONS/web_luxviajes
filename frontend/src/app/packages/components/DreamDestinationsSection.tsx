@@ -2,34 +2,25 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {
-  DocumentArrowDownIcon,
-} from "@heroicons/react/24/outline";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/24/solid";
- 
+import { DocumentArrowDownIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+
 import type { FC } from "react";
 import type { DreamDestination } from "../data/packages-data";
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
- interface DreamDestinationsSectionProps {
+interface DreamDestinationsSectionProps {
   destinations: DreamDestination[];
   onDetalles: (destination: DreamDestination) => void;
   maxCards?: number;
   showScrollControls?: boolean;
- 
 }
- 
-export const DreamDestinationsSection: FC<
-  DreamDestinationsSectionProps 
-> = ({
+
+export const DreamDestinationsSection: FC<DreamDestinationsSectionProps> = ({
   destinations,
   onDetalles,
   maxCards = destinations.length,
   showScrollControls = false,
- 
 }) => {
   const [page, setPage] = useState(0);
 
@@ -40,15 +31,17 @@ export const DreamDestinationsSection: FC<
   const startIndex = page * maxCards;
   const visibleDestinations = destinations.slice(
     startIndex,
-    startIndex + maxCards
+    startIndex + maxCards,
   );
 
   const handleDownloadPDF = (pdfUrl?: string, title?: string) => {
     if (!pdfUrl) return;
-    
+
     const link = document.createElement("a");
     link.href = pdfUrl;
-    link.download = title ? `${title.toLowerCase().replace(/\s+/g, "-")}.pdf` : "download.pdf";
+    link.download = title
+      ? `${title.toLowerCase().replace(/\s+/g, "-")}.pdf`
+      : "download.pdf";
     link.target = "_blank";
     link.click();
   };
@@ -57,8 +50,7 @@ export const DreamDestinationsSection: FC<
   const handlePageChange = (newPage: number) => {
     if (newPage === page) return;
 
-    const sectionTop =
-      sectionRef.current?.getBoundingClientRect().top ?? 0;
+    const sectionTop = sectionRef.current?.getBoundingClientRect().top ?? 0;
 
     setPage(newPage);
 
@@ -70,10 +62,7 @@ export const DreamDestinationsSection: FC<
     });
   };
 
-  const getPaginationItems = (
-    currentPage: number,
-    totalPages: number
-  ) => {
+  const getPaginationItems = (currentPage: number, totalPages: number) => {
     const current = currentPage + 1;
     const delta = 2;
     const range: number[] = [];
@@ -106,23 +95,18 @@ export const DreamDestinationsSection: FC<
 
     return rangeWithDots;
   };
- 
- 
+
   return (
-    
-    <section
-      ref={sectionRef}
-      className="bg-neutral-50 py-12 sm:py-16 md:py-20"
-    >
+    <section ref={sectionRef} className="bg-neutral-50 py-12 sm:py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* HEADER */}
         <div className="mb-6 sm:mb-7 flex flex-col items-start justify-between gap-3 sm:gap-4 md:flex-row md:items-end">
           <div>
-            <p className="text-xs sm:text-sm text-accent-red">
+            <p className="text-xs sm:text-sm md:text-md font-semibold uppercase tracking-wide text-secondary-600!">
               Escapa, Explora, Disfruta
             </p>
             <h2 className="mt-1 text-2xl sm:text-3xl md:text-4xl font-bold text-primary-700">
-        Top Destinos de la Semana
+              Top Destinos de la Semana
             </h2>
           </div>
 
@@ -157,12 +141,12 @@ export const DreamDestinationsSection: FC<
                     className="overflow-hidden rounded-lg sm:rounded-2xl bg-white shadow-sm ring-1 ring-primary-100 flex flex-col h-full"
                   >
                     {/* IMAGE */}
-                    <div className="relative h-32 sm:h-36 md:h-40 w-full shrink-0">
+                    <div className="relative w-full shrink-0 aspect-[4/3] sm:aspect-auto sm:h-36 md:h-40">
                       <Image
                         src={item.image}
                         alt={item.title}
                         fill
-                        className="object-cover"
+                        className="object-cover object-center"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       />
                     </div>
@@ -180,7 +164,9 @@ export const DreamDestinationsSection: FC<
 
                       <ul className="mt-1.5 sm:mt-2 space-y-0.5 text-xs text-neutral-700 shrink-0">
                         {item.included.slice(0, 3).map((includedItem, idx) => (
-                          <li key={idx} className="line-clamp-1">{includedItem}</li>
+                          <li key={idx} className="line-clamp-1">
+                            {includedItem}
+                          </li>
                         ))}
                       </ul>
 
@@ -207,7 +193,9 @@ export const DreamDestinationsSection: FC<
                               className="flex-1 rounded-full border-2 border-primary-700 p-2 sm:p-2.5 text-primary-700 transition hover:bg-primary-50 flex items-center justify-center gap-1 text-xs sm:text-sm font-semibold"
                             >
                               <DocumentArrowDownIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-                              <span className="hidden sm:inline">Descargar</span>
+                              <span className="hidden sm:inline">
+                                Descargar
+                              </span>
                             </button>
                           )}
                         </div>
@@ -224,9 +212,7 @@ export const DreamDestinationsSection: FC<
         {showScrollControls && totalPages > 1 && (
           <div className="mt-6 sm:mt-8 flex justify-center items-center gap-1 sm:gap-2">
             <button
-              onClick={() =>
-                handlePageChange(Math.max(0, page - 1))
-              }
+              onClick={() => handlePageChange(Math.max(0, page - 1))}
               disabled={page === 0}
               className={`p-1.5 sm:p-2 rounded-full transition ${
                 page === 0
@@ -237,33 +223,28 @@ export const DreamDestinationsSection: FC<
               <ChevronLeftIcon className="h-4 w-4" />
             </button>
 
-            {getPaginationItems(page, totalPages).map(
-              (item, index) => (
-                <button
-                  key={index}
-                  onClick={() =>
-                    typeof item === "number" &&
-                    handlePageChange(item - 1)
-                  }
-                  disabled={typeof item !== "number"}
-                  className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold ${
-                    item === page + 1
-                      ? "bg-primary-700 text-white"
-                      : typeof item === "number"
+            {getPaginationItems(page, totalPages).map((item, index) => (
+              <button
+                key={index}
+                onClick={() =>
+                  typeof item === "number" && handlePageChange(item - 1)
+                }
+                disabled={typeof item !== "number"}
+                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold ${
+                  item === page + 1
+                    ? "bg-primary-700 text-white"
+                    : typeof item === "number"
                       ? "bg-neutral-200 hover:bg-neutral-300"
                       : "text-neutral-500 cursor-default"
-                  }`}
-                >
-                  {item}
-                </button>
-              )
-            )}
+                }`}
+              >
+                {item}
+              </button>
+            ))}
 
             <button
               onClick={() =>
-                handlePageChange(
-                  Math.min(totalPages - 1, page + 1)
-                )
+                handlePageChange(Math.min(totalPages - 1, page + 1))
               }
               disabled={page === totalPages - 1}
               className={`p-2 rounded-full transition ${
