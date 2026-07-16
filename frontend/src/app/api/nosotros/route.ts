@@ -87,7 +87,6 @@ function getSmallImageUrl(imagen?: StrapiImagen): string {
 
 export async function GET() {
   try {
-    // Construir query con populate para asesores e imágenes
     const query = qs.stringify(
       {
         populate: {
@@ -102,7 +101,6 @@ export async function GET() {
             },
           },
         },
-        "pagination[asesores][pageSize]": 100,
       },
       { encodeValuesOnly: true },
     );
@@ -114,7 +112,7 @@ export async function GET() {
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 3600 }, // Revalidar cada hora
+      next: { revalidate: 10 }, // Revalidar cada 10 segundos
     });
 
     if (!response.ok) {
@@ -163,7 +161,7 @@ export async function GET() {
 
     return NextResponse.json(transformedData, {
       headers: {
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        "Cache-Control": "public, s-maxage=10, stale-while-revalidate=59",
       },
     });
   } catch (error) {

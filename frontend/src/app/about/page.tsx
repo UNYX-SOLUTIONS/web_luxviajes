@@ -141,13 +141,14 @@ export default function AboutPage() {
   const teamByOffice = useMemo(() => {
     if (!aboutData?.asesores) return [];
 
-    // console.log("=== INICIO AGRUPACIÓN ===");
-    // console.log("Total de asesores recibidos en frontend:", aboutData.asesores.length);
-    // console.log("Asesores completos:", aboutData.asesores);
+    // Lista de sedes conocidas (añadir aquí nuevas sedes cuando existan)
+    const allSedes = ["samborondon", "quito", "cuenca", "guayaquil"]; // -> modificar para añadir más sedes
 
+    // Inicializar grupos con todas las sedes, garantizando filas vacías
     const grouped: { [key: string]: Asesor[] } = {};
+    allSedes.forEach((s) => (grouped[s] = []));
 
-    aboutData.asesores.forEach((asesor, index) => {
+    aboutData.asesores.forEach((asesor) => {
       // Normalizar sede a minúsculas y quitar espacios/acentos
       const sedeOriginal = asesor.sede || "sin-sede";
       const sedeNormalizada = sedeOriginal
@@ -156,23 +157,15 @@ export default function AboutPage() {
         .replace(/[\u0300-\u036f]/g, "") // Quitar acentos
         .trim();
 
-      // console.log(`[${index}] Asesor: ${asesor.nombre}`);
-      // console.log(`     Sede RAW: "${asesor.sede}"`);
-      // console.log(`     Sede Original: "${sedeOriginal}"`);
-      // console.log(`     Sede Normalizada: "${sedeNormalizada}"`);
-
+      // Si la sede no está en la lista predefinida, se crea dinámicamente
       if (!grouped[sedeNormalizada]) {
-        // console.log(`     -> Creando nuevo grupo: "${sedeNormalizada}"`);
         grouped[sedeNormalizada] = [];
-      } else {
-        // console.log(`     -> Agregando a grupo existente: "${sedeNormalizada}"`);
       }
 
       grouped[sedeNormalizada].push(asesor);
-      // console.log(`     -> Total en grupo "${sedeNormalizada}": ${grouped[sedeNormalizada].length}`);
     });
 
-    // Mapear nombres de sedes
+    // Mapear nombres legibles de sedes
     const sedeNames: { [key: string]: string } = {
       samborondon: "Sede Guayas Samborondón",
       quito: "Sede Quito",
@@ -180,16 +173,12 @@ export default function AboutPage() {
       guayaquil: "Sede Guayaquil",
     };
 
-    // console.log("=== RESULTADO AGRUPACIÓN ===");
-    // console.log("Grupos creados:", Object.keys(grouped));
-    // Object.entries(grouped).forEach(([sede, asesores]) => {
-    //   // console.log(`Sede "${sede}": ${asesores.length} asesores`);
-    //   asesores.forEach(a => console.log(`  - ${a.nombre}`));
-    // });
+    // Ordenar sedes: primero las conocidas, luego las dinámicas restantes
+    const orderedSedes = [...allSedes, ...Object.keys(grouped).filter((s) => !allSedes.includes(s))];
 
-    return Object.entries(grouped).map(([sede, members]) => ({
+    return orderedSedes.map((sede) => ({
       office: sedeNames[sede] || sede,
-      members: members.map((m) => ({
+      members: grouped[sede].map((m) => ({
         name: m.nombre,
         photo: m.imagen || "/images/team/default.png",
       })),
@@ -332,19 +321,19 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-white py-6 sm:py-8 md:py-16 items-center text-center lg:py-20">
+      <section className="bg-white py-6! sm:py-8! md:py-16! items-center text-center lg:py-20!">
         <p className="text-xs! md:text-md! font-bold uppercase tracking-wider text-[#4E2D00]!">
           Nuestros valores
         </p>
-        <div className="mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8 flex flex-col gap-4 md:gap-4">
-          <h3 className="mt-1 md:mt-2 text-lg! sm:text-xl! md:text-4xl! font-bold text-neutral-900">
+        <div className="mx-auto! max-w-6xl! px-4! text-center! sm:px-6! lg:px-8! flex flex-col gap-4! md:gap-4!">
+          <h3 className="mt-1! md:mt-2! text-lg! sm:text-xl! md:text-4xl! font-bold! text-neutral-900!">
             Lo que nos mueve
           </h3>
 
-          <div className="mt-4 sm:mt-5 md:mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:grid-cols-4">
+          <div className="mt-4! sm:mt-5! md:mt-10! grid! grid-cols-2 gap-3! sm:gap-4! md:gap-6! lg:grid-cols-4!">
             {values.map((value) => (
               <div key={value.title}>
-                <h4 className="text-sm! md:text-2xl! font-semibold text-primary-700">
+                <h4 className="text-sm! md:text-2xl! font-semibold! text-primary-700!">
                   {value.title}
                 </h4>
                 <p className="mt-0.5 md:mt-1 text-xs! md:text-sm! text-[#4C4452]!">
@@ -354,24 +343,24 @@ export default function AboutPage() {
             ))}
           </div>
 
-          <blockquote className="mx-auto mt-4 sm:mt-6 md:mt-14 max-w-3xl text-base sm:text-lg md:text-4xl font-extrabold leading-tight text-[#4C4452]!">
+          <blockquote className="mx-auto! mt-4! sm:mt-6! md:mt-14! max-w-3xl! text-base! sm:text-lg! md:text-4xl! font-extrabold! leading-tight! text-[#4C4452]!">
             &quot;Viajar es la única cosa que compras que te hace más rico&quot;
           </blockquote>
         </div>
       </section>
 
-      <section className="bg-primary-50 py-6 sm:py-8 md:py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl rounded-t-3xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-3 sm:mb-4 md:mb-8">
-            <h3 className="text-lg sm:text-xl md:text-4xl font-bold text-neutral-900">
+      <section className="bg-primary-50! py-6! sm:py-8! md:py-16! lg:py-20!">
+        <div className="mx-auto! max-w-7xl! rounded-t-3xl! px-4! sm:px-6! lg:px-8!">
+          <div className="mb-3! sm:mb-4! md:mb-8!">
+            <h3 className="text-lg! sm:text-xl! md:text-4xl! font-bold! text-neutral-900!">
               Conoce a tus cómplices
             </h3>
-            <p className="mt-0.5 md:mt-2 text-xs sm:text-sm md:text-base text-neutral-600">
+            <p className="mt-0.5! md:mt-2! text-xs! sm:text-sm! md:text-base! lg:text-lg! text-neutral-700!">
               El talento detrás de cada itinerario perfecto.
             </p>
           </div>
 
-          <div className="overflow-hidden rounded-lg md:rounded-2xl border border-primary-100 bg-white/50">
+          <div className="overflow-hidden rounded-lg! md:rounded-2xl! border border-primary-100 bg-white/50">
             {teamByOffice.map((office) => (
               <div
                 key={office.office}
