@@ -35,7 +35,6 @@ export function AppointmentDialog({ isOpen, onClose }: AppointmentDialogProps) {
             onSuccess={onClose} 
             onCancel={onClose} 
             isDialogMode={true} 
-            showUrgencia={false}
             appointmentSource={AppointmentSource.CALENDAR}
           />
         </div>

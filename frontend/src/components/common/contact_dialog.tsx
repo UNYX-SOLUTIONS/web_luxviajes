@@ -1,8 +1,12 @@
-'use client';
+"use client";
 
-import { XMarkIcon, PhoneIcon, VideoCameraIcon } from '@heroicons/react/24/solid';
-import { useState, useEffect } from 'react';
-import { FaWhatsapp } from 'react-icons/fa';
+import {
+  XMarkIcon,
+  PhoneIcon,
+  VideoCameraIcon,
+} from "@heroicons/react/24/solid";
+import { useState, useEffect } from "react";
+import { FaWhatsapp } from "react-icons/fa";
 interface ContactDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,9 +18,9 @@ interface ContactDialogProps {
 export function ContactDialog({
   isOpen,
   onClose,
-  whatsappNumber = '593964220600',
-  phoneNumber = '+593964220600',
-  videoCallUrl = '/contact',
+  whatsappNumber = "593964220600",
+  phoneNumber = "+593964220600",
+  videoCallUrl = "/contact",
 }: ContactDialogProps) {
   const [isClosing, setIsClosing] = useState(false);
 
@@ -32,26 +36,27 @@ export function ContactDialog({
   useEffect(() => {
     if (isOpen) {
       // Calcular el ancho de la scrollbar
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      
+      const scrollbarWidth =
+        window.innerWidth - document.documentElement.clientWidth;
+
       // Guardar estilos originales
       const originalOverflow = document.body.style.overflow;
       const originalPaddingRight = document.body.style.paddingRight;
-      
+
       // Aplicar nuevos estilos
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
       if (scrollbarWidth > 0) {
         document.body.style.paddingRight = `${scrollbarWidth}px`;
       }
-      
+
       // Cleanup
       return () => {
         document.body.style.overflow = originalOverflow;
         document.body.style.paddingRight = originalPaddingRight;
       };
     } else {
-      document.body.style.overflow = 'unset';
-      document.body.style.paddingRight = 'unset';
+      document.body.style.overflow = "unset";
+      document.body.style.paddingRight = "unset";
     }
   }, [isOpen]);
 
@@ -59,42 +64,42 @@ export function ContactDialog({
 
   const contactOptions = [
     {
-      id: 'whatsapp',
+      id: "whatsapp",
       icon: FaWhatsapp,
-      title: 'WhatsApp',
-      description: 'Mensaje instantáneo',
-      color: 'from-green-500 to-green-600',
-      hoverColor: 'hover:from-green-600 hover:to-green-700',
-      bgColor: 'bg-green-50',
-      textColor: 'text-green-700',
+      title: "WhatsApp",
+      description: "Mensaje instantáneo",
+      color: "from-green-500 to-green-600",
+      hoverColor: "hover:from-green-600 hover:to-green-700",
+      bgColor: "bg-green-50",
+      textColor: "text-green-700",
       action: () => {
-        window.open(`https://wa.me/${whatsappNumber}`, '_blank');
+        window.open(`https://wa.me/${whatsappNumber}`, "_blank");
         handleClose();
       },
     },
     {
-      id: 'call',
+      id: "call",
       icon: PhoneIcon,
-      title: 'Llamada',
-      description: 'Habla directamente',
-      color: 'from-blue-500 to-blue-600',
-      hoverColor: 'hover:from-blue-600 hover:to-blue-700',
-      bgColor: 'bg-blue-50',
-      textColor: 'text-blue-700',
+      title: "Llamada",
+      description: "Habla directamente",
+      color: "from-blue-500 to-blue-600",
+      hoverColor: "hover:from-blue-600 hover:to-blue-700",
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-700",
       action: () => {
         window.location.href = `tel:${phoneNumber}`;
         handleClose();
       },
     },
     {
-      id: 'video',
+      id: "video",
       icon: VideoCameraIcon,
-      title: 'Videollamada',
-      description: 'Cara a cara',
-      color: 'from-purple-500 to-purple-600',
-      hoverColor: 'hover:from-purple-600 hover:to-purple-700',
-      bgColor: 'bg-purple-50',
-      textColor: 'text-purple-700',
+      title: "Videollamada",
+      description: "Cara a cara",
+      color: "from-purple-500 to-purple-600",
+      hoverColor: "hover:from-purple-600 hover:to-purple-700",
+      bgColor: "bg-purple-50",
+      textColor: "text-purple-700",
       action: () => {
         window.location.href = videoCallUrl;
         handleClose();
@@ -107,7 +112,7 @@ export function ContactDialog({
       {/* Backdrop */}
       <div
         className={`fixed inset-0 z-999 bg-black transition-opacity duration-200 rounded-lg ${
-          isClosing ? 'opacity-0' : 'opacity-50'
+          isClosing ? "opacity-0" : "opacity-50"
         }`}
         onClick={handleClose}
       />
@@ -116,7 +121,7 @@ export function ContactDialog({
       <div className="fixed inset-0 z-1000 flex items-center justify-center p-4 rounded-lg">
         <div
           className={`relative w-full max-w-md rounded-3xl bg-white shadow-2xl transition-all duration-200 ${
-            isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
+            isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
           }`}
         >
           {/* Close Button */}
@@ -130,7 +135,9 @@ export function ContactDialog({
 
           {/* Header */}
           <div className="border-b border-neutral-200 px-6 pt-6 pb-4">
-            <h4 className="text-2xl font-bold text-neutral-900">¿Cómo prefieres contactarnos?</h4>
+            <h4 className="text-2xl font-bold text-neutral-900">
+              ¿Cómo prefieres contactarnos?
+            </h4>
             <p className="mt-2 text-sm text-neutral-600">
               Elige la opción que mejor se adapte a ti
             </p>
@@ -156,8 +163,12 @@ export function ContactDialog({
 
                     {/* Content */}
                     <div className="flex-1 text-left">
-                      <h5 className="font-bold text-neutral-900">{option.title}</h5>
-                      <p className="text-sm text-neutral-600">{option.description}</p>
+                      <h5 className="font-bold text-neutral-900">
+                        {option.title}
+                      </h5>
+                      <p className="text-sm text-neutral-600">
+                        {option.description}
+                      </p>
                     </div>
 
                     {/* Arrow */}

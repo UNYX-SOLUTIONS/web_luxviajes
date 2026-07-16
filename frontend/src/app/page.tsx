@@ -1,6 +1,10 @@
 ﻿"use client";
 
-import { ContactDialog, HeroCarousel, MailMarketingDialog } from "@/components/common";
+import {
+  ContactDialog,
+  HeroCarousel,
+  MailMarketingDialog,
+} from "@/components/common";
 import {
   StatsSection,
   ServicesDetailSection,
@@ -12,7 +16,6 @@ import { XMarkIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { DreamDestinationsSection } from "./packages/components";
 import { type DreamDestination } from "./packages/data/packages-data";
 import { useHomeData } from "@/hooks";
-import KommoChat from "@/components/common/KommoChat";
 
 interface PackageDetails {
   title: string;
@@ -47,7 +50,9 @@ export default function Home() {
       duration: destino.duracion,
       nights: destino.subtitulo,
       season: destino.disponibilidad,
-      included: (destino.descripcion || "").split("\n").filter((line) => line.trim()), // Para las cards
+      included: (destino.descripcion || "")
+        .split("\n")
+        .filter((line) => line.trim()), // Para las cards
       detailIncluded: (destino.descripcionDetallada || "")
         .split("\n")
         .filter((line) => line.trim()), // Para el diálogo
@@ -122,7 +127,7 @@ export default function Home() {
       const lastShownTime = localStorage.getItem("lastMailMarketingShown");
       const now = Date.now();
       const TWO_MINUTES = 1 * 60 * 1000;
-      
+
       if (!lastShownTime || now - parseInt(lastShownTime) > TWO_MINUTES) {
         setShowMailMarketingDialog(true);
         localStorage.setItem("lastMailMarketingShown", now.toString());
@@ -134,7 +139,6 @@ export default function Home() {
 
   return (
     <>
-    
       {/* Hero Section */}
       <div ref={heroRef}>
         {loading ? (
@@ -214,10 +218,13 @@ export default function Home() {
         isOpen={showMailMarketingDialog}
         onClose={(closeType) => {
           setShowMailMarketingDialog(false);
-          
+
           if (closeType === "dontShow") {
             // Guardar que no quiere ver por 24 horas
-            localStorage.setItem("mailMarketingDontShow", Date.now().toString());
+            localStorage.setItem(
+              "mailMarketingDontShow",
+              Date.now().toString(),
+            );
           }
           // Si es "close", el cooldown de 2 minutos ya se guardó en la lógica de mostrar
         }}
