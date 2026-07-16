@@ -358,9 +358,7 @@ export default function ContactPage() {
       <section id="contact-form" className="bg-secondary-50 py-14 md:py-16">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <div className="column">
-            <p
-              className="text-sm! font-bold! text-primary-600! md:text-md! lg:text-lg!"
-            >
+            <p className="text-sm! font-bold! text-primary-600! md:text-md! lg:text-lg!">
               Contáctanos
             </p>
             <h1 className="mt-3 text-3xl! md:text-5xl! leading-none text-neutral-900 font-semibold py-2">
@@ -476,7 +474,7 @@ export default function ContactPage() {
             <div className="mx-auto mt-4 h-0.75 w-20 bg-tertiary-500" />
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-4">
             {direcciones.length > 0 ? (
               direcciones.map((office, index) => (
                 <article
