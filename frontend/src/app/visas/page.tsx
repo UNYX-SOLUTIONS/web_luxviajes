@@ -13,7 +13,12 @@ import { useState, useEffect } from "react";
 import { ContactDialog } from "@/components/common/contact_dialog";
 import { useVisasData } from "@/hooks/useVisasData";
 import { Visa } from "@/types";
-import { APPOINTMENT_WEBHOOK_URL, AppointmentSource } from "@/components/common/AppointmentBase";
+import {
+  APPOINTMENT_WEBHOOK_URL,
+  AppointmentSource,
+} from "@/components/common/AppointmentBase";
+import { usePurchaseDialog } from "@/hooks/usePurchaseDialog";
+import { PurchaseSummaryDialog } from "@/components/common/purchase_summary_dialog";
 
 const steps = [
   {
@@ -41,29 +46,76 @@ export default function VisasPage() {
   const [showRequirementsDialog, setShowRequirementsDialog] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const { data: visasPageData, loading, error } = useVisasData();
-  
+
+  // Hook para el resumen de pago
+  const {
+    isOpen: isPurchaseDialogOpen,
+    isLoading: isPurchaseLoading,
+    currentService,
+    openDialog: openPurchaseDialog,
+    closeDialog: closePurchaseDialog,
+    handlePay: handlePurchasePay,
+  } = usePurchaseDialog();
+
   // Estado para el newsletter
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [isSubmittingNewsletter, setIsSubmittingNewsletter] = useState(false);
-  const [newsletterMessage, setNewsletterMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [newsletterMessage, setNewsletterMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
+  // Mostrar requisitos de la visa
   const handleShowRequirements = (visa: Visa) => {
     setSelectedVisa(visa);
     setShowRequirementsDialog(true);
   };
 
-  const handleCloseDialog = () => {
+  // Cerrar diálogo de requisitos
+  const handleCloseRequirementsDialog = () => {
     setShowRequirementsDialog(false);
     setSelectedVisa(null);
+  };
+
+  // Manejar "Iniciar Trámite" - abre el diálogo de compra
+  const handleStartProcess = () => {
+    if (!selectedVisa) return;
+
+    // Cerrar el diálogo de requisitos
+    setShowRequirementsDialog(false);
+
+    // Abrir el diálogo de compra con los datos de la visa
+    openPurchaseDialog({
+      id: selectedVisa.id,
+      documentId: selectedVisa.documentId,
+      name: selectedVisa.titulo,
+      type: selectedVisa.subtitulo || "Visado",
+      price: 199, // Precio por defecto si no existe
+      validity: selectedVisa.validez || "Variable según destino",
+      processing: selectedVisa.procesamiento || "15-30 días hábiles",
+      includes: [
+        "Asesoría personalizada con especialista",
+        "Revisión y validación de documentos",
+        "Seguimiento del estado de tu solicitud",
+        "Soporte durante todo el proceso",
+        "Garantía de confidencialidad",
+      ],
+    });
   };
 
   // Manejar suscripción al newsletter
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validar email
-    if (!newsletterEmail || !newsletterEmail.includes("@") || !newsletterEmail.includes(".")) {
-      setNewsletterMessage({ type: "error", text: "Por favor ingresa un correo electrónico válido" });
+
+    if (
+      !newsletterEmail ||
+      !newsletterEmail.includes("@") ||
+      !newsletterEmail.includes(".")
+    ) {
+      setNewsletterMessage({
+        type: "error",
+        text: "Por favor ingresa un correo electrónico válido",
+      });
       return;
     }
 
@@ -71,7 +123,7 @@ export default function VisasPage() {
     setNewsletterMessage(null);
 
     try {
-      const response = await fetch(APPOINTMENT_WEBHOOK_URL, { // Usar la misma constante que en AppointmentBase
+      const response = await fetch(APPOINTMENT_WEBHOOK_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,25 +138,31 @@ export default function VisasPage() {
         throw new Error(`Webhook respondió con estado ${response.status}`);
       }
 
-      // Éxito
-      setNewsletterMessage({ type: "success", text: "¡Gracias por suscribirte! Revisa tu correo para confirmar la suscripción." });
-      setNewsletterEmail(""); // Limpiar el campo
-      
+      setNewsletterMessage({
+        type: "success",
+        text: "¡Gracias por suscribirte! Revisa tu correo para confirmar la suscripción.",
+      });
+      setNewsletterEmail("");
+
       setTimeout(() => {
         setNewsletterMessage(null);
       }, 5000);
-      
     } catch (error) {
       console.error("Error al enviar suscripción:", error);
-      setNewsletterMessage({ type: "error", text: "Hubo un error al procesar tu suscripción. Por favor intenta nuevamente." });
+      setNewsletterMessage({
+        type: "error",
+        text: "Hubo un error al procesar tu suscripción. Por favor intenta nuevamente.",
+      });
     } finally {
       setIsSubmittingNewsletter(false);
     }
   };
 
-  // Controlar scroll del body cuando el dialog de requisitos está abierto
+  // Controlar scroll del body cuando los diálogos están abiertos
   useEffect(() => {
-    if (showRequirementsDialog) {
+    const isAnyDialogOpen = showRequirementsDialog || isPurchaseDialogOpen;
+
+    if (isAnyDialogOpen) {
       const scrollbarWidth =
         window.innerWidth - document.documentElement.clientWidth;
 
@@ -121,8 +179,8 @@ export default function VisasPage() {
       document.body.style.overflow = "unset";
       document.body.style.paddingRight = "unset";
     }
-  }, [showRequirementsDialog]);
-  
+  }, [showRequirementsDialog, isPurchaseDialogOpen]);
+
   return (
     <>
       {/* Hero section */}
@@ -219,18 +277,38 @@ export default function VisasPage() {
                     {visa.subtitulo}
                   </p>
 
-                  <div className="mt-auto w-full">
-                    <button
-                      onClick={() => setShowContactDialog(true)}
-                      className="w-full rounded-full bg-secondary-50 px-4 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-100 cursor-pointer"
-                    >
-                      Solicitar
-                    </button>
+                  <div className="mt-auto w-full space-y-3">
                     <button
                       onClick={() => handleShowRequirements(visa)}
-                      className="mt-4 block w-full text-center text-xs text-neutral-600 hover:text-primary-700 transition cursor-pointer"
+                      className="group relative block w-full text-center text-xs text-neutral-600 transition-all duration-300 hover:text-primary-700 cursor-pointer py-1"
                     >
-                      Más Información
+                      <span className="relative inline-flex items-center gap-1.5">
+                        Más Información
+                        <svg
+                          className="w-3 h-3 transition-transform duration-300 group-hover:translate-x-0.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                        <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-primary-700 transition-all duration-300 group-hover:w-full" />
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => setShowContactDialog(true)}
+                      className="group relative w-full overflow-hidden rounded-full bg-secondary-50 px-6 py-3.5 text-sm font-semibold text-primary-700 transition-all duration-300 hover:bg-primary-100 hover:scale-[1.02] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-700/20 active:scale-95 cursor-pointer"
+                    >
+                      <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                      <span className="relative flex items-center justify-center gap-2">
+                        Solicitar
+                      </span>
                     </button>
                   </div>
                 </article>
@@ -415,7 +493,10 @@ export default function VisasPage() {
                 {visasPageData?.subscripcionTitulo ||
                   "Ofertas exclusivas en tu email"}
               </h3>
-              <form onSubmit={handleNewsletterSubmit} className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <form
+                onSubmit={handleNewsletterSubmit}
+                className="mt-5 flex flex-col gap-3 sm:flex-row"
+              >
                 <input
                   type="email"
                   value={newsletterEmail}
@@ -429,15 +510,16 @@ export default function VisasPage() {
                   disabled={isSubmittingNewsletter}
                   className="h-12 rounded-full bg-primary-700 px-6 text-sm font-semibold text-white transition hover:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmittingNewsletter ? "Enviando..." : "¡Quiero recibirlas!"}
+                  {isSubmittingNewsletter
+                    ? "Enviando..."
+                    : "¡Quiero recibirlas!"}
                 </button>
               </form>
               <p className="mt-3 text-xs text-neutral-500">
                 {visasPageData?.subscripcionSubtitulo ||
                   "Recibirás emails promocionales de Luxviajes. Para más información consulta las políticas de privacidad."}
               </p>
-              
-              {/* Mensaje de feedback */}
+
               {newsletterMessage && (
                 <div
                   className={`mt-4 rounded-lg p-3 text-sm ${
@@ -456,11 +538,12 @@ export default function VisasPage() {
 
       {/* Requirements Dialog */}
       {showRequirementsDialog && selectedVisa && (
-        <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/50 p-4">
-          <div className="relative w-full max-w-2xl rounded-3xl bg-white shadow-2xl flex flex-col max-h-[90vh] z-1000">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 p-4">
+          <div className="relative w-full max-w-2xl rounded-3xl bg-white shadow-2xl flex flex-col max-h-[90vh]">
+            {/* Header */}
             <div className="shrink-0 border-b border-neutral-200 bg-white px-8 py-6">
               <button
-                onClick={handleCloseDialog}
+                onClick={handleCloseRequirementsDialog}
                 className="absolute right-6 top-6 rounded-full bg-neutral-100 p-2 hover:bg-neutral-200 transition"
               >
                 <XMarkIcon className="h-6 w-6 text-neutral-700" />
@@ -489,6 +572,7 @@ export default function VisasPage() {
               </div>
             </div>
 
+            {/* Content */}
             <div className="flex-1 overflow-y-auto p-8 md:p-10">
               <div className="mb-8 grid grid-cols-2 gap-4">
                 <div className="rounded-lg bg-primary-50 p-4">
@@ -529,9 +613,10 @@ export default function VisasPage() {
               </div>
             </div>
 
+            {/* Footer */}
             <div className="shrink-0 border-t border-neutral-200 bg-white px-8 py-6 flex flex-col gap-3 sm:flex-row">
               <button
-                onClick={() => setShowContactDialog(true)}
+                onClick={handleStartProcess}
                 className="flex-1 rounded-full bg-primary-700 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-primary-800 cursor-pointer"
               >
                 Iniciar Trámite
@@ -540,7 +625,7 @@ export default function VisasPage() {
                 <a
                   href={selectedVisa.pdf}
                   download
-                  className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 cursor-pointer flex items-center justify-center gap-2"
+                  className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-bold text-neutral-700 transition hover:bg-neutral-50 cursor-pointer flex items-center justify-center gap-2"
                 >
                   <ArrowDownTrayIcon className="h-4 w-4" />
                   Descargar PDF
@@ -548,7 +633,7 @@ export default function VisasPage() {
               )}
               {!selectedVisa.pdf && (
                 <button
-                  onClick={handleCloseDialog}
+                  onClick={handleCloseRequirementsDialog}
                   className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 cursor-pointer"
                 >
                   Cerrar
@@ -559,6 +644,29 @@ export default function VisasPage() {
         </div>
       )}
 
+      {/* Purchase Summary Dialog */}
+      <PurchaseSummaryDialog
+        isOpen={isPurchaseDialogOpen}
+        onClose={closePurchaseDialog}
+        service={
+          currentService || {
+            id: 0,
+            documentId: "",
+            name: "Servicio no disponible",
+            type: "Visado",
+            price: 0,
+            validity: "Variable",
+            processing: "Variable",
+            includes: [],
+          }
+        }
+        onPay={handlePurchasePay}
+        isLoading={isPurchaseLoading}
+        currency="€"
+        taxRate={0.21}
+      />
+
+      {/* Contact Dialog */}
       <ContactDialog
         isOpen={showContactDialog}
         onClose={() => setShowContactDialog(false)}
