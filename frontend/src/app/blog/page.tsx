@@ -247,7 +247,7 @@ export default function BlogPage() {
           <div className="absolute inset-0 bg-linear-to-r from-primary-950/85 via-primary-900/60 to-primary-900/40" />
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 py-30 sm:py-40 md:py-50 sm:px-6 lg:px-8 mt-20 sm:mt-0 justify-center">
+        <div className="relative mx-auto max-w-7xl px-4! py-30! sm:py-40! md:py-50! sm:px-6! lg:px-8! mt-10! flex flex-col justify-center">
           <div className="mx-auto max-w-3xl text-center justify-center text-white">
             <span className="inline-block rounded-full bg-primary-600/30 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary-100 backdrop-blur-sm mb-4">
               Inspiración para tu próximo viaje
