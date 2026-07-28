@@ -1,34 +1,8 @@
-// hooks/useBlogData.ts
-import { useState, useEffect } from "react";
-
-export interface ApiPost {
-  documentId?: string;
-  id?: string;
-  titulo: string;
-  slug: string;
-  resumen?: string;
-  excerpt?: string;
-  contenido?: string;
-  content?: string;
-  imagen?: string;
-  image?: string;
-  autor?: string;
-  author?: string;
-  avatar?: string;
-  fecha?: string;
-  date?: string;
-  tiempoLectura?: string;
-  readTime?: string;
-  categoria?: string;
-  category?: string;
-  etiquetas?: string[];
-  tags?: string[];
-  destacado?: boolean;
-  featured?: boolean;
-}
+import { useState, useEffect, useCallback } from "react";
+import { BlogPost } from "@/types";
 
 interface BlogData {
-  posts: ApiPost[];
+  posts: BlogPost[];
   heroTitulo?: string;
   heroSubtitulo?: string;
   heroImagen?: string;
@@ -38,35 +12,88 @@ interface UseBlogDataResult {
   data: BlogData | null;
   loading: boolean;
   error: Error | null;
+  refetch: () => Promise<void>;
 }
 
+let cachedData: BlogData | null = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 0;
+
 export function useBlogData(): UseBlogDataResult {
-  const [data, setData] = useState<BlogData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<BlogData | null>(cachedData);
+  const [loading, setLoading] = useState(!cachedData);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    async function fetchBlogData() {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/blog");
-
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error("Unknown error"));
-        console.error("Error fetching blog data:", err);
-      } finally {
-        setLoading(false);
-      }
+  const fetchBlogData = useCallback(async () => {
+    const now = Date.now();
+    if (cachedData && now - cacheTimestamp < CACHE_DURATION) {
+      setData(cachedData);
+      setLoading(false);
+      return;
     }
 
-    fetchBlogData();
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch("/api/blog", {
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            "Authentication failed: Invalid or expired Strapi token",
+          );
+        }
+        if (response.status === 403) {
+          throw new Error(
+            "Access forbidden: Check Strapi API token permissions",
+          );
+        }
+        if (response.status === 404) {
+          throw new Error("The blog endpoint is not available");
+        }
+        if (response.status === 429) {
+          throw new Error(
+            "Too many requests. Please wait a moment and try again",
+          );
+        }
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      const result: BlogData = await response.json();
+
+      const validatedData: BlogData = {
+        posts: Array.isArray(result.posts) ? result.posts : [],
+        heroTitulo: result.heroTitulo,
+        heroSubtitulo: result.heroSubtitulo,
+        heroImagen: result.heroImagen,
+      };
+
+      cachedData = validatedData;
+      cacheTimestamp = now;
+
+      setData(validatedData);
+    } catch (err) {
+      const errorObj =
+        err instanceof Error ? err : new Error("Unknown error occurred");
+      setError(errorObj);
+      console.error("Error fetching blog data:", errorObj);
+
+      if (cachedData) {
+        setData(cachedData);
+      }
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { data, loading, error };
+  useEffect(() => {
+    fetchBlogData();
+  }, [fetchBlogData]);
+
+  return { data, loading, error, refetch: fetchBlogData };
 }

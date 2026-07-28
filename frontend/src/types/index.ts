@@ -324,3 +324,70 @@ export interface Help {
   updatedAt: string;
   publishedAt: string;
 }
+
+// ─── Blog Types ───────────────────────────────────────────
+
+export interface BlogPost {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  image?: string;
+  author: string;
+  authorAvatar?: string;
+  date: string;
+  readTime: string;
+  category: string;
+  tags: string[];
+  featured: boolean;
+}
+
+export interface HeroSection {
+  heroTitulo: string;
+  heroSubtitulo: string;
+  heroImagen?: string; // URL completa de la imagen
+}
+
+export interface BlogPageData {
+  id: number;
+  documentId: string;
+  heroTitulo?: string;
+  heroSubtitulo?: string;
+  heroImagen?: string;
+  posts?: BlogPost[];
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface StrapiImage {
+  url?: string;
+  formats?: {
+    large?: { url?: string };
+    medium?: { url?: string };
+    small?: { url?: string };
+    thumbnail?: { url?: string };
+  };
+}
+
+export interface GetBlogPostsResponse {
+  data: BlogPost[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+}
+
+export interface GetBlogPostBySlugResponse {
+  data: BlogPost;
+}
+
+export interface GetBlogPageResponse {
+  data: BlogPageData;
+}

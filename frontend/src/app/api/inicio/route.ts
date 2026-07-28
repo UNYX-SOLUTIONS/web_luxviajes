@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import qs from "qs";
 
-const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
-const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com";
+const STRAPI_URL = "http://localhost:1337/api";
+const STRAPI_ORIGIN = "http://localhost:1337";
 
 interface Banner {
   id: number;
@@ -245,7 +245,7 @@ export async function GET() {
 
     return NextResponse.json(transformedData, {
       headers: {
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        "Cache-Control": "public, s-maxage=0, stale-while-revalidate=0",
       },
     });
   } catch (error) {

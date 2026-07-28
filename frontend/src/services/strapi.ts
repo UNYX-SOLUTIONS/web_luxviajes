@@ -1,9 +1,30 @@
-import { Banner, Home, StatCard, RedSocial } from "@/types";
+import {
+  Banner,
+  BlogPost,
+  BlogPageData,
+  HeroSection,
+  Home,
+  StatCard,
+  StrapiImage,
+  RedSocial,
+} from "@/types";
+import { env } from "@/lib/env";
 
-// Usar la URL de Strapi desde variables de entorno
-const STRAPI_URL = "https://cms.agencialuxviajes.com";
-const BASE_URL = `${STRAPI_URL}/api`;
+const STRAPI_URL = env.strapiApiUrl;
+const BASE_URL = `${STRAPI_URL}`;
 const CMS_ORIGIN = new URL(STRAPI_URL).origin;
+
+const STRAPI_TOKEN = env.strapiApiToken;
+
+function getAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (STRAPI_TOKEN) {
+    headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
+  }
+  return headers;
+}
 
 interface StrapiResponse<T> {
   data: T;
@@ -27,65 +48,67 @@ interface StrapiImageFormat {
   url?: string;
 }
 
-interface StrapiImage {
-  url?: string;
-  formats?: {
-    large?: StrapiImageFormat;
-    medium?: StrapiImageFormat;
-    small?: StrapiImageFormat;
-    thumbnail?: StrapiImageFormat;
-  };
+interface HomeBannerData {
+  id: number;
+  Banner: Banner[];
 }
 
 interface BannerWithImageData extends Omit<Banner, "image"> {
   image?: StrapiImage | string | null;
 }
 
-interface HomeBannerData {
-  id: number;
-  Banner: BannerWithImageData[];
-}
-
 let homeCachePromise: Promise<Home | null> | null = null;
 
-export async function getStrapiData<T>(url: string): Promise<T | null> {
+async function strapiFetch<T>(
+  url: string,
+  init?: RequestInit,
+): Promise<T | null> {
   try {
-    const response = await fetch(`${BASE_URL}${url}`);
+    const response = await fetch(`${BASE_URL}${url}`, {
+      cache: "no-store",
+      headers: {
+        ...getAuthHeaders(),
+        ...init?.headers,
+      },
+      ...init,
+    });
+
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error(
+          "Authentication failed: Invalid or expired Strapi token",
+        );
+      }
+      if (response.status === 403) {
+        throw new Error(
+          "Access forbidden: Check Strapi API token permissions",
+        );
+      }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
     const data = await response.json();
-    return data;
+    return data as T;
   } catch (error) {
-    console.error("Error fetching data:", error);
+    if (
+      error instanceof TypeError &&
+      error.message === "Failed to fetch"
+    ) {
+      console.error("Strapi is unreachable. Check STRAPI_URL configuration.");
+    } else {
+      console.error("Error fetching from Strapi:", error);
+    }
     return null;
   }
 }
 
-export async function getHomeData(): Promise<HomeData | null> {
-  const res = await getStrapiData<StrapiResponse<HomeData>>("home?populate=*");
-  return res?.data ?? null;
-}
-
-export async function getHomeBannerData(): Promise<HomeBannerData | null> {
-  const res = await getStrapiData<StrapiResponse<HomeBannerData>>(
-    "home?populate[Banner][populate]=image",
-  );
-  return res?.data ?? null;
-}
-
-export async function getBanners(): Promise<Banner[]> {
-  const bannerData = await getHomeBannerData();
-  return mapBannerDataToBanners(bannerData);
-}
-
-function getBannerImageUrl(image?: StrapiImage | string | null): string {
+function getImageUrl(image?: StrapiImage | string | null): string {
   if (!image) return "";
   if (typeof image === "string") {
     return image.startsWith("http") ? image : `${CMS_ORIGIN}${image}`;
   }
 
-  const imageUrl =
+  const url =
     image.formats?.large?.url ??
     image.formats?.medium?.url ??
     image.formats?.small?.url ??
@@ -93,14 +116,31 @@ function getBannerImageUrl(image?: StrapiImage | string | null): string {
     image.url ??
     "";
 
-  if (!imageUrl) return "";
-  return imageUrl.startsWith("http") ? imageUrl : `${CMS_ORIGIN}${imageUrl}`;
+  if (!url) return "";
+  return url.startsWith("http") ? url : `${CMS_ORIGIN}${url}`;
 }
 
-function mapBannerDataToBanners(bannerData: HomeBannerData | null): Banner[] {
+export async function getStrapiData<T>(url: string): Promise<T | null> {
+  return strapiFetch<T>(url);
+}
+
+export async function getHomeData(): Promise<HomeData | null> {
+  const res = await strapiFetch<StrapiResponse<HomeData>>("home?populate=*");
+  return res?.data ?? null;
+}
+
+export async function getHomeBannerData(): Promise<HomeBannerData | null> {
+  const res = await strapiFetch<StrapiResponse<HomeBannerData>>(
+    "home?populate[Banner][populate]=image",
+  );
+  return res?.data ?? null;
+}
+
+export async function getBanners(): Promise<Banner[]> {
+  const bannerData = await getHomeBannerData();
   return (bannerData?.Banner ?? []).map((banner) => ({
     ...banner,
-    image: getBannerImageUrl(banner.image),
+    image: getImageUrl(banner.image),
   }));
 }
 
@@ -145,7 +185,10 @@ export async function getHome(): Promise<Home | null> {
         if (!homeData) return null;
         return mapHomeDataToHome(
           homeData,
-          mapBannerDataToBanners(homeBannerData),
+          (homeBannerData?.Banner ?? []).map((b) => ({
+            ...b,
+            image: getImageUrl(b.image),
+          })),
         );
       },
     );
@@ -156,4 +199,93 @@ export async function getHome(): Promise<Home | null> {
 
 export function clearHomeCache(): void {
   homeCachePromise = null;
+}
+
+// ─── Blog Functions ──────────────────────────────────────
+
+interface StrapiBlogPost {
+  id: number;
+  documentId: string;
+  titulo: string;
+  slug: string;
+  resumen?: string;
+  contenido?: string;
+  imagen?: StrapiImage | string | null;
+  autor?: string;
+  fecha?: string;
+  tiempoLectura?: string;
+  categoria?: string;
+  etiquetas?: string[];
+  destacado?: boolean;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+function mapStrapiPostToBlogPost(post: StrapiBlogPost): BlogPost {
+  const authorName = post.autor ?? "Luxviajes";
+  return {
+    id: post.id,
+    documentId: post.documentId,
+    title: post.titulo,
+    slug: post.slug,
+    excerpt: post.resumen ?? "",
+    content: post.contenido ?? "",
+    image: post.imagen ? getImageUrl(post.imagen as StrapiImage) : "",
+    author: authorName,
+    authorAvatar: `https://ui-avatars.com/api/?name=${authorName.replace(" ", "+")}&background=500088&color=fff`,
+    date: post.fecha ?? "",
+    readTime: post.tiempoLectura ?? "5 min",
+    category: post.categoria ?? "General",
+    tags: post.etiquetas ?? [],
+    featured: post.destacado ?? false,
+  };
+}
+
+export async function getBlogPosts(
+  limit = 50,
+): Promise<BlogPost[]> {
+  const query = `blog-posts?populate[imagen][populate]=*&sort[fecha]=desc&pagination[pageSize]=${Math.min(limit, 100)}`;
+  const res = await strapiFetch<StrapiResponse<StrapiBlogPost[]>>(query);
+  if (!res?.data) return [];
+
+  return res.data.map(mapStrapiPostToBlogPost);
+}
+
+export async function getBlogPostBySlug(
+  slug: string,
+): Promise<BlogPost | null> {
+  const query = `blog-posts?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[imagen][populate]=*&pagination[pageSize]=1`;
+  const res = await strapiFetch<StrapiResponse<StrapiBlogPost[]>>(query);
+  if (!res?.data?.[0]) return null;
+
+  return mapStrapiPostToBlogPost(res.data[0]);
+}
+
+export async function getBlogPage(): Promise<BlogPageData | null> {
+  const query = `blog?populate[heroImagen][populate]=*`;
+  const res = await strapiFetch<StrapiResponse<BlogPageData>>(query);
+  if (!res?.data) return null;
+
+  const data = res.data;
+  return {
+    ...data,
+    heroImagen: data.heroImagen
+      ? getImageUrl(data.heroImagen as unknown as StrapiImage)
+      : undefined,
+  };
+}
+
+// ─── Hero Section Functions ──────────────────────────────
+
+export async function getHeroSection(): Promise<HeroSection | null> {
+  const blogPage = await getBlogPage();
+
+  if (!blogPage) return null;
+
+  return {
+    heroTitulo: blogPage.heroTitulo ?? "",
+    heroSubtitulo: blogPage.heroSubtitulo ?? "",
+    heroImagen: blogPage.heroImagen,
+  };
 }

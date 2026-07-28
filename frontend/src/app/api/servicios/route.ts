@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
+const STRAPI_URL = "http://localhost:1337/api";
 
 interface TarjetaServicioResponse {
   id: number;
@@ -30,7 +30,7 @@ export async function GET() {
       `${STRAPI_URL}/inicio?populate=tarjetasServicio`,
       {
         next: {
-          revalidate: 3600, // Revalidar cada hora
+          revalidate: 0, // Revalidar cada hora
         },
       },
     );

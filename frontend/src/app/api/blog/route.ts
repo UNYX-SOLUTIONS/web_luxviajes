@@ -1,155 +1,82 @@
 import { NextResponse } from "next/server";
-import qs from "qs";
+import {
+  getBlogPosts,
+  getBlogPostBySlug,
+  getBlogPage,
+} from "@/services/strapi";
 
-const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
-const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com";
-
-interface StrapiImagen {
-  formats?: {
-    large?: { url?: string };
-    medium?: { url?: string };
-    small?: { url?: string };
-    thumbnail?: { url?: string };
-  };
-  url?: string;
-}
-
-interface StrapiPost {
-  id: number;
-  documentId: string;
-  titulo: string;
-  slug: string;
-  resumen?: string;
-  contenido?: string;
-  autor?: string;
-  avatar?: string;
-  fecha?: string;
-  tiempoLectura?: string;
-  categoria?: string;
-  etiquetas?: string[];
-  destacado?: boolean;
-  imagen?: StrapiImagen;
-  createdAt: string;
-  updatedAt: string;
-  publishedAt: string;
-}
-
-interface StrapiBlogPageResponse {
-  data: {
-    id: number;
-    documentId: string;
-    heroTitulo?: string;
-    heroSubtitulo?: string;
-    heroImagen?: StrapiImagen;
-    posts?: StrapiPost[];
-  };
-}
-
-interface StrapiPostsListResponse {
-  data: StrapiPost[];
-}
-
-function getImageUrl(imagen?: StrapiImagen): string {
-  if (!imagen) return "";
-
-  const url =
-    imagen.formats?.large?.url ??
-    imagen.formats?.medium?.url ??
-    imagen.formats?.small?.url ??
-    imagen.formats?.thumbnail?.url ??
-    imagen.url ??
-    "";
-
-  if (!url) return "";
-  return url.startsWith("http") ? url : `${STRAPI_ORIGIN}${url}`;
-}
-
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // Intentar obtener la página del blog (si existe como single type)
-    let heroTitulo: string | undefined;
-    let heroSubtitulo: string | undefined;
-    let heroImagen: string | undefined;
+    const { searchParams } = new URL(request.url);
+    const slug = searchParams.get("slug");
 
-    try {
-      const blogPageQuery = qs.stringify(
-        { populate: { heroImagen: { populate: "*" } } },
-        { encodeValuesOnly: true },
-      );
-      const blogPageRes = await fetch(`${STRAPI_URL}/blog?${blogPageQuery}`, {
-        next: { revalidate: 60 },
-      });
-      if (blogPageRes.ok) {
-        const blogPageData: StrapiBlogPageResponse = await blogPageRes.json();
-        heroTitulo = blogPageData.data?.heroTitulo;
-        heroSubtitulo = blogPageData.data?.heroSubtitulo;
-        heroImagen = getImageUrl(blogPageData.data?.heroImagen);
-      }
-    } catch {
-      // El single type no existe, continuamos con sólo los posts
-    }
+    if (slug) {
+      const post = await getBlogPostBySlug(slug);
 
-    // Obtener los posts (collection type)
-    const postsQuery = qs.stringify(
-      {
-        populate: { imagen: { populate: "*" } },
-        sort: ["fecha:desc", "createdAt:desc"],
-        pagination: { pageSize: 50 },
-      },
-      { encodeValuesOnly: true },
-    );
-
-    const postsRes = await fetch(`${STRAPI_URL}/blog-posts?${postsQuery}`, {
-      next: { revalidate: 60 },
-    });
-
-    // Si la colección aún no existe en Strapi (404) o hay otro error,
-    // devolvemos posts vacío para que el frontend no se rompa.
-    if (!postsRes.ok) {
-      console.warn(
-        `[api/blog] Strapi respondió con ${postsRes.status}. ¿La colección "blog-posts" existe en el CMS?`,
-      );
-      return NextResponse.json(
-        { posts: [], heroTitulo, heroSubtitulo, heroImagen },
-        {
-          headers: {
-            "Cache-Control": "no-store",
+      if (!post) {
+        return NextResponse.json(
+          {
+            error: "Post not found",
+            message: `No se encontró un post con el slug "${slug}"`,
           },
-        },
-      );
+          { status: 404 },
+        );
+      }
+
+      return NextResponse.json(post, {
+        headers: { "Cache-Control": "no-store" },
+      });
     }
 
-    const postsData: StrapiPostsListResponse = await postsRes.json();
+    const posts = await getBlogPosts(50);
 
-    const posts = (postsData.data || []).map((post) => ({
-      id: post.id,
-      documentId: post.documentId,
-      titulo: post.titulo,
-      slug: post.slug,
-      resumen: post.resumen ?? "",
-      contenido: post.contenido ?? "",
-      autor: post.autor ?? "Luxviajes",
-      avatar: post.avatar ?? "",
-      fecha: post.fecha ?? post.createdAt,
-      tiempoLectura: post.tiempoLectura ?? "5 min",
-      categoria: post.categoria ?? "General",
-      etiquetas: post.etiquetas ?? [],
-      destacado: post.destacado ?? false,
-      imagen: getImageUrl(post.imagen),
-    }));
+    const blogPage = await getBlogPage();
 
     return NextResponse.json(
-      { posts, heroTitulo, heroSubtitulo, heroImagen },
       {
-        headers: {
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
-        },
+        posts,
+        heroTitulo: blogPage?.heroTitulo,
+        heroSubtitulo: blogPage?.heroSubtitulo,
+        heroImagen: blogPage?.heroImagen,
+      },
+      {
+        headers: { "Cache-Control": "no-store" },
       },
     );
   } catch (error) {
-    console.error("Error al obtener datos del blog desde Strapi:", error);
+    console.error("Error in /api/blog:", error);
+
+    const message =
+      error instanceof Error ? error.message : "Error desconocido";
+
+    if (message.includes("Authentication failed")) {
+      return NextResponse.json(
+        {
+          error: "Authentication error",
+          message:
+            "No se pudo autenticar con el CMS de Strapi. Verifique el token de API.",
+        },
+        { status: 401 },
+      );
+    }
+
+    if (message.includes("Access forbidden")) {
+      return NextResponse.json(
+        {
+          error: "Access forbidden",
+          message:
+            "El token de API no tiene permisos para acceder a los contenidos de blog.",
+        },
+        { status: 403 },
+      );
+    }
+
     return NextResponse.json(
-      { error: "Error al obtener datos del blog", posts: [] },
+      {
+        error: "Error al obtener datos del blog",
+        message,
+        posts: [],
+      },
       { status: 500 },
     );
   }

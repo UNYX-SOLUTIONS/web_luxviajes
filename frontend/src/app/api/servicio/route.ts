@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import qs from "qs";
 
-const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
-const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com";
+const STRAPI_URL = "http://localhost:1337/api";
+const STRAPI_ORIGIN = "http://localhost:1337";
 
 interface StrapiImagen {
   formats?: {
@@ -131,7 +131,7 @@ export async function GET() {
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 3600 }, // Revalidar cada hora
+      next: { revalidate: 0 }, // Revalidar cada hora
     });
 
     if (!response.ok) {

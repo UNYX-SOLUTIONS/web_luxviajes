@@ -13,7 +13,8 @@ import {
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { motion } from "framer-motion";
-import { useBlogData, ApiPost } from "@/hooks/useBlogData";
+import { useBlogData } from "@/hooks/useBlogData";
+import { BlogPost } from "@/types";
 import { ContactDialog } from "@/components/common/contact_dialog";
 import { useRedSocial } from "@/hooks";
 
@@ -46,25 +47,8 @@ function parseStyledText(text: string): string {
 }
 
 // Función para transformar un post de la API a BlogPost
-function transformPost(post: ApiPost): BlogPost {
-  const authorName = post.autor || post.author || "Luxviajes";
-  return {
-    id: post.documentId || post.id || "",
-    title: post.titulo,
-    slug: post.slug,
-    excerpt: post.resumen || post.excerpt || "",
-    content: post.contenido || post.content || "",
-    image: post.imagen || post.image || "",
-    author: authorName,
-    authorAvatar:
-      post.avatar ||
-      `https://ui-avatars.com/api/?name=${authorName.replace(" ", "+")}&background=500088&color=fff`,
-    date: post.fecha || post.date || new Date().toISOString(),
-    readTime: post.tiempoLectura || post.readTime || "5 min",
-    category: post.categoria || post.category || "General",
-    tags: post.etiquetas || post.tags || [],
-    featured: post.destacado || post.featured || false,
-  };
+function transformPost(post: BlogPost): BlogPost {
+  return post;
 }
 
 // Componente para las cards de blog

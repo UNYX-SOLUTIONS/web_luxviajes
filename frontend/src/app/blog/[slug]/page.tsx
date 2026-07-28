@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useParams } from "next/navigation";
@@ -13,20 +12,10 @@ import {
   ShareIcon,
 } from "@heroicons/react/24/outline";
 import { useState, useMemo } from "react";
-import { useBlogData, ApiPost } from "@/hooks/useBlogData";
-import { useRedSocial } from "@/hooks/useRedSocial";
+import { useBlogData } from "@/hooks/useBlogData";
+import { BlogPost } from "@/types";
 import { ContactDialog } from "@/components/common/contact_dialog";
-
-function parseStyledText(text: string): string {
-  if (!text) return "";
-  let parsed = text.replace(
-    /\*([^*]+)\*/g,
-    '<span class="text-primary-600">$1</span>',
-  );
-  parsed = parsed.replace(/<br\s*\/?>/gi, "<br />");
-  parsed = parsed.replace(/\n/g, "<br />");
-  return parsed;
-}
+import { useRedSocial } from "@/hooks";
 
 export default function BlogPostPage() {
   const params = useParams();
@@ -38,7 +27,7 @@ export default function BlogPostPage() {
   // Encontrar el post por slug
   const post = useMemo(() => {
     if (!blogData?.posts) return null;
-    return blogData.posts.find((p: ApiPost) => p.slug === slug);
+    return blogData.posts.find((p: BlogPost) => p.slug === slug);
   }, [blogData, slug]);
 
   // Posts relacionados (misma categoría)
@@ -46,7 +35,7 @@ export default function BlogPostPage() {
     if (!blogData?.posts || !post) return [];
     return blogData.posts
       .filter(
-        (p: ApiPost) =>
+        (p: BlogPost) =>
           p.documentId !== post.documentId && p.categoria === post.categoria,
       )
       .slice(0, 3);
@@ -56,12 +45,12 @@ export default function BlogPostPage() {
   const postData = useMemo(() => {
     if (!post) return null;
     return {
-      id: post.documentId || post.id,
+      id: post.documentId || post.id || "",
       title: post.titulo,
       slug: post.slug,
-      excerpt: post.resumen || post.excerpt,
-      content: post.contenido || post.content,
-      image: post.imagen || post.image,
+      excerpt: post.resumen || post.excerpt || "",
+      content: post.contenido || post.content || "",
+      image: post.imagen || post.image || "",
       author: post.autor || post.author || "Luxviajes",
       authorAvatar:
         post.avatar ||
@@ -108,11 +97,13 @@ export default function BlogPostPage() {
 
   return (
     <>
-      {/* Hero del artículo - MISMO ESTILO QUE HERO DE PACKAGES */}
       <section className="relative overflow-hidden bg-neutral-900 min-h-[50vh] flex items-end">
         <div className="absolute inset-0">
           <Image
-            src={postData.image || ""}
+            src={
+              postData.image ||
+              "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=1800&h=900&fit=crop"
+            }
             alt={postData.title}
             fill
             className="object-cover"
@@ -159,15 +150,12 @@ export default function BlogPostPage() {
         </div>
       </section>
 
-      {/* Contenido del artículo */}
       <section className="bg-white py-12 md:py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          {/* Extracto */}
           <div className="text-lg text-neutral-700 border-l-4 border-primary-600 pl-4 py-2 mb-8 bg-primary-50/30 rounded-r-lg">
             {postData.excerpt}
           </div>
 
-          {/* Contenido - Renderizado con HTML seguro */}
           <div
             className="prose prose-lg max-w-none prose-headings:text-neutral-900 prose-p:text-neutral-700 prose-a:text-primary-600"
             dangerouslySetInnerHTML={{
@@ -175,7 +163,6 @@ export default function BlogPostPage() {
             }}
           />
 
-          {/* Tags */}
           {postData.tags && postData.tags.length > 0 && (
             <div className="mt-8 pt-8 border-t border-neutral-200">
               <div className="flex flex-wrap items-center gap-2">
@@ -192,7 +179,6 @@ export default function BlogPostPage() {
             </div>
           )}
 
-          {/* Compartir */}
           <div className="mt-6 flex items-center gap-4 pt-6 border-t border-neutral-200">
             <span className="text-sm font-medium text-neutral-600">
               Compartir:
@@ -204,7 +190,6 @@ export default function BlogPostPage() {
         </div>
       </section>
 
-      {/* Artículos relacionados */}
       {relatedPosts.length > 0 && (
         <section className="bg-neutral-50 py-12 md:py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -212,11 +197,11 @@ export default function BlogPostPage() {
               Artículos relacionados
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {relatedPosts.map((related: ApiPost) => {
+              {relatedPosts.map((related: BlogPost) => {
                 const relatedData = {
                   slug: related.slug,
                   title: related.titulo,
-                  excerpt: related.resumen || related.excerpt,
+                  excerpt: related.resumen || related.excerpt || "",
                   image: related.imagen || related.image || "",
                 };
                 return (
@@ -226,12 +211,18 @@ export default function BlogPostPage() {
                     className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                   >
                     <div className="relative h-48 w-full overflow-hidden">
-                      <Image
-                        src={relatedData.image}
-                        alt={relatedData.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
+                      {relatedData.image ? (
+                        <Image
+                          src={relatedData.image}
+                          alt={relatedData.title}
+                          fill
+                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-primary-100 flex items-center justify-center">
+                          <span className="text-primary-400">Sin imagen</span>
+                        </div>
+                      )}
                     </div>
                     <div className="p-4">
                       <h3 className="font-bold text-neutral-900 group-hover:text-primary-700 transition-colors line-clamp-2">
@@ -249,7 +240,6 @@ export default function BlogPostPage() {
         </section>
       )}
 
-      {/* CTA Section - MISMO ESTILO QUE CTASECTION */}
       <section className="bg-primary-700 py-12 md:py-16">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
           <h3 className="text-2xl md:text-3xl font-bold text-white">
@@ -268,15 +258,9 @@ export default function BlogPostPage() {
         </div>
       </section>
 
-      {/* Contact Dialog */}
       <ContactDialog
         isOpen={showContactDialog}
         onClose={() => setShowContactDialog(false)}
-        whatsappNumber={
-          redes?.whatsapp?.replace(/[^0-9]/g, "") || "593964220600"
-        }
-        phoneNumber={redes?.llamada || "+593964220600"}
-        videoCallUrl="/contact"
       />
     </>
   );
