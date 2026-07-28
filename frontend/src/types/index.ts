@@ -122,11 +122,6 @@ export interface HomeStats {
   rating: string;
 }
 
-export interface StatCard {
-  label: string;
-  value: string;
-}
-
 export interface Home {
   id: number;
   documentId: string;

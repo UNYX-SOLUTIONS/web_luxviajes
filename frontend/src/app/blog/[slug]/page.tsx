@@ -36,7 +36,7 @@ export default function BlogPostPage() {
     return blogData.posts
       .filter(
         (p: BlogPost) =>
-          p.documentId !== post.documentId && p.categoria === post.categoria,
+          p.documentId !== post.documentId && p.category === post.category,
       )
       .slice(0, 3);
   }, [blogData, post]);
@@ -45,21 +45,21 @@ export default function BlogPostPage() {
   const postData = useMemo(() => {
     if (!post) return null;
     return {
-      id: post.documentId || post.id || "",
-      title: post.titulo,
+      id: post.documentId || String(post.id) || "",
+      title: post.title,
       slug: post.slug,
-      excerpt: post.resumen || post.excerpt || "",
-      content: post.contenido || post.content || "",
-      image: post.imagen || post.image || "",
-      author: post.autor || post.author || "Luxviajes",
+      excerpt: post.excerpt || "",
+      content: post.content || "",
+      image: post.image || "",
+      author: post.author || "Luxviajes",
       authorAvatar:
-        post.avatar ||
-        `https://ui-avatars.com/api/?name=${(post.autor || post.author || "Luxviajes").replace(" ", "+")}&background=500088&color=fff`,
-      date: post.fecha || post.date || new Date().toISOString(),
-      readTime: post.tiempoLectura || post.readTime || "5 min",
-      category: post.categoria || post.category || "General",
-      tags: post.etiquetas || post.tags || [],
-      featured: post.destacado || post.featured || false,
+        post.authorAvatar ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author || "Luxviajes")}&background=500088&color=fff`,
+      date: post.date || new Date().toISOString(),
+      readTime: post.readTime || "5 min",
+      category: post.category || "General",
+      tags: post.tags || [],
+      featured: post.featured || false,
     };
   }, [post]);
 
@@ -200,9 +200,9 @@ export default function BlogPostPage() {
               {relatedPosts.map((related: BlogPost) => {
                 const relatedData = {
                   slug: related.slug,
-                  title: related.titulo,
-                  excerpt: related.resumen || related.excerpt || "",
-                  image: related.imagen || related.image || "",
+                  title: related.title,
+                  excerpt: related.excerpt || "",
+                  image: related.image || "",
                 };
                 return (
                   <Link

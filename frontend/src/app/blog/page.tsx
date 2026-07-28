@@ -18,22 +18,6 @@ import { BlogPost } from "@/types";
 import { ContactDialog } from "@/components/common/contact_dialog";
 import { useRedSocial } from "@/hooks";
 
-interface BlogPost {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  image: string;
-  author: string;
-  authorAvatar?: string;
-  date: string;
-  readTime: string;
-  category: string;
-  tags: string[];
-  featured?: boolean;
-}
-
 // Función para parsear texto con estilo
 function parseStyledText(text: string): string {
   if (!text) return "";
@@ -44,11 +28,6 @@ function parseStyledText(text: string): string {
   parsed = parsed.replace(/<br\s*\/?>/gi, "<br />");
   parsed = parsed.replace(/\n/g, "<br />");
   return parsed;
-}
-
-// Función para transformar un post de la API a BlogPost
-function transformPost(post: BlogPost): BlogPost {
-  return post;
 }
 
 // Componente para las cards de blog
@@ -64,7 +43,7 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
         {/* Image */}
         <div className="relative h-52 w-full overflow-hidden shrink-0">
           <Image
-            src={post.image}
+            src={post.image || "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=800&h=600&fit=crop"}
             alt={post.title}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -109,7 +88,7 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
           <div className="mt-4 flex items-center justify-between pt-4 border-t border-neutral-100">
             <div className="flex items-center gap-2">
               <img
-                src={post.authorAvatar}
+                src={post.authorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author)}&background=500088&color=fff`}
                 alt={post.author}
                 className="h-6 w-6 rounded-full"
               />
@@ -136,10 +115,10 @@ export default function BlogPage() {
   const [showContactDialog, setShowContactDialog] = useState(false);
   const POSTS_PER_PAGE = 6;
 
-  // Obtener posts del API y transformarlos - SIN ANY
+  // Obtener posts del API
   const posts = useMemo(() => {
     if (blogData?.posts && blogData.posts.length > 0) {
-      return blogData.posts.map((post: ApiPost) => transformPost(post));
+      return blogData.posts;
     }
     return [];
   }, [blogData]);
@@ -316,7 +295,7 @@ export default function BlogPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                   <div className="relative h-64 md:h-auto">
                     <Image
-                      src={featuredPost.image}
+                      src={featuredPost.image || "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=800&h=600&fit=crop"}
                       alt={featuredPost.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { BlogPost } from "@/types";
 
 interface BlogData {
@@ -20,22 +20,22 @@ let cacheTimestamp = 0;
 const CACHE_DURATION = 0;
 
 export function useBlogData(): UseBlogDataResult {
-  const [data, setData] = useState<BlogData | null>(cachedData);
-  const [loading, setLoading] = useState(!cachedData);
+  const [data, setData] = useState<BlogData | null>(() => cachedData);
+  const [loading, setLoading] = useState(() => !cachedData);
   const [error, setError] = useState<Error | null>(null);
+  const mountedRef = useRef(true);
+  const initRef = useRef(false);
 
-  const fetchBlogData = useCallback(async () => {
+  const refetch = useCallback(async () => {
+    if (!mountedRef.current) return;
+
     const now = Date.now();
     if (cachedData && now - cacheTimestamp < CACHE_DURATION) {
       setData(cachedData);
-      setLoading(false);
       return;
     }
 
     try {
-      setLoading(true);
-      setError(null);
-
       const response = await fetch("/api/blog", {
         headers: {
           "Cache-Control": "no-cache",
@@ -76,8 +76,12 @@ export function useBlogData(): UseBlogDataResult {
       cachedData = validatedData;
       cacheTimestamp = now;
 
-      setData(validatedData);
+      if (mountedRef.current) {
+        setData(validatedData);
+        setError(null);
+      }
     } catch (err) {
+      if (!mountedRef.current) return;
       const errorObj =
         err instanceof Error ? err : new Error("Unknown error occurred");
       setError(errorObj);
@@ -87,13 +91,31 @@ export function useBlogData(): UseBlogDataResult {
         setData(cachedData);
       }
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   }, []);
 
   useEffect(() => {
-    fetchBlogData();
-  }, [fetchBlogData]);
+    if (initRef.current) return;
+    initRef.current = true;
 
-  return { data, loading, error, refetch: fetchBlogData };
+    if (!cachedData) {
+      const id = setTimeout(() => {
+        refetch().catch(() => {});
+      }, 0);
+
+      return () => {
+        clearTimeout(id);
+        mountedRef.current = false;
+      };
+    }
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, [refetch]);
+
+  return { data, loading, error, refetch };
 }
