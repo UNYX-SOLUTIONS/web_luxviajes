@@ -90,7 +90,7 @@ export default function VisasPage() {
       documentId: selectedVisa.documentId,
       name: selectedVisa.titulo,
       type: selectedVisa.subtitulo || "Visado",
-      price: 199, // Precio por defecto si no existe
+      price: 0.01, // Precio por defecto si no existe
       validity: selectedVisa.validez || "Variable según destino",
       processing: selectedVisa.procesamiento || "15-30 días hábiles",
       includes: [
@@ -302,7 +302,20 @@ export default function VisasPage() {
                     </button>
 
                     <button
-                      onClick={() => setShowContactDialog(true)}
+                      onClick={() => openPurchaseDialog({
+                        id: visa.id,
+                        documentId: visa.documentId,
+                        name: visa.titulo,
+                        type: visa.subtitulo || "Visado",
+                        price: 0.01, // Precio por defecto si no existe
+                        validity: visa.validez || "Variable según destino",
+                        processing: visa.procesamiento || "15-30 días hábiles",
+                        includes: [
+                          "Documentos requeridos",
+                          "Asesoría personalizada",
+                          "Seguimiento del proceso"
+                        ]
+                      })}
                       className="group relative w-full overflow-hidden rounded-full bg-secondary-50 px-6 py-3.5 text-sm font-semibold text-primary-700 transition-all duration-300 hover:bg-primary-100 hover:scale-[1.02] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-700/20 active:scale-95 cursor-pointer"
                     >
                       <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
@@ -662,8 +675,8 @@ export default function VisasPage() {
         }
         onPay={handlePurchasePay}
         isLoading={isPurchaseLoading}
-        currency="€"
-        taxRate={0.21}
+        currency="$" // dolar
+        taxRate={0.15}
       />
 
       {/* Contact Dialog */}

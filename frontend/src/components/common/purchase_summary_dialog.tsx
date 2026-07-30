@@ -43,8 +43,8 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
   service,
   onPay,
   isLoading = false,
-  currency = "€",
-  taxRate = 0.21, // 21% por defecto
+  currency = "$", // Por defecto dólar
+  taxRate = 0.15, // 15% por defecto
 }) => {
   // Formateador de precios
   const formatPrice = (price: number) => {
