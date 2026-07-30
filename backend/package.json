@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "prisma": {
-    "schema": "src/prisma/schema.prisma"
+    "schema": "./prisma/schema.prisma"
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
