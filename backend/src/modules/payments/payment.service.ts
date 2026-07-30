@@ -47,6 +47,26 @@ export class PaymentService {
   async createCheckout(data: CreateCheckoutInput) {
     const merchantTransactionId = `TRX_${Date.now()}_${uuidv4().slice(0, 8)}`;
 
+    const customer = await prisma.customer.upsert({
+      where: { email: data.customer.email },
+      create: {
+        merchantCustomerId: `CUST_${uuidv4().slice(0, 8)}`,
+        givenName: data.customer.givenName,
+        surname: data.customer.surname,
+        email: data.customer.email,
+        phone: data.customer.phone,
+        identificationDocId: data.customer.identificationDocId,
+        identificationDocType: data.customer.identificationDocType || 'IDCARD',
+        address: data.billing.street1,
+      },
+      update: {
+        givenName: data.customer.givenName,
+        surname: data.customer.surname,
+        phone: data.customer.phone,
+        identificationDocId: data.customer.identificationDocId,
+      },
+    });
+
     const transaction = await prisma.transaction.create({
       data: {
         merchantTransactionId,
@@ -57,7 +77,7 @@ export class PaymentService {
         base0: data.taxes.base0,
         baseImp: data.taxes.baseImp,
         iva: data.taxes.iva,
-        customerId: data.customer.merchantCustomerId,
+        customerId: customer.id,
         items: (data.items as unknown as Prisma.InputJsonValue) ?? Prisma.JsonNull,
         metadata: data.creditType || data.installments
           ? { creditType: data.creditType, installments: data.installments }

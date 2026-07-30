@@ -84,7 +84,6 @@ export function useDatafastPayment() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("auth_token") || "" : ""}`,
         },
         body: JSON.stringify(payload),
       });

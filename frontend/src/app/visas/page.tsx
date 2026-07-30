@@ -45,12 +45,12 @@ export default function VisasPage() {
   const [selectedVisa, setSelectedVisa] = useState<Visa | null>(null);
   const [showRequirementsDialog, setShowRequirementsDialog] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
-  const { data: visasPageData, loading, error } = useVisasData();
+  const { data: visasPageData, loading, error: visasError } = useVisasData();
 
-  // Hook para el resumen de pago
   const {
     isOpen: isPurchaseDialogOpen,
     isLoading: isPurchaseLoading,
+    error: purchaseError,
     currentService,
     openDialog: openPurchaseDialog,
     closeDialog: closePurchaseDialog,
@@ -248,7 +248,7 @@ export default function VisasPage() {
               <div className="col-span-full text-center py-12">
                 <p className="text-neutral-600">Cargando visas...</p>
               </div>
-            ) : error ? (
+            ) : visasError ? (
               <div className="col-span-full text-center py-12">
                 <p className="text-red-600">Error al cargar las visas</p>
               </div>
@@ -675,6 +675,7 @@ export default function VisasPage() {
         }
         onPay={handlePurchasePay}
         isLoading={isPurchaseLoading}
+        error={purchaseError}
         currency="$" // dolar
         taxRate={0.15}
       />

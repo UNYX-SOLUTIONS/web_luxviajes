@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { PaymentController } from './payment.controller';
-import { authMiddleware } from '../../middlewares/auth';
+import { optionalAuth } from '../../middlewares/auth';
 
 const router = Router();
 const controller = new PaymentController();
 
-router.use(authMiddleware);
+router.use(optionalAuth);
 
 router.post('/create-checkout', (req, res, next) => controller.createCheckout(req, res, next));
 router.get('/status', (req, res, next) => controller.getPaymentStatus(req, res, next));
