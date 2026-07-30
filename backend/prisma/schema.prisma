@@ -66,6 +66,8 @@ model Transaction {
   
   refunds              Refund[]
   recurringPayments    RecurringPayment?
+
+  @@index([checkoutId])
 }
 
 model Token {

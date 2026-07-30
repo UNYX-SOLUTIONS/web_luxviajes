@@ -24,6 +24,19 @@ interface RecurringPaymentInput {
   taxes: ITokenPaymentRequest['taxes'];
 }
 
+interface UpdateTransactionParams {
+  transactionId: string;
+  status: PaymentStatus;
+  paymentId?: string;
+  resultCode?: string;
+  resultDescription?: string;
+  responseCode?: string;
+  authCode?: string;
+  acquirerCode?: string;
+  acquirerName?: string;
+  metadata?: Record<string, unknown>;
+}
+
 export class PaymentService {
   private datafastService: DatafastService;
 
@@ -70,16 +83,7 @@ export class PaymentService {
         merchantTransactionId,
       };
     } catch (error) {
-      await prisma.transaction.update({
-        where: { id: transaction.id },
-        data: {
-          status: 'FAILED',
-          errorDetails: {
-            message: error instanceof Error ? error.message : String(error),
-            name: error instanceof Error ? error.name : 'UnknownError',
-          },
-        },
-      });
+      await this.markTransactionFailed(transaction.id, error);
       throw error;
     }
   }
@@ -99,21 +103,19 @@ export class PaymentService {
     if (transaction) {
       const status = this.mapStatus(paymentData.result.code);
 
-      await prisma.transaction.update({
-        where: { id: transaction.id },
-        data: {
-          paymentId: paymentData.id,
-          status,
-          resultCode: paymentData.result.code,
-          resultDescription: paymentData.result.description,
-          responseCode: paymentData.resultDetails?.ResponseCode,
-          authCode: paymentData.resultDetails?.AuthCode,
-          acquirerCode: paymentData.resultDetails?.AcquirerCode,
-          acquirerName: paymentData.resultDetails?.clearingInstituteName,
-          metadata: {
-            ...(transaction.metadata as Record<string, unknown> ?? {}),
-            resultDetails: paymentData.resultDetails as unknown as Prisma.InputJsonValue,
-          },
+      await this.updateTransactionStatus({
+        transactionId: transaction.id,
+        status,
+        paymentId: paymentData.id,
+        resultCode: paymentData.result.code,
+        resultDescription: paymentData.result.description,
+        responseCode: paymentData.resultDetails?.ResponseCode,
+        authCode: paymentData.resultDetails?.AuthCode,
+        acquirerCode: paymentData.resultDetails?.AcquirerCode,
+        acquirerName: paymentData.resultDetails?.clearingInstituteName,
+        metadata: {
+          ...(transaction.metadata as Record<string, unknown> ?? {}),
+          resultDetails: paymentData.resultDetails as unknown as Prisma.InputJsonValue,
         },
       });
 
@@ -176,17 +178,13 @@ export class PaymentService {
     });
 
     if (transaction) {
-      const status = this.mapStatus(paymentData.result.code);
-
-      await prisma.transaction.update({
-        where: { id: transaction.id },
-        data: {
-          status,
-          resultCode: paymentData.result.code,
-          resultDescription: paymentData.result.description,
-          responseCode: paymentData.resultDetails?.ResponseCode,
-          authCode: paymentData.resultDetails?.AuthCode,
-        },
+      await this.updateTransactionStatus({
+        transactionId: transaction.id,
+        status: this.mapStatus(paymentData.result.code),
+        resultCode: paymentData.result.code,
+        resultDescription: paymentData.result.description,
+        responseCode: paymentData.resultDetails?.ResponseCode,
+        authCode: paymentData.resultDetails?.AuthCode,
       });
     }
 
@@ -223,32 +221,19 @@ export class PaymentService {
         { ...data, merchantTransactionId }
       );
 
-      const status = this.mapStatus(response.result.code);
-
-      await prisma.transaction.update({
-        where: { id: transaction.id },
-        data: {
-          paymentId: response.id,
-          status,
-          resultCode: response.result.code,
-          resultDescription: response.result.description,
-          responseCode: response.resultDetails?.ResponseCode,
-          authCode: response.resultDetails?.AuthCode,
-        },
+      await this.updateTransactionStatus({
+        transactionId: transaction.id,
+        status: this.mapStatus(response.result.code),
+        paymentId: response.id,
+        resultCode: response.result.code,
+        resultDescription: response.result.description,
+        responseCode: response.resultDetails?.ResponseCode,
+        authCode: response.resultDetails?.AuthCode,
       });
 
       return { ...response, transactionId: transaction.id };
     } catch (error) {
-      await prisma.transaction.update({
-        where: { id: transaction.id },
-        data: {
-          status: 'FAILED',
-          errorDetails: {
-            message: error instanceof Error ? error.message : String(error),
-            name: error instanceof Error ? error.name : 'UnknownError',
-          },
-        },
-      });
+      await this.markTransactionFailed(transaction.id, error);
       throw error;
     }
   }
@@ -262,6 +247,37 @@ export class PaymentService {
     });
 
     return { success: true };
+  }
+
+  private async updateTransactionStatus(params: UpdateTransactionParams) {
+    const data: Record<string, unknown> = { status: params.status };
+
+    if (params.paymentId !== undefined) data.paymentId = params.paymentId;
+    if (params.resultCode !== undefined) data.resultCode = params.resultCode;
+    if (params.resultDescription !== undefined) data.resultDescription = params.resultDescription;
+    if (params.responseCode !== undefined) data.responseCode = params.responseCode;
+    if (params.authCode !== undefined) data.authCode = params.authCode;
+    if (params.acquirerCode !== undefined) data.acquirerCode = params.acquirerCode;
+    if (params.acquirerName !== undefined) data.acquirerName = params.acquirerName;
+    if (params.metadata !== undefined) data.metadata = params.metadata;
+
+    await prisma.transaction.update({
+      where: { id: params.transactionId },
+      data: data as any,
+    });
+  }
+
+  private async markTransactionFailed(transactionId: string, error: unknown) {
+    await prisma.transaction.update({
+      where: { id: transactionId },
+      data: {
+        status: 'FAILED',
+        errorDetails: {
+          message: error instanceof Error ? error.message : String(error),
+          name: error instanceof Error ? error.name : 'UnknownError',
+        },
+      },
+    });
   }
 
   private async saveToken(
@@ -304,7 +320,7 @@ export class PaymentService {
     const mapped = StatusMapper[code];
     if (mapped) return mapped.status as unknown as PaymentStatus;
 
-    if (code.startsWith('000.')) return 'SUCCESS';
+    if (code.startsWith('000.100.')) return 'SUCCESS';
     return 'FAILED';
   }
 }

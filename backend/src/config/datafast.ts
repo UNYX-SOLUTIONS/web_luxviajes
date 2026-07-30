@@ -30,17 +30,3 @@ export const DATAFAST_CONSTANTS = {
   PSERV: '17913101',
   VERSION: '2',
 };
-
-// Tipos de crédito
-export const CreditTypes = {
-  CORRIENTE: '00',
-  DIFERIDO_CORRIENTE: '01',
-  DIFERIDO_CON_INTERES: '02',
-  DIFERIDO_SIN_INTERES: '03',
-  DIFERIDO_CON_INTERES_GRACIA: '07',
-  DIFERIDO_SIN_INTERES_GRACIA: '09',
-  DIFERIDO_PLUS_CUOTAS: '21',
-  DUPLICA_TU_PLAZO: '22',
-} as const;
-
-export type CreditType = typeof CreditTypes[keyof typeof CreditTypes];

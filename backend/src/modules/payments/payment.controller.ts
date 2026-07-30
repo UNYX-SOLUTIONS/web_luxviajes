@@ -123,7 +123,7 @@ export class PaymentController {
 
   async deleteToken(req: Request, res: Response, next: NextFunction) {
     try {
-      const { registrationId } = req.params;
+      const { registrationId } = req.body;
 
       if (!registrationId) {
         return res.status(400).json({
