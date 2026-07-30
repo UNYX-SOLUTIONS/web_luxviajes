@@ -12,15 +12,11 @@ export class PaymentController {
     this.paymentService = new PaymentService();
   }
 
-  /**
-   * POST /api/payments/create-checkout
-   */
   async createCheckout(req: Request, res: Response, next: NextFunction) {
     try {
-      // Validar DTO
       const dto = plainToInstance(CreateCheckoutDto, req.body);
       const errors = await validate(dto);
-      
+
       if (errors.length > 0) {
         return res.status(400).json({
           success: false,
@@ -31,34 +27,24 @@ export class PaymentController {
         });
       }
 
-      // Obtener IP del cliente
-      const clientIp = req.ip || req.connection.remoteAddress || '';
+      const clientIp = req.ip || req.socket.remoteAddress || '';
 
       const result = await this.paymentService.createCheckout({
         ...dto,
-        customer: {
-          ...dto.customer,
-          ip: clientIp,
-        },
+        customer: { ...dto.customer, ip: clientIp },
       });
 
-      return res.status(201).json({
-        success: true,
-        data: result,
-      });
+      return res.status(201).json({ success: true, data: result });
     } catch (error) {
       logger.error({ err: error }, 'Error en createCheckout');
       next(error);
     }
   }
 
-  /**
-   * GET /api/payments/status
-   */
   async getPaymentStatus(req: Request, res: Response, next: NextFunction) {
     try {
       const { resourcePath } = req.query;
-      
+
       if (!resourcePath) {
         return res.status(400).json({
           success: false,
@@ -66,26 +52,25 @@ export class PaymentController {
         });
       }
 
-      const result = await this.paymentService.getPaymentStatus(
-        resourcePath as string
-      );
+      const result = await this.paymentService.getPaymentStatus(resourcePath as string);
 
-      return res.json({
-        success: true,
-        data: result,
-      });
+      return res.json({ success: true, data: result });
     } catch (error) {
       logger.error({ err: error }, 'Error en getPaymentStatus');
       next(error);
     }
   }
 
-  /**
-   * POST /api/payments/refund
-   */
   async refundTransaction(req: Request, res: Response, next: NextFunction) {
     try {
       const { transactionId, amount, reason } = req.body;
+
+      if (!transactionId || !amount) {
+        return res.status(400).json({
+          success: false,
+          error: 'transactionId y amount son requeridos',
+        });
+      }
 
       const result = await this.paymentService.refundTransaction({
         transactionId,
@@ -93,31 +78,65 @@ export class PaymentController {
         reason,
       });
 
-      return res.json({
-        success: true,
-        data: result,
-      });
+      return res.json({ success: true, data: result });
     } catch (error) {
       logger.error({ err: error }, 'Error en refundTransaction');
       next(error);
     }
   }
 
-  /**
-   * GET /api/payments/verify/:paymentId
-   */
   async verifyTransaction(req: Request, res: Response, next: NextFunction) {
     try {
       const { paymentId } = req.params;
-
       const result = await this.paymentService.verifyTransaction(paymentId);
 
-      return res.json({
-        success: true,
-        data: result,
-      });
+      return res.json({ success: true, data: result });
     } catch (error) {
       logger.error({ err: error }, 'Error en verifyTransaction');
+      next(error);
+    }
+  }
+
+  async createRecurringPayment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { tokenId, amount, taxes } = req.body;
+
+      if (!tokenId || !amount || !taxes) {
+        return res.status(400).json({
+          success: false,
+          error: 'tokenId, amount y taxes son requeridos',
+        });
+      }
+
+      const result = await this.paymentService.createRecurringPayment({
+        tokenId,
+        amount,
+        taxes,
+      });
+
+      return res.status(201).json({ success: true, data: result });
+    } catch (error) {
+      logger.error({ err: error }, 'Error en createRecurringPayment');
+      next(error);
+    }
+  }
+
+  async deleteToken(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { registrationId } = req.params;
+
+      if (!registrationId) {
+        return res.status(400).json({
+          success: false,
+          error: 'registrationId es requerido',
+        });
+      }
+
+      const result = await this.paymentService.deleteToken(registrationId);
+
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error({ err: error }, 'Error en deleteToken');
       next(error);
     }
   }

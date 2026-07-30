@@ -1,8 +1,28 @@
 import { DatafastService } from '../../services/datafast/datafast.service';
 import { prisma } from '../../config/database';
 import { logger } from '../../config/logger';
-import { PaymentStatus } from '@prisma/client';
+import { PaymentStatus, Prisma } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
+import { ICreateCheckoutRequest, ITokenPaymentRequest, IPaymentStatusResponse } from '../../services/datafast/types/datafast.types';
+import { StatusMapper } from '../../services/datafast/types/datafast.types';
+
+interface CreateCheckoutInput {
+  amount: number;
+  customer: ICreateCheckoutRequest['customer'];
+  billing: ICreateCheckoutRequest['billing'];
+  taxes: ICreateCheckoutRequest['taxes'];
+  shipping?: ICreateCheckoutRequest['shipping'];
+  items?: ICreateCheckoutRequest['items'];
+  creditType?: string;
+  installments?: number;
+  createRegistration?: boolean;
+}
+
+interface RecurringPaymentInput {
+  tokenId: string;
+  amount: number;
+  taxes: ITokenPaymentRequest['taxes'];
+}
 
 export class PaymentService {
   private datafastService: DatafastService;
@@ -11,10 +31,9 @@ export class PaymentService {
     this.datafastService = new DatafastService();
   }
 
-  async createCheckout(data: any) {
+  async createCheckout(data: CreateCheckoutInput) {
     const merchantTransactionId = `TRX_${Date.now()}_${uuidv4().slice(0, 8)}`;
 
-    // Crear registro de transacción en BD
     const transaction = await prisma.transaction.create({
       data: {
         merchantTransactionId,
@@ -26,34 +45,23 @@ export class PaymentService {
         baseImp: data.taxes.baseImp,
         iva: data.taxes.iva,
         customerId: data.customer.merchantCustomerId,
-        items: data.items || [],
-        metadata: {
-          creditType: data.creditType,
-          installments: data.installments,
-        },
+        items: (data.items as unknown as Prisma.InputJsonValue) ?? Prisma.JsonNull,
+        metadata: data.creditType || data.installments
+          ? { creditType: data.creditType, installments: data.installments }
+          : undefined,
       },
     });
 
     try {
-      // Llamar a Datafast
-      const checkoutData = {
+      const checkoutResponse = await this.datafastService.createCheckout({
         ...data,
         merchantTransactionId,
-        // Asegurar que el merchantCustomerId exista en la BD
-        customer: {
-          ...data.customer,
-          merchantCustomerId: transaction.customerId,
-        },
-      };
+        createRegistration: data.createRegistration,
+      });
 
-      const checkoutResponse = await this.datafastService.createCheckout(checkoutData);
-
-      // Actualizar transacción con checkoutId
       await prisma.transaction.update({
         where: { id: transaction.id },
-        data: {
-          checkoutId: checkoutResponse.id,
-        },
+        data: { checkoutId: checkoutResponse.id },
       });
 
       return {
@@ -62,12 +70,14 @@ export class PaymentService {
         merchantTransactionId,
       };
     } catch (error) {
-      // Marcar transacción como fallida
       await prisma.transaction.update({
         where: { id: transaction.id },
         data: {
           status: 'FAILED',
-          errorDetails: error instanceof Error ? { message: error.message, name: error.name } : String(error),
+          errorDetails: {
+            message: error instanceof Error ? error.message : String(error),
+            name: error instanceof Error ? error.name : 'UnknownError',
+          },
         },
       });
       throw error;
@@ -75,56 +85,48 @@ export class PaymentService {
   }
 
   async getPaymentStatus(resourcePath: string) {
-    try {
-      const paymentData = await this.datafastService.getPaymentStatus(resourcePath);
-      
-      // Buscar transacción por checkoutId o paymentId
-      const transaction = await prisma.transaction.findFirst({
-        where: {
-          OR: [
-            { checkoutId: paymentData.id },
-            { paymentId: paymentData.id },
-          ],
+    const paymentData = await this.datafastService.getPaymentStatus(resourcePath);
+
+    const transaction = await prisma.transaction.findFirst({
+      where: {
+        OR: [
+          { checkoutId: paymentData.id },
+          { paymentId: paymentData.id },
+        ],
+      },
+    });
+
+    if (transaction) {
+      const status = this.mapStatus(paymentData.result.code);
+
+      await prisma.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          paymentId: paymentData.id,
+          status,
+          resultCode: paymentData.result.code,
+          resultDescription: paymentData.result.description,
+          responseCode: paymentData.resultDetails?.ResponseCode,
+          authCode: paymentData.resultDetails?.AuthCode,
+          acquirerCode: paymentData.resultDetails?.AcquirerCode,
+          acquirerName: paymentData.resultDetails?.clearingInstituteName,
+          metadata: {
+            ...(transaction.metadata as Record<string, unknown> ?? {}),
+            resultDetails: paymentData.resultDetails as unknown as Prisma.InputJsonValue,
+          },
         },
       });
 
-      if (transaction) {
-        // Actualizar estado
-        const status = this.mapStatus(paymentData.result.code);
-        
-        await prisma.transaction.update({
-          where: { id: transaction.id },
-          data: {
-            paymentId: paymentData.id,
-            status,
-            resultCode: paymentData.result.code,
-            resultDescription: paymentData.result.description,
-            responseCode: paymentData.resultDetails?.ResponseCode,
-            authCode: paymentData.resultDetails?.AuthCode,
-            acquirerCode: paymentData.resultDetails?.AcquirerCode,
-            acquirerName: paymentData.resultDetails?.clearingInstituteName,
-            metadata: {
-              ...(transaction.metadata as any || {}),
-              resultDetails: paymentData.resultDetails,
-            },
-          },
-        });
-
-        // Si la transacción fue exitosa y se creó un token, guardarlo
-        if (status === 'SUCCESS' && paymentData.registrationId) {
-          await this.saveToken(
-            paymentData.registrationId,
-            transaction.customerId,
-            paymentData
-          );
-        }
+      if (status === 'SUCCESS' && paymentData.registrationId) {
+        await this.saveToken(
+          paymentData.registrationId,
+          transaction.customerId,
+          paymentData.resultDetails
+        );
       }
-
-      return paymentData;
-    } catch (error) {
-      logger.error({ err: error }, 'Error obteniendo estado');
-      throw error;
     }
+
+    return paymentData;
   }
 
   async refundTransaction(data: { transactionId: string; amount: number; reason?: string }) {
@@ -132,116 +134,177 @@ export class PaymentService {
       where: { id: data.transactionId },
     });
 
-    if (!transaction) {
-      throw new Error('Transacción no encontrada');
-    }
+    if (!transaction) throw new Error('Transacción no encontrada');
+    if (transaction.status !== 'SUCCESS') throw new Error('Solo se pueden anular transacciones exitosas');
+    if (!transaction.paymentId) throw new Error('La transacción no tiene paymentId');
 
-    if (transaction.status !== 'SUCCESS') {
-      throw new Error('Solo se pueden anular transacciones exitosas');
-    }
+    const refundData = {
+      amount: data.amount,
+      merchantTransactionId: `RF_${Date.now()}_${uuidv4().slice(0, 8)}`,
+    };
 
-    if (!transaction.paymentId) {
-      throw new Error('La transacción no tiene paymentId');
-    }
+    const refundResponse = await this.datafastService.refundTransaction(
+      transaction.paymentId,
+      refundData
+    );
 
-    try {
-      const refundData = {
+    await prisma.refund.create({
+      data: {
+        transactionId: transaction.id,
         amount: data.amount,
-        merchantTransactionId: `RF_${Date.now()}_${uuidv4().slice(0, 8)}`,
-      };
+        refundId: refundResponse.id,
+        status: refundResponse.result.code === '000.000.000' ? 'COMPLETED' : 'PROCESSING',
+        reason: data.reason,
+      },
+    });
 
-      const refundResponse = await this.datafastService.refundTransaction(
-        transaction.paymentId,
-        refundData
-      );
-
-      // Crear registro de anulación
-      await prisma.refund.create({
-        data: {
-          transactionId: transaction.id,
-          amount: data.amount,
-          refundId: refundResponse.id,
-          status: refundResponse.result.code === '000.000.000' ? 'COMPLETED' : 'PROCESSING',
-          reason: data.reason,
-        },
+    if (refundResponse.result.code === '000.000.000') {
+      await prisma.transaction.update({
+        where: { id: transaction.id },
+        data: { status: 'REFUNDED' },
       });
-
-      // Actualizar estado de transacción
-      if (refundResponse.result.code === '000.000.000') {
-        await prisma.transaction.update({
-          where: { id: transaction.id },
-          data: { status: 'REFUNDED' },
-        });
-      }
-
-      return refundResponse;
-    } catch (error) {
-      logger.error({ err: error }, 'Error en anulación');
-      throw error;
     }
+
+    return refundResponse;
   }
 
   async verifyTransaction(paymentId: string) {
+    const paymentData = await this.datafastService.verifyTransactionByPaymentId(paymentId);
+
+    const transaction = await prisma.transaction.findFirst({
+      where: { paymentId: paymentData.id },
+    });
+
+    if (transaction) {
+      const status = this.mapStatus(paymentData.result.code);
+
+      await prisma.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          status,
+          resultCode: paymentData.result.code,
+          resultDescription: paymentData.result.description,
+          responseCode: paymentData.resultDetails?.ResponseCode,
+          authCode: paymentData.resultDetails?.AuthCode,
+        },
+      });
+    }
+
+    return paymentData;
+  }
+
+  async createRecurringPayment(data: RecurringPaymentInput) {
+    const token = await prisma.token.findUnique({
+      where: { id: data.tokenId },
+    });
+
+    if (!token) throw new Error('Token no encontrado');
+    if (!token.isActive) throw new Error('Token inactivo');
+
+    const merchantTransactionId = `REC_${Date.now()}_${uuidv4().slice(0, 8)}`;
+
+    const transaction = await prisma.transaction.create({
+      data: {
+        merchantTransactionId,
+        amount: data.amount,
+        currency: 'USD',
+        paymentType: 'DB',
+        status: 'PENDING',
+        base0: data.taxes.base0,
+        baseImp: data.taxes.baseImp,
+        iva: data.taxes.iva,
+        customerId: token.customerId,
+      },
+    });
+
     try {
-      const paymentData = await this.datafastService.verifyTransactionByPaymentId(paymentId);
-      
-      // Actualizar transacción si existe
-      const transaction = await prisma.transaction.findFirst({
-        where: { paymentId: paymentData.id },
+      const response = await this.datafastService.createRecurringPayment(
+        token.registrationId,
+        { ...data, merchantTransactionId }
+      );
+
+      const status = this.mapStatus(response.result.code);
+
+      await prisma.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          paymentId: response.id,
+          status,
+          resultCode: response.result.code,
+          resultDescription: response.result.description,
+          responseCode: response.resultDetails?.ResponseCode,
+          authCode: response.resultDetails?.AuthCode,
+        },
       });
 
-      if (transaction) {
-        const status = this.mapStatus(paymentData.result.code);
-        
-        await prisma.transaction.update({
-          where: { id: transaction.id },
-          data: {
-            status,
-            resultCode: paymentData.result.code,
-            resultDescription: paymentData.result.description,
-            responseCode: paymentData.resultDetails?.ResponseCode,
-            authCode: paymentData.resultDetails?.AuthCode,
-          },
-        });
-      }
-
-      return paymentData;
+      return { ...response, transactionId: transaction.id };
     } catch (error) {
-      logger.error({ err: error }, 'Error verificando transacción');
+      await prisma.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          status: 'FAILED',
+          errorDetails: {
+            message: error instanceof Error ? error.message : String(error),
+            name: error instanceof Error ? error.name : 'UnknownError',
+          },
+        },
+      });
       throw error;
     }
   }
 
-  private async saveToken(registrationId: string, customerId: string, paymentData: any) {
-    try {
-      // Extraer últimos 4 dígitos de la tarjeta si están disponibles
-      const lastFourDigits = paymentData.resultDetails?.LastFourDigits || '****';
-      const cardType = paymentData.resultDetails?.CardType || null;
+  async deleteToken(registrationId: string) {
+    await this.datafastService.deleteToken(registrationId);
 
-      await prisma.token.create({
-        data: {
+    await prisma.token.updateMany({
+      where: { registrationId },
+      data: { isActive: false },
+    });
+
+    return { success: true };
+  }
+
+  private async saveToken(
+    registrationId: string,
+    customerId: string,
+    resultDetails: IPaymentStatusResponse['resultDetails']
+  ) {
+    try {
+      const lastFourDigits = resultDetails?.LastFourDigits || '****';
+      const cardType = resultDetails?.CardType || null;
+      const expiryDate = resultDetails?.ExpiryDate || null;
+
+      await prisma.token.upsert({
+        where: { registrationId },
+        create: {
           registrationId,
           customerId,
           lastFourDigits,
           cardType,
-          expiryDate: paymentData.resultDetails?.ExpiryDate,
+          expiryDate,
+        },
+        update: {
+          lastFourDigits,
+          cardType,
+          expiryDate,
+          isActive: true,
         },
       });
 
-      logger.info(`✅ Token guardado: ${registrationId} para cliente ${customerId}`);
+      logger.info(`Token guardado: ${registrationId} para cliente ${customerId}`);
     } catch (error) {
       logger.error({ err: error }, 'Error guardando token');
+      throw error;
     }
   }
 
   private mapStatus(code: string): PaymentStatus {
-    if (code === '000.000.000') return 'SUCCESS';
+    if (!code) return 'FAILED';
+
+    const mapped = StatusMapper[code];
+    if (mapped) return mapped.status as unknown as PaymentStatus;
+
     if (code.startsWith('000.')) return 'SUCCESS';
-    if (code.startsWith('800.')) return 'FAILED';
-    if (code.startsWith('100.')) return 'FAILED';
-    if (code.startsWith('200.')) return 'FAILED';
-    if (code.startsWith('700.')) return 'FAILED';
-    if (code.startsWith('900.')) return 'FAILED';
     return 'FAILED';
   }
 }

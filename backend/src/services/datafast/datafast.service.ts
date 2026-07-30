@@ -1,5 +1,5 @@
 import { DatafastClient } from './datafast.client';
-import { datafastConfig, DATAFAST_CONSTANTS, CreditTypes } from '../../config/datafast';
+import { datafastConfig, DATAFAST_CONSTANTS } from '../../config/datafast';
 import { logger } from '../../config/logger';
 import { 
   ICreateCheckoutRequest, 
