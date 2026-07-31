@@ -111,6 +111,10 @@ export class PaymentService {
   async getPaymentStatus(resourcePath: string) {
     const paymentData = await this.datafastService.getPaymentStatus(resourcePath);
 
+    if (!paymentData?.result?.code) {
+      return paymentData;
+    }
+
     const transaction = await prisma.transaction.findFirst({
       where: {
         OR: [

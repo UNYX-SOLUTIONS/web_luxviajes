@@ -1,77 +1,107 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getPaymentStatus } from "@/services/payments";
+
+const ERROR_MESSAGES: Record<string, string> = {
+  "800.100.151": "Tarjeta inválida. Verifica el número.",
+  "800.100.152": "Transacción rechazada por el banco.",
+  "800.100.155": "Fondos insuficientes.",
+  "800.100.157": "Fecha de expiración incorrecta.",
+  "800.100.159": "Tarjeta reportada como robada.",
+  "800.100.165": "Tarjeta reportada como perdida.",
+  "800.100.168": "Tarjeta restringida.",
+  "800.100.170": "Transacción no permitida.",
+  "800.100.174": "Monto inválido.",
+  "100.400.147": "Transacción rechazada por regla antifraude.",
+  "900.100.100": "Error de comunicación con el banco. Reintenta.",
+};
+
+type Status = "loading" | "success" | "failed" | "error";
 
 function ResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const resourcePath = searchParams.get("resourcePath");
 
-  const [status, setStatus] = useState<"loading" | "success" | "failed" | "error">("loading");
-  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<Status>(!resourcePath ? "error" : "loading");
+  const [message, setMessage] = useState(!resourcePath ? "No se recibió información." : "");
   const [details, setDetails] = useState<Record<string, string | undefined>>({});
+  const pendingRef = useRef(false);
+  const checkStatusRef = useRef<(path: string) => Promise<void>>(async () => {});
 
   useEffect(() => {
-    if (!resourcePath) {
-      setStatus("error");
-      setMessage("No se recibió información de la transacción.");
-      return;
-    }
+    checkStatusRef.current = async (path: string) => {
+    pendingRef.current = true;
 
-    let cancelled = false;
+    try {
+      const result = await getPaymentStatus(path);
 
-    async function fetchStatus() {
-      try {
-        const result = await getPaymentStatus(resourcePath!);
+      if (!pendingRef.current) return;
 
-        if (cancelled) return;
+      if (!result.success || !result.data) {
+        setStatus("error");
+        setMessage(result.error || "No se pudo verificar el estado.");
+        return;
+      }
 
-        if (!result.success || !result.data) {
-          setStatus("error");
-          setMessage(result.error || "No se pudo verificar el estado de la transacción.");
-          return;
+      const code = result.data.result?.code || "";
+
+      if (code === "000.000.000" || code === "000.100.110" || code.startsWith("000.000.")) {
+        setStatus("success");
+        setMessage("Tu solicitud ha sido registrada exitosamente.");
+      } else if (code.startsWith("000.200.")) {
+        setStatus("loading");
+        setMessage("Tu pago está siendo procesado. Verificando nuevamente...");
+
+        if (pendingRef.current) {
+          setTimeout(() => {
+            if (pendingRef.current) checkStatusRef.current(path);
+          }, 3000);
         }
+      } else {
+        setStatus("failed");
+        setMessage(ERROR_MESSAGES[code] || result.data.result?.description || "El pago no pudo ser completado.");
+      }
 
-        const code = result.data.result.code;
-
-        if (code === "000.000.000" || code === "000.100.110" || code.startsWith("000.000.")) {
-          setStatus("success");
-          setMessage("¡Pago exitoso! Tu solicitud ha sido registrada.");
-        } else if (code.startsWith("000.200.")) {
-          setStatus("loading");
-          setMessage("Tu pago está siendo procesado. Te notificaremos cuando se complete.");
-        } else {
-          setStatus("failed");
-          setMessage(result.data.result.description || "El pago no pudo ser completado.");
-        }
-
-        setDetails({
-          "Monto": result.data.amount ? `$ ${result.data.amount}` : undefined,
-          "Moneda": result.data.currency,
-          "Tipo de pago": result.data.paymentType,
-          "Código de autorización": result.data.resultDetails?.AuthCode,
-          "Banco": result.data.resultDetails?.clearingInstituteName,
-          "Terminación tarjeta": result.data.resultDetails?.LastFourDigits
-            ? `****${result.data.resultDetails.LastFourDigits}`
-            : undefined,
-        });
-      } catch {
-        if (!cancelled) {
-          setStatus("error");
-          setMessage("Error de conexión al verificar el pago.");
-        }
+      setDetails({
+        "Monto": result.data.amount ? `$ ${result.data.amount}` : undefined,
+        "Moneda": result.data.currency,
+        "Código": code,
+        "Autorización": result.data.resultDetails?.AuthCode,
+        "Banco": result.data.resultDetails?.clearingInstituteName,
+        "Terminación tarjeta": result.data.resultDetails?.LastFourDigits
+          ? `****${result.data.resultDetails.LastFourDigits}`
+          : undefined,
+      });
+    } catch {
+      if (pendingRef.current) {
+        setStatus("error");
+        setMessage("Error de conexión al verificar el pago.");
       }
     }
+  };
 
-    fetchStatus();
-    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!resourcePath) return;
+    pendingRef.current = true;
+    checkStatusRef.current(resourcePath);
+    return () => { pendingRef.current = false; };
   }, [resourcePath]);
 
+  const handleRetry = () => {
+    if (!resourcePath) return;
+    setStatus("loading");
+    pendingRef.current = true;
+    checkStatusRef.current(resourcePath);
+  };
+
   return (
-    <main className="min-h-screen bg-neutral-50 flex items-center justify-center px-4">
+    <main className="min-h-screen! bg-neutral-50 flex items-center justify-center pt-50! pb-30! px-4!">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-sm ring-1 ring-neutral-200 p-8 text-center">
           {status === "loading" && (
@@ -108,12 +138,17 @@ function ResultContent() {
               </div>
               <h1 className="text-2xl font-bold text-neutral-900">Pago Rechazado</h1>
               <p className="text-neutral-600 mt-2">{message}</p>
-              <button
-                onClick={() => router.back()}
-                className="mt-6 inline-flex rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-800"
-              >
-                Intentar de nuevo
-              </button>
+              <div className="mt-6 flex flex-col gap-3">
+                <button
+                  onClick={() => router.back()}
+                  className="inline-flex items-center justify-center rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-800"
+                >
+                  Intentar con otra tarjeta
+                </button>
+                <Link href="/visas" className="text-sm text-neutral-500 hover:underline">
+                  Volver a Visas
+                </Link>
+              </div>
             </>
           )}
 
@@ -126,6 +161,17 @@ function ResultContent() {
               </div>
               <h1 className="text-2xl font-bold text-neutral-900">Algo salió mal</h1>
               <p className="text-neutral-600 mt-2">{message}</p>
+              <div className="mt-6 flex flex-col gap-3">
+                <button
+                  onClick={handleRetry}
+                  className="inline-flex items-center justify-center rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-800"
+                >
+                  Reintentar
+                </button>
+                <Link href="/visas" className="text-sm text-neutral-500 hover:underline">
+                  Volver a Visas
+                </Link>
+              </div>
             </>
           )}
 
@@ -142,17 +188,6 @@ function ResultContent() {
                   ) : null
                 )}
               </dl>
-            </div>
-          )}
-
-          {(status === "success" || status === "error") && (
-            <div className="mt-6">
-              <Link
-                href="/visas"
-                className="text-sm text-primary-700 hover:underline"
-              >
-                ← Volver a Visas
-              </Link>
             </div>
           )}
         </div>

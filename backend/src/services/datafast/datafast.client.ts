@@ -29,8 +29,11 @@ export class DatafastClient {
         return response;
       },
       (error: AxiosError) => {
-        const errorData = error.response?.data || error.message;
-        logger.error({ err: errorData }, 'Datafast Error');
+        if (error.response?.data) {
+          logger.warn(`Datafast Error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
+          return error.response;
+        }
+        logger.error({ err: error.message }, 'Datafast Network Error');
         return Promise.reject(error);
       }
     );
