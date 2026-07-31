@@ -59,7 +59,7 @@ const VISA_PRICES: Record<string, number> = {
   // "aq5xz8..." : 10,  ← ejemplo: reemplaza con documentId real
 };
 
-const DEFAULT_VISA_PRICE = 7.0;
+const DEFAULT_VISA_PRICE = 1.0;
 
 function getVisaPrice(visa: Visa): number {
   if (visa.precio != null && visa.precio > 0) return visa.precio;

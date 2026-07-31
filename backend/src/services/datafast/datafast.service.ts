@@ -32,7 +32,6 @@ export class DatafastService {
     params.append('amount', data.amount.toFixed(2));
     params.append('currency', 'USD');
     params.append('paymentType', 'DB');
-    params.append('shopperResultUrl', datafastConfig.shopperResultUrl);
     
     // Datos del cliente (Fase 2 - Obligatorios)
     params.append('customer.givenName', data.customer.givenName);

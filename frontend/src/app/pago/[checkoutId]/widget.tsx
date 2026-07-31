@@ -320,7 +320,7 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
   }, [initWidget, clearTimers]);
 
   return (
-    <main className="min-h-screen bg-neutral-50 flex items-start justify-center pt-32 pb-16 px-4">
+    <main className="min-h-screen bg-neutral-50 flex items-start! justify-center! pt-32! pb-16! px-4!">
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-neutral-900">Pago Seguro</h1>
