@@ -75,7 +75,7 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
         <div className="bg-white rounded-2xl shadow-sm ring-1 ring-neutral-200 p-6">
           <form
             id="datafast-payment-form"
-            action={`${typeof window !== "undefined" ? window.location.origin : ""}/pago/resultado`}
+            action="/pago/resultado"
             className="paymentWidgets"
             data-brand="VISA MASTER DINERS DISCOVER"
           />

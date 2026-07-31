@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, Suspense } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getPaymentStatus } from "@/services/payments";
@@ -19,101 +19,117 @@ const ERROR_MESSAGES: Record<string, string> = {
   "900.100.100": "Error de comunicación con el banco. Reintenta.",
 };
 
-type Status = "loading" | "success" | "failed" | "error";
+type Status = "loading" | "success" | "failed" | "pending" | "error";
 
 function ResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const resourcePath = searchParams.get("resourcePath");
 
-  const [status, setStatus] = useState<Status>(!resourcePath ? "error" : "loading");
-  const [message, setMessage] = useState(!resourcePath ? "No se recibió información." : "");
+  const [status, setStatus] = useState<Status>("loading");
+  const [message, setMessage] = useState("");
   const [details, setDetails] = useState<Record<string, string | undefined>>({});
-  const pendingRef = useRef(false);
-  const checkStatusRef = useRef<(path: string) => Promise<void>>(async () => {});
 
   useEffect(() => {
-    checkStatusRef.current = async (path: string) => {
-    pendingRef.current = true;
+    if (!resourcePath || resourcePath.length < 5) {
+      setStatus("error");
+      setMessage("No se recibió información de la transacción.");
+      return;
+    }
 
-    try {
-      const result = await getPaymentStatus(path);
+    setStatus("loading");
 
-      if (!pendingRef.current) return;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+      setStatus("error");
+      setMessage("Tiempo de espera agotado. El servidor no respondió a tiempo.");
+    }, 25000);
 
-      if (!result.success || !result.data) {
-        setStatus("error");
-        setMessage(result.error || "No se pudo verificar el estado.");
-        return;
-      }
+    let mounted = true;
 
-      const code = result.data.result?.code || "";
+    async function check() {
+      try {
+        const result = await getPaymentStatus(resourcePath!);
 
-      if (code === "000.000.000" || code === "000.100.110" || code.startsWith("000.000.")) {
-        setStatus("success");
-        setMessage("Tu solicitud ha sido registrada exitosamente.");
-      } else if (code.startsWith("000.200.")) {
-        setStatus("loading");
-        setMessage("Tu pago está siendo procesado. Verificando nuevamente...");
+        if (!mounted) return;
+        clearTimeout(timeoutId);
 
-        if (pendingRef.current) {
-          setTimeout(() => {
-            if (pendingRef.current) checkStatusRef.current(path);
-          }, 3000);
+        if (!result.success || !result.data) {
+          setStatus("error");
+          setMessage(result.error || "No se pudo verificar el estado.");
+          return;
         }
-      } else {
-        setStatus("failed");
-        setMessage(ERROR_MESSAGES[code] || result.data.result?.description || "El pago no pudo ser completado.");
-      }
 
-      setDetails({
-        "Monto": result.data.amount ? `$ ${result.data.amount}` : undefined,
-        "Moneda": result.data.currency,
-        "Código": code,
-        "Autorización": result.data.resultDetails?.AuthCode,
-        "Banco": result.data.resultDetails?.clearingInstituteName,
-        "Terminación tarjeta": result.data.resultDetails?.LastFourDigits
-          ? `****${result.data.resultDetails.LastFourDigits}`
-          : undefined,
-      });
-    } catch {
-      if (pendingRef.current) {
+        const code = result.data.result?.code || "";
+
+        if (code === "000.000.000" || code === "000.100.110" || code === "000.100.112") {
+          setStatus("success");
+          setMessage("Tu solicitud ha sido registrada exitosamente.");
+        } else if (code.startsWith("000.200.")) {
+          setStatus("pending");
+          setMessage("El pago está siendo procesado. No cierres esta página.");
+        } else {
+          setStatus("failed");
+          setMessage(ERROR_MESSAGES[code] || result.data.result?.description || "El pago no pudo ser completado.");
+        }
+
+        setDetails({
+          "Monto": result.data.amount ? `$ ${result.data.amount}` : undefined,
+          "Moneda": result.data.currency,
+          "Código": code,
+          "Autorización": result.data.resultDetails?.AuthCode,
+          "Banco": result.data.resultDetails?.clearingInstituteName,
+          "Terminación tarjeta": result.data.resultDetails?.LastFourDigits
+            ? `****${result.data.resultDetails.LastFourDigits}`
+            : undefined,
+        });
+      } catch {
+        if (!mounted) return;
+        clearTimeout(timeoutId);
         setStatus("error");
-        setMessage("Error de conexión al verificar el pago.");
+        setMessage("Error de conexión al verificar el pago. Verifica tu conexión a internet.");
       }
     }
-  };
 
-  }, []);
+    check();
 
-  useEffect(() => {
-    if (!resourcePath) return;
-    pendingRef.current = true;
-    checkStatusRef.current(resourcePath);
-    return () => { pendingRef.current = false; };
+    return () => {
+      mounted = false;
+      clearTimeout(timeoutId);
+    };
   }, [resourcePath]);
 
-  const handleRetry = () => {
-    if (!resourcePath) return;
-    setStatus("loading");
-    pendingRef.current = true;
-    checkStatusRef.current(resourcePath);
-  };
-
   return (
-    <main className="min-h-screen! bg-neutral-50 flex items-center justify-center pt-50! pb-30! px-4!">
+    <main className="min-h-screen bg-neutral-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-sm ring-1 ring-neutral-200 p-8 text-center">
           {status === "loading" && (
             <>
               <div className="flex justify-center mb-6">
-                <svg className="h-16 w-16 animate-spin text-primary-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="h-16 w-16 animate-spin text-primary-700" viewBox="0 0 24 24" fill="none">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
               </div>
               <h1 className="text-xl font-bold text-neutral-900">Verificando pago</h1>
               <p className="text-neutral-600 mt-2">{message || "Consultando estado de la transacción..."}</p>
+            </>
+          )}
+
+          {status === "pending" && (
+            <>
+              <div className="flex justify-center mb-6">
+                <svg className="h-16 w-16 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h1 className="text-xl font-bold text-neutral-900">Pago en Procesamiento</h1>
+              <p className="text-neutral-600 mt-2">{message}</p>
+              <p className="text-xs text-neutral-400 mt-4">Puedes cerrar esta página. Te notificaremos por email cuando se complete.</p>
+              <Link href="/visas" className="mt-6 inline-flex items-center justify-center rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-800">
+                Volver a Visas
+              </Link>
             </>
           )}
 
@@ -126,6 +142,9 @@ function ResultContent() {
               </div>
               <h1 className="text-2xl font-bold text-neutral-900">¡Pago Exitoso!</h1>
               <p className="text-neutral-600 mt-2">{message}</p>
+              <Link href="/visas" className="mt-6 inline-flex items-center justify-center rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-800">
+                Volver a Visas
+              </Link>
             </>
           )}
 
@@ -162,12 +181,14 @@ function ResultContent() {
               <h1 className="text-2xl font-bold text-neutral-900">Algo salió mal</h1>
               <p className="text-neutral-600 mt-2">{message}</p>
               <div className="mt-6 flex flex-col gap-3">
-                <button
-                  onClick={handleRetry}
-                  className="inline-flex items-center justify-center rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-800"
-                >
-                  Reintentar
-                </button>
+                {resourcePath && (
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="inline-flex items-center justify-center rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-800"
+                  >
+                    Reintentar
+                  </button>
+                )}
                 <Link href="/visas" className="text-sm text-neutral-500 hover:underline">
                   Volver a Visas
                 </Link>
@@ -202,7 +223,7 @@ export default function DatafastResultPage() {
       fallback={
         <main className="min-h-screen bg-neutral-50 flex items-center justify-center">
           <div className="text-center">
-            <svg className="h-10 w-10 animate-spin text-primary-700 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg className="h-10 w-10 animate-spin text-primary-700 mx-auto" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
