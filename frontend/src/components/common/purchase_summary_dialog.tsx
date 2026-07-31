@@ -295,7 +295,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                             </a>
                             ,{" "}
                             <a
-                              href={helpData?.pdfPoliticasVisas || "#"}
+                              href={helpData?.pdfPoliticasPrivacidad || "#"}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => {

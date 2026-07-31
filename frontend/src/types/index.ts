@@ -315,6 +315,7 @@ export interface Help {
   documentId: string;
   pdfPoliticasVisas?: string; // URL completa del PDF
   pdfPoliticasViaje?: string; // URL completa del PDF
+  pdfPoliticasPrivacidad?: string; // URL completa del PDF
   preguntasFrecuentes?: PreguntaFrecuente[];
   createdAt: string;
   updatedAt: string;

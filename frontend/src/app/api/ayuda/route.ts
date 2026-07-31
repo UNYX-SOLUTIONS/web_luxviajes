@@ -54,6 +54,7 @@ interface StrapiAyudaResponse {
     documentId: string;
     pdfPoliticasVisas?: StrapiPDF;
     pdfPoliticasViaje?: StrapiPDF;
+    pdfPoliticasPrivacidad?: StrapiPDF;
     preguntas_frecuentas?: PreguntaFrecuente[];
     createdAt: string;
     updatedAt: string;
@@ -79,6 +80,9 @@ export async function GET() {
             populate: "*",
           },
           pdfPoliticasViaje: {
+            populate: "*",
+          },
+          pdfPoliticasPrivacidad: {
             populate: "*",
           },
           preguntas_frecuentas: {
@@ -127,6 +131,7 @@ export async function GET() {
       documentId: data.data.documentId,
       pdfPoliticasVisas: getPdfUrl(data.data.pdfPoliticasVisas),
       pdfPoliticasViaje: getPdfUrl(data.data.pdfPoliticasViaje),
+      pdfPoliticasPrivacidad: getPdfUrl(data.data.pdfPoliticasPrivacidad),
       preguntasFrecuentes: (data.data.preguntas_frecuentas || []).map(
         (pregunta) => ({
           id: pregunta.id,

@@ -39,6 +39,13 @@ const helpTopics = [
     icon: CalendarDaysIcon,
     downloadKey: "pdfPoliticasViaje",
   },
+  {
+    title: "Politicas de Privacidad",
+    description:
+      "Informacion detallada sobre nuestras politicas de privacidad y como protegemos tu informacion personal.",
+    icon: ShieldCheckIcon,
+    downloadKey: "pdfPoliticasPrivacidad",
+  },
  /*  {
     title: "Vuelos internacionales",
     description:
