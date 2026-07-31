@@ -23,28 +23,34 @@ const SUPPORTED_BRANDS = "VISA MASTERCARD AMEX DINERS DISCOVER";
 const WIDGET_TIMEOUT_MS = 20000;
 const WIDGET_CHECK_INTERVAL_MS = 500;
 
-function isValidCheckoutId(id: string): boolean {
-  return /^[A-Za-z0-9]{20,60}$/.test(id);
-}
-
 function injectCustomFields(): void {
-  const formCard = document.querySelector("form.wpwl-form-card");
+  const formCard =
+    document.querySelector("form.wpwl-form-card") ||
+    document.querySelector("form.paymentWidgets > div");
+
   if (!formCard) return;
 
-  const submitBtn = formCard.querySelector(".wpwl-button");
+  const submitBtn =
+    formCard.querySelector(".wpwl-button") ||
+    formCard.querySelector("button[type='submit']");
   if (!submitBtn) return;
+
+  const parent = submitBtn.parentNode!;
 
   const wrapper = (label: string, innerHTML: string): HTMLDivElement => {
     const div = document.createElement("div");
     div.className = "wpwl-wrapper wpwl-wrapper-custom";
-    div.innerHTML = `<label style="display:block;margin-bottom:4px;font-weight:500">${label}:</label>${innerHTML}`;
+    div.style.marginBottom = "12px";
+    div.innerHTML = label
+      ? `<label style="display:block;margin-bottom:4px;font-weight:500">${label}:</label>${innerHTML}`
+      : innerHTML;
     return div;
   };
 
-  submitBtn.parentNode!.insertBefore(
+  parent.insertBefore(
     wrapper(
       "Número de cuotas",
-      `<select name="customParameters[SHOPPER_INSTALLMENTS]" class="wpwl-control">
+      `<select name="customParameters[SHOPPER_INSTALLMENTS]" class="wpwl-control" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:14px">
         <option value="0">0 (Corriente)</option>
         <option value="3">3 cuotas</option>
         <option value="6">6 cuotas</option>
@@ -57,10 +63,10 @@ function injectCustomFields(): void {
     submitBtn
   );
 
-  submitBtn.parentNode!.insertBefore(
+  parent.insertBefore(
     wrapper(
       "Tipo de crédito",
-      `<select name="customParameters[SHOPPER_TIPOCREDITO]" class="wpwl-control">
+      `<select name="customParameters[SHOPPER_TIPOCREDITO]" class="wpwl-control" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:14px">
         <option value="00">Corriente</option>
         <option value="01">Diferido corriente</option>
         <option value="02">Diferido con interés</option>
@@ -74,10 +80,10 @@ function injectCustomFields(): void {
     submitBtn
   );
 
-  submitBtn.parentNode!.insertBefore(
+  parent.insertBefore(
     wrapper(
       "",
-      `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0">
+      `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
         <input type="checkbox" name="createRegistration" value="true" />
         Guardar datos de tarjeta para futuras compras
       </label>`
@@ -122,7 +128,13 @@ function LoadingSpinner() {
   );
 }
 
-function ErrorDisplay({ message, onRetry }: { message: string; onRetry: () => void }) {
+function ErrorDisplay({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry: () => void;
+}) {
   return (
     <div className="text-center py-12">
       <div className="rounded-full bg-red-100 w-16 h-16 flex items-center justify-center mx-auto mb-4">
@@ -185,7 +197,7 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
       setLoading(false);
       setError(msg);
     },
-    [clearTimers]
+    [clearTimers],
   );
 
   const handleRetry = useCallback(() => {
@@ -196,11 +208,6 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
 
   const initWidget = useCallback(() => {
     if (!checkoutId || !mountedRef.current) return;
-
-    if (!isValidCheckoutId(checkoutId)) {
-      handleError("El identificador de pago no es válido.");
-      return;
-    }
 
     const form = document.getElementById("datafast-payment-form");
     if (!form) {
@@ -235,13 +242,15 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
       },
       onBeforeSubmitCard: () => {
         const cardholderInput = document.querySelector(
-          ".wpwl-control-cardHolder"
+          ".wpwl-control-cardHolder",
         ) as HTMLInputElement | null;
 
         if (!cardholderInput || !cardholderInput.value.trim()) {
           cardholderInput?.classList.add("wpwl-has-error");
 
-          const existingError = document.querySelector(".wpwl-hint-cardHolderError");
+          const existingError = document.querySelector(
+            ".wpwl-hint-cardHolderError",
+          );
           if (!existingError && cardholderInput?.parentNode) {
             const errorDiv = document.createElement("div");
             errorDiv.className = "wpwl-hint wpwl-hint-cardHolderError";
@@ -254,19 +263,23 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
       },
       onError: (err: unknown) => {
         console.error("[Datafast] Error del widget:", err);
-        handleError("Error al cargar el formulario de pago. Intente nuevamente.");
+        handleError(
+          "Error al cargar el formulario de pago. Intente nuevamente.",
+        );
       },
     };
 
     timeoutRef.current = setTimeout(() => {
       handleError(
-        "Tiempo de espera agotado al cargar el formulario de pago. Verifica tu conexión e inténtalo de nuevo."
+        "Tiempo de espera agotado al cargar el formulario de pago. Verifica tu conexión e inténtalo de nuevo.",
       );
     }, WIDGET_TIMEOUT_MS);
 
     pollRef.current = setInterval(() => {
       if (!mountedRef.current) return;
-      const cardForm = form.querySelector(".wpwl-form-card");
+      const cardForm =
+        form.querySelector(".wpwl-form-card") ||
+        form.querySelector(".wpwl-control");
       if (cardForm && !readyCalledRef.current) {
         clearTimers();
         readyCalledRef.current = true;
@@ -277,14 +290,6 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
 
     const script = document.createElement("script");
     script.src = `${DATAFAST_BASE_URL}/v1/paymentWidgets.js?checkoutId=${encodeURIComponent(checkoutId)}`;
-    script.onload = () => {
-      const errorEl = form.querySelector(".wpwl-hint-error");
-      if (errorEl && !readyCalledRef.current) {
-        handleError(
-          "No se pudo inicializar el formulario de pago. Verifica los datos e inténtalo de nuevo."
-        );
-      }
-    };
     script.onerror = () => {
       console.error("[Datafast] Error de red al cargar paymentWidgets.js");
       handleError("Error al cargar el formulario de pago. Intente nuevamente.");
@@ -296,7 +301,6 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
 
   useEffect(() => {
     mountedRef.current = true;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     initWidget();
 
     return () => {
@@ -323,8 +327,7 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
           <form
             id="datafast-payment-form"
             action="/pago/resultado"
-            className="wpwl-form"
-            data-brands={SUPPORTED_BRANDS}
+            className="paymentWidgets"
             noValidate
           >
             {SUPPORTED_BRANDS}
