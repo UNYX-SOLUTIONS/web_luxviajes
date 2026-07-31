@@ -14,6 +14,7 @@ interface ServiceData {
 
 export interface CustomerFormData {
   givenName: string;
+  middleName?: string;
   surname: string;
   email: string;
   phone: string;
@@ -76,6 +77,7 @@ export const usePurchaseDialog = () => {
             merchantCustomerId: `CUST_${Date.now()}`,
             identificationDocId: customerData.identificationDocId,
             phone: customerData.phone,
+            ...(customerData.middleName ? { middleName: customerData.middleName } : {}),
           },
           billing: {
             street1: "Av. Principal",

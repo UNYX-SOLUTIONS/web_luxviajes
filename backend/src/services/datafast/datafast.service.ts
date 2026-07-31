@@ -43,7 +43,7 @@ export class DatafastService {
     params.append('customer.merchantCustomerId', data.customer.merchantCustomerId);
     params.append('customer.email', data.customer.email);
     params.append('customer.identificationDocType', data.customer.identificationDocType || 'IDCARD');
-    params.append('customer.identificationDocId', data.customer.identificationDocId);
+    params.append('customer.identificationDocId', data.customer.identificationDocId.padStart(10, '0'));
     params.append('customer.phone', data.customer.phone);
     
     // Datos de facturación

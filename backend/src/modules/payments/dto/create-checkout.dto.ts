@@ -1,17 +1,23 @@
-import { IsNotEmpty, IsString, IsNumber, Min, Max, IsEmail, IsOptional, IsArray, ValidateNested, IsIn } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, Min, Max, IsEmail, IsOptional, IsArray, ValidateNested, IsIn, MinLength, MaxLength } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class CustomerDto {
   @IsNotEmpty()
   @IsString()
+  @MinLength(3)
+  @MaxLength(48)
   givenName: string;
 
   @IsOptional()
   @IsString()
+  @MinLength(2)
+  @MaxLength(50)
   middleName?: string;
 
   @IsNotEmpty()
   @IsString()
+  @MinLength(3)
+  @MaxLength(48)
   surname: string;
 
   @IsNotEmpty()
@@ -32,12 +38,15 @@ class CustomerDto {
 
   @IsNotEmpty()
   @IsString()
+  @MinLength(7)
+  @MaxLength(25)
   phone: string;
 }
 
 class BillingDto {
   @IsNotEmpty()
   @IsString()
+  @MaxLength(100)
   street1: string;
 
   @IsNotEmpty()

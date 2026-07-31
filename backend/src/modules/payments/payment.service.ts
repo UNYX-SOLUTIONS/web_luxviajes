@@ -50,7 +50,7 @@ export class PaymentService {
     const customer = await prisma.customer.upsert({
       where: { email: data.customer.email },
       create: {
-        merchantCustomerId: `CUST_${uuidv4().slice(0, 8)}`,
+        merchantCustomerId: data.customer.merchantCustomerId || `CUST_${uuidv4().slice(0, 8)}`,
         givenName: data.customer.givenName,
         surname: data.customer.surname,
         email: data.customer.email,

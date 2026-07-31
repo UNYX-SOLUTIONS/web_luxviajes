@@ -12,6 +12,7 @@ interface CreateCheckoutRequest {
   };
   customer: {
     givenName: string;
+    middleName?: string;
     surname: string;
     email: string;
     merchantCustomerId: string;
