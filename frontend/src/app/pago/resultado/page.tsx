@@ -26,18 +26,22 @@ function ResultContent() {
   const searchParams = useSearchParams();
   const resourcePath = searchParams.get("resourcePath");
 
-  const [status, setStatus] = useState<Status>("loading");
-  const [message, setMessage] = useState("");
+  const isValidResourcePath = resourcePath && resourcePath.length >= 5;
+
+  const [status, setStatus] = useState<Status>(() => {
+    if (!isValidResourcePath) return "error";
+    return "loading";
+  });
+  const [message, setMessage] = useState(() => {
+    if (!isValidResourcePath) return "No se recibió información de la transacción.";
+    return "";
+  });
   const [details, setDetails] = useState<Record<string, string | undefined>>({});
 
   useEffect(() => {
-    if (!resourcePath || resourcePath.length < 5) {
-      setStatus("error");
-      setMessage("No se recibió información de la transacción.");
+    if (!isValidResourcePath) {
       return;
     }
-
-    setStatus("loading");
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -98,10 +102,10 @@ function ResultContent() {
       mounted = false;
       clearTimeout(timeoutId);
     };
-  }, [resourcePath]);
+  }, [resourcePath, isValidResourcePath]);
 
   return (
-    <main className="min-h-screen bg-neutral-50 flex items-center justify-center px-4">
+    <main className="min-h-screen! bg-neutral-50 flex items-center justify-center pt-50! pb-30! px-4!">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-sm ring-1 ring-neutral-200 p-8 text-center">
           {status === "loading" && (
@@ -124,10 +128,10 @@ function ResultContent() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h1 className="text-xl font-bold text-neutral-900">Pago en Procesamiento</h1>
+              <h1 className="text-xl! font-bold text-neutral-900">Pago en Procesamiento</h1>
               <p className="text-neutral-600 mt-2">{message}</p>
-              <p className="text-xs text-neutral-400 mt-4">Puedes cerrar esta página. Te notificaremos por email cuando se complete.</p>
-              <Link href="/visas" className="mt-6 inline-flex items-center justify-center rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-800">
+              <p className="text-xs! text-neutral-400 mt-4">Puedes cerrar esta página. Te notificaremos por email cuando se complete.</p>
+              <Link href="/visas" className="mt-6! inline-flex items-center justify-center rounded-full bg-primary-700 px-6! py-3! text-sm font-semibold text-white hover:bg-primary-800">
                 Volver a Visas
               </Link>
             </>
@@ -140,9 +144,9 @@ function ResultContent() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-neutral-900">¡Pago Exitoso!</h1>
+              <h1 className="text-2xl! font-bold text-neutral-900">¡Pago Exitoso!</h1>
               <p className="text-neutral-600 mt-2">{message}</p>
-              <Link href="/visas" className="mt-6 inline-flex items-center justify-center rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-800">
+              <Link href="/visas" className="mt-6! inline-flex items-center justify-center rounded-full bg-primary-700 px-6! py-3! text-sm font-semibold text-white hover:bg-primary-800">
                 Volver a Visas
               </Link>
             </>
@@ -150,21 +154,21 @@ function ResultContent() {
 
           {status === "failed" && (
             <>
-              <div className="rounded-full bg-red-100 w-20 h-20 flex items-center justify-center mx-auto mb-6">
+              <div className="rounded-full bg-red-100 w-20 h-20 flex items-center! justify-center! mx-auto mb-6">
                 <svg className="h-10 w-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-neutral-900">Pago Rechazado</h1>
+              <h1 className="text-2xl! font-bold text-neutral-900">Pago Rechazado</h1>
               <p className="text-neutral-600 mt-2">{message}</p>
-              <div className="mt-6 flex flex-col gap-3">
+              <div className="mt-6! flex flex-col gap-3 ">
                 <button
                   onClick={() => router.back()}
-                  className="inline-flex items-center justify-center rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-800"
+                  className="inline-flex items-center! justify-center! rounded-full bg-primary-700 px-6! py-3! text-sm font-semibold text-white hover:bg-primary-800"
                 >
                   Intentar con otra tarjeta
                 </button>
-                <Link href="/visas" className="text-sm text-neutral-500 hover:underline">
+                <Link href="/visas" className="text-sm! text-neutral-500 hover:underline">
                   Volver a Visas
                 </Link>
               </div>
@@ -198,7 +202,7 @@ function ResultContent() {
 
           {Object.keys(details).length > 0 && (
             <div className="mt-6 border-t border-neutral-200 pt-4 text-left">
-              <h3 className="text-sm font-semibold text-neutral-700 mb-3">Detalles de la transacción</h3>
+              <h3 className="text-sm! font-semibold text-neutral-700 mb-3">Detalles de la transacción</h3>
               <dl className="space-y-2">
                 {Object.entries(details).map(([key, value]) =>
                   value ? (
