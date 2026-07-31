@@ -16,6 +16,7 @@ import {
   IdentificationIcon,
 } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
+import { useHelpData } from "@/hooks";
 
 interface ServiceItem {
   id: string | number;
@@ -56,6 +57,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
   taxRate = 0.15,
   error = null,
 }) => {
+  const { data: helpData } = useHelpData();
   const [showForm, setShowForm] = useState(false);
 
   const [formData, setFormData] = useState<CustomerFormData>({
@@ -278,14 +280,24 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                           <p className="mt-3 text-justify">
                             Confirmo que he leído los{" "}
                             <a
-                              href="/terms"
+                              href={helpData?.pdfPoliticasViaje || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
                               className="text-primary-700 hover:underline"
                             >
                               términos y condiciones
                             </a>
                             ,{" "}
                             <a
-                              href="/privacy"
+                              href={helpData?.pdfPoliticasVisas || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
                               className="text-primary-700 hover:underline"
                             >
                               políticas de privacidad{" "}
