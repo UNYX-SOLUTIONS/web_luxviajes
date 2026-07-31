@@ -39,6 +39,7 @@ export interface Visa {
   validez: string;
   procesamiento: string;
   requisitos: string;
+  precio?: number;
   imagen?: string;
   pdf?: string;
   createdAt: string;

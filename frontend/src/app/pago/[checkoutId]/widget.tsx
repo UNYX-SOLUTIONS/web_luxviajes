@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 declare global {
@@ -21,7 +22,11 @@ const DATAFAST_BASE_URL =
   process.env.NEXT_PUBLIC_DATAFAST_BASE_URL || "https://eu-test.oppwa.com";
 const SUPPORTED_BRANDS = "VISA MASTERCARD AMEX DINERS DISCOVER";
 const WIDGET_TIMEOUT_MS = 20000;
-const WIDGET_CHECK_INTERVAL_MS = 500;
+const WIDGET_POLL_MS = 300;
+
+// ---------------------------------------------------------------------------
+// DOM helpers
+// ---------------------------------------------------------------------------
 
 function injectCustomFields(): void {
   const formCard =
@@ -30,67 +35,6 @@ function injectCustomFields(): void {
 
   if (!formCard) return;
 
-  const submitBtn =
-    formCard.querySelector(".wpwl-button") ||
-    formCard.querySelector("button[type='submit']");
-  if (!submitBtn) return;
-
-  const parent = submitBtn.parentNode!;
-
-  const wrapper = (label: string, innerHTML: string): HTMLDivElement => {
-    const div = document.createElement("div");
-    div.className = "wpwl-wrapper wpwl-wrapper-custom";
-    div.style.marginBottom = "12px";
-    div.innerHTML = label
-      ? `<label style="display:block;margin-bottom:4px;font-weight:500">${label}:</label>${innerHTML}`
-      : innerHTML;
-    return div;
-  };
-
-  parent.insertBefore(
-    wrapper(
-      "Número de cuotas",
-      `<select name="customParameters[SHOPPER_INSTALLMENTS]" class="wpwl-control" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:14px">
-        <option value="0">0 (Corriente)</option>
-        <option value="3">3 cuotas</option>
-        <option value="6">6 cuotas</option>
-        <option value="9">9 cuotas</option>
-        <option value="12">12 cuotas</option>
-        <option value="18">18 cuotas</option>
-        <option value="24">24 cuotas</option>
-      </select>`
-    ),
-    submitBtn
-  );
-
-  parent.insertBefore(
-    wrapper(
-      "Tipo de crédito",
-      `<select name="customParameters[SHOPPER_TIPOCREDITO]" class="wpwl-control" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:14px">
-        <option value="00">Corriente</option>
-        <option value="01">Diferido corriente</option>
-        <option value="02">Diferido con interés</option>
-        <option value="03">Diferido sin interés</option>
-        <option value="07">Diferido con interés + Meses gracia</option>
-        <option value="09">Diferido sin interés + Meses gracia</option>
-        <option value="21">Diferido Plus</option>
-        <option value="22">Duplica tu plazo</option>
-      </select>`
-    ),
-    submitBtn
-  );
-
-  parent.insertBefore(
-    wrapper(
-      "",
-      `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
-        <input type="checkbox" name="createRegistration" value="true" />
-        Guardar datos de tarjeta para futuras compras
-      </label>`
-    ),
-    submitBtn
-  );
-
   const logoDiv = document.createElement("div");
   logoDiv.style.textAlign = "center";
   logoDiv.style.marginTop = "16px";
@@ -98,6 +42,29 @@ function injectCustomFields(): void {
     '<img src="https://www.datafast.com.ec/images/verified.png" style="max-width:300px;width:100%;display:block;margin:0 auto" alt="Powered by Datafast" loading="lazy" />';
   formCard.appendChild(logoDiv);
 }
+
+/** Detecta si Datafast inyectó su propio error HTML dentro del form */
+function hasDatafastError(form: HTMLElement): boolean {
+  const text = (form.textContent ?? "").toLowerCase();
+  return (
+    text.includes("payment cannot be completed") ||
+    text.includes("please contact support") ||
+    text.includes("is invalid") ||
+    text.includes("checkoutid")
+  );
+}
+
+/** Vuelve a dejar el form limpio (solo las marcas de texto) */
+function resetFormContent(form: HTMLElement): void {
+  while (form.firstChild) {
+    form.removeChild(form.firstChild);
+  }
+  form.appendChild(document.createTextNode(` ${SUPPORTED_BRANDS} `));
+}
+
+// ---------------------------------------------------------------------------
+// Sub‑componentes
+// ---------------------------------------------------------------------------
 
 function LoadingSpinner() {
   return (
@@ -123,55 +90,91 @@ function LoadingSpinner() {
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
         />
       </svg>
-      <p className="text-sm text-neutral-500">Cargando formulario de pago seguro...</p>
+      <p className="text-sm text-neutral-500">
+        Cargando formulario de pago seguro…
+      </p>
     </div>
   );
 }
 
-function ErrorDisplay({
-  message,
-  onRetry,
-}: {
-  message: string;
-  onRetry: () => void;
-}) {
+function ErrorDisplay({ isExpired }: { isExpired: boolean }) {
   return (
-    <div className="text-center py-12">
-      <div className="rounded-full bg-red-100 w-16 h-16 flex items-center justify-center mx-auto mb-4">
+    <div className="text-center py-10">
+      {/* Icono */}
+      <div className="rounded-full bg-amber-100 w-16 h-16 flex items-center justify-center mx-auto mb-4">
         <svg
-          className="h-8 w-8 text-red-600"
+          className="h-8 w-8 text-amber-600"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
           aria-hidden="true"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
+          {isExpired ? (
+            /* Reloj */
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          ) : (
+            /* Triángulo */
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          )}
         </svg>
       </div>
-      <p className="text-red-700 font-medium">{message}</p>
-      <button
-        type="button"
-        onClick={onRetry}
-        className="mt-4 text-sm text-primary-700 hover:underline"
-      >
-        Reintentar
-      </button>
+
+      {/* Mensaje */}
+      <h3 className="text-lg font-semibold text-neutral-800 mb-2">
+        {isExpired
+          ? "La sesión de pago ha expirado"
+          : "No se pudo cargar el formulario"}
+      </h3>
+      <p className="text-sm text-neutral-500 max-w-xs mx-auto mb-6">
+        {isExpired
+          ? "El enlace de pago ya no es válido. Por favor inicia un nuevo pago desde la página de Visas."
+          : "Ocurrió un error al comunicarse con el proveedor de pago. Verifica tu conexión e inténtalo nuevamente."}
+      </p>
+
+      {/* Acciones */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <Link
+          href="/visas"
+          className="inline-flex items-center justify-center rounded-full bg-primary-700 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-800"
+        >
+          Volver a Visas
+        </Link>
+        {!isExpired && (
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center justify-center rounded-full border border-neutral-300 px-6 py-2.5 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
+          >
+            Reintentar
+          </button>
+        )}
+      </div>
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Componente principal
+// ---------------------------------------------------------------------------
 
 interface Props {
   checkoutId: string;
 }
 
 export function DatafastPaymentWidget({ checkoutId }: Props) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"loading" | "ready" | "expired" | "error">(
+    "loading",
+  );
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -190,34 +193,32 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
     }
   }, []);
 
-  const handleError = useCallback(
-    (msg: string) => {
+  const bail = useCallback(
+    (next: "expired" | "error") => {
       if (!mountedRef.current) return;
       clearTimers();
-      setLoading(false);
-      setError(msg);
+
+      const form = document.getElementById("datafast-payment-form");
+      if (form && hasDatafastError(form)) {
+        resetFormContent(form);
+      }
+
+      setPhase(next);
     },
     [clearTimers],
   );
-
-  const handleRetry = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    readyCalledRef.current = false;
-  }, []);
 
   const initWidget = useCallback(() => {
     if (!checkoutId || !mountedRef.current) return;
 
     const form = document.getElementById("datafast-payment-form");
     if (!form) {
-      handleError("No se encontró el formulario de pago.");
+      bail("error");
       return;
     }
 
-    const alreadyLoaded = form.querySelector(".wpwl-form-card");
-    if (alreadyLoaded) {
-      setLoading(false);
+    if (form.querySelector(".wpwl-form-card")) {
+      setPhase("ready");
       return;
     }
 
@@ -237,7 +238,7 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
         if (!mountedRef.current) return;
         clearTimers();
         readyCalledRef.current = true;
-        setLoading(false);
+        setPhase("ready");
         injectCustomFields();
       },
       onBeforeSubmitCard: () => {
@@ -261,46 +262,51 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
         }
         return true;
       },
-      onError: (err: unknown) => {
-        console.error("[Datafast] Error del widget:", err);
-        handleError(
-          "Error al cargar el formulario de pago. Intente nuevamente.",
-        );
+      onError: () => {
+        bail("error");
       },
     };
 
     timeoutRef.current = setTimeout(() => {
-      handleError(
-        "Tiempo de espera agotado al cargar el formulario de pago. Verifica tu conexión e inténtalo de nuevo.",
-      );
+      bail("error");
     }, WIDGET_TIMEOUT_MS);
 
     pollRef.current = setInterval(() => {
       if (!mountedRef.current) return;
+
+      const currentForm = document.getElementById("datafast-payment-form");
+      if (!currentForm) return;
+
+      if (hasDatafastError(currentForm)) {
+        bail("expired");
+        return;
+      }
+
       const cardForm =
-        form.querySelector(".wpwl-form-card") ||
-        form.querySelector(".wpwl-control");
+        currentForm.querySelector(".wpwl-form-card") ||
+        currentForm.querySelector(".wpwl-control");
+
       if (cardForm && !readyCalledRef.current) {
         clearTimers();
         readyCalledRef.current = true;
-        setLoading(false);
+        setPhase("ready");
         injectCustomFields();
       }
-    }, WIDGET_CHECK_INTERVAL_MS);
+    }, WIDGET_POLL_MS);
 
     const script = document.createElement("script");
     script.src = `${DATAFAST_BASE_URL}/v1/paymentWidgets.js?checkoutId=${encodeURIComponent(checkoutId)}`;
     script.onerror = () => {
-      console.error("[Datafast] Error de red al cargar paymentWidgets.js");
-      handleError("Error al cargar el formulario de pago. Intente nuevamente.");
+      bail("error");
     };
 
     form.appendChild(script);
     scriptRef.current = script;
-  }, [checkoutId, handleError, clearTimers]);
+  }, [checkoutId, bail, clearTimers]);
 
   useEffect(() => {
     mountedRef.current = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     initWidget();
 
     return () => {
@@ -324,18 +330,22 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm ring-1 ring-neutral-200 p-6">
+          {/* El form siempre se renderiza pero se oculta con CSS si hay error */}
           <form
             id="datafast-payment-form"
             action="/pago/resultado"
             className="paymentWidgets"
             noValidate
+            style={{ display: phase === "loading" || phase === "ready" ? undefined : "none" }}
           >
             {SUPPORTED_BRANDS}
           </form>
 
-          {loading && !error && <LoadingSpinner />}
+          {phase === "loading" && <LoadingSpinner />}
 
-          {error && <ErrorDisplay message={error} onRetry={handleRetry} />}
+          {phase !== "loading" && phase !== "ready" && (
+            <ErrorDisplay isExpired={phase === "expired"} />
+          )}
         </div>
 
         <div className="mt-4 text-center text-xs text-neutral-400">

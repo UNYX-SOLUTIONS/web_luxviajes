@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getPaymentStatus } from "@/services/payments";
 
 const ERROR_MESSAGES: Record<string, string> = {
+  "200.300.404": "El proveedor de pago rechazó la transacción por un parámetro inválido. Contacta a soporte.",
   "800.100.151": "Tarjeta inválida. Verifica el número.",
   "800.100.152": "Transacción rechazada por el banco.",
   "800.100.155": "Fondos insuficientes.",

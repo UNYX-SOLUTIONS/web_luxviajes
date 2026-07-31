@@ -136,7 +136,7 @@ export class DatafastService {
         { entityId: datafastConfig.entityId }
       );
       
-      logger.info(`✅ Estado de transacción obtenido: ${response.result?.code}`);
+      logger.info({ result: response.result, resultDetails: response.resultDetails }, `Estado de transacción: ${response.result?.code}`);
       return response;
     } catch (error) {
       logger.error({ err: error }, 'Error obteniendo estado');

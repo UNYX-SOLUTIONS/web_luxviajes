@@ -55,11 +55,13 @@ export function useDatafastPayment() {
       }
 
       const taxRate = 0.15;
-      const baseImp = data.amount / (1 + taxRate);
-      const iva = data.amount - baseImp;
+      const ROUND = (n: number) => Math.round(n * 100) / 100;
+
+      const baseImp = ROUND(data.amount / (1 + taxRate));
+      const iva = ROUND(data.amount - baseImp);
 
       const payload = {
-        amount: data.amount,
+        amount: ROUND(data.amount),
         customer: {
           ...data.customer,
           ip: clientIp,
@@ -68,14 +70,14 @@ export function useDatafastPayment() {
         billing: data.billing,
         taxes: {
           base0: 0,
-          baseImp: Number(baseImp.toFixed(2)),
-          iva: Number(iva.toFixed(2)),
+          baseImp,
+          iva,
         },
         items: [
           {
             name: data.service.name,
             description: data.service.type,
-            price: Number(baseImp.toFixed(2)),
+            price: baseImp,
             quantity: 1,
           },
         ],

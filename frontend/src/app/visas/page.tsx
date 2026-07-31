@@ -41,6 +41,32 @@ const steps = [
   },
 ];
 
+//
+// PRECIOS DE VISAS — Hardcodeados temporalmente (sin IVA)
+//
+// Cuando agregues el campo "precio" en Strapi (Visa Item), la API lo
+// reenviará como visa.precio y este código lo usará automáticamente.
+// Mientras tanto, asigna precios por documentId aquí.
+//
+// Para obtener el documentId: Strapi Admin > Visa Item > [visa] >
+// panel lateral derecho > "Document ID". Copialo y pegalo como key.
+//
+// Precio default: $7.00  (total con IVA ≈ $8.05)
+// Cupo max tarjeta:  $50
+// Montos bloqueados: $2, $3, $4, $5, $50, $999, $1000
+//
+const VISA_PRICES: Record<string, number> = {
+  // "aq5xz8..." : 10,  ← ejemplo: reemplaza con documentId real
+};
+
+const DEFAULT_VISA_PRICE = 7.0;
+
+function getVisaPrice(visa: Visa): number {
+  if (visa.precio != null && visa.precio > 0) return visa.precio;
+  if (VISA_PRICES[visa.documentId] != null) return VISA_PRICES[visa.documentId];
+  return DEFAULT_VISA_PRICE;
+}
+
 export default function VisasPage() {
   const [selectedVisa, setSelectedVisa] = useState<Visa | null>(null);
   const [showRequirementsDialog, setShowRequirementsDialog] = useState(false);
@@ -90,7 +116,7 @@ export default function VisasPage() {
       documentId: selectedVisa.documentId,
       name: selectedVisa.titulo,
       type: selectedVisa.subtitulo || "Visado",
-      price: 0.01, // Precio por defecto si no existe
+      price: getVisaPrice(selectedVisa),
       validity: selectedVisa.validez || "Variable según destino",
       processing: selectedVisa.procesamiento || "15-30 días hábiles",
       includes: [
@@ -307,7 +333,7 @@ export default function VisasPage() {
                         documentId: visa.documentId,
                         name: visa.titulo,
                         type: visa.subtitulo || "Visado",
-                        price: 0.01, // Precio por defecto si no existe
+                        price: getVisaPrice(visa),
                         validity: visa.validez || "Variable según destino",
                         processing: visa.procesamiento || "15-30 días hábiles",
                         includes: [

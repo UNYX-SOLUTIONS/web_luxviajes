@@ -26,6 +26,7 @@ interface StrapiVisaItem {
   validez: string;
   procesamiento: string;
   requisitos: string;
+  precio?: number;
   bandera?: StrapiImagen;
   pdf?: StrapiPdf;
   createdAt: string;
@@ -128,6 +129,7 @@ export async function GET() {
         ...visa,
         imagen: getImageUrl(visa.bandera),
         pdf: getPdfUrl(visa.pdf),
+        precio: visa.precio,
       })),
     };
 
