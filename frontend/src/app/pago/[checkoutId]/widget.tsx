@@ -17,6 +17,8 @@ interface WpwlOptions {
   onError?: (error: unknown) => void;
 }
 
+const DATAFAST_BASE_URL =
+  process.env.NEXT_PUBLIC_DATAFAST_BASE_URL || "https://eu-test.oppwa.com";
 const SUPPORTED_BRANDS = "VISA MASTERCARD AMEX DINERS DISCOVER";
 const WIDGET_TIMEOUT_MS = 20000;
 const WIDGET_CHECK_INTERVAL_MS = 500;
@@ -274,7 +276,7 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
     }, WIDGET_CHECK_INTERVAL_MS);
 
     const script = document.createElement("script");
-    script.src = `https://eu-test.oppwa.com/v1/paymentWidgets.js?checkoutId=${encodeURIComponent(checkoutId)}`;
+    script.src = `${DATAFAST_BASE_URL}/v1/paymentWidgets.js?checkoutId=${encodeURIComponent(checkoutId)}`;
     script.onload = () => {
       const errorEl = form.querySelector(".wpwl-hint-error");
       if (errorEl && !readyCalledRef.current) {
