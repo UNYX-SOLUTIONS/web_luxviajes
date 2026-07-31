@@ -58,6 +58,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
   error = null,
 }) => {
   const { data: helpData } = useHelpData();
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
   const [formData, setFormData] = useState<CustomerFormData>({
@@ -266,12 +267,14 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                         </div>
                       </div>
                       <div className="mt-6 flex flex-row items-center justify-center gap-2 px-2">
-                        {/* Un checkbox */}
+                        {/* Un checkbox obligatoio si no no puede avanzar */}
                         <input
                           type="checkbox"
                           id="terms"
                           name="terms"
-                          className="h-4 w-4 rounded border-neutral-300 text-primary-700 focus:ring-primary-500"
+                          checked={termsAccepted}
+                          onChange={(e) => setTermsAccepted(e.target.checked)}
+                          className="h-4 w-4 rounded border-neutral-300 text-primary-700 focus:ring-primary-500 accent-primary-700"
                         />
                         <label
                           htmlFor="terms"
@@ -323,7 +326,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                       <div className="mt-6">
                         <button
                           onClick={() => setShowForm(true)}
-                          disabled={isLoading}
+                          disabled={isLoading || !termsAccepted}
                           className="flex w-full items-center justify-center gap-3 rounded-full bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                         >
                           <CreditCardIcon className="h-5 w-5" />
