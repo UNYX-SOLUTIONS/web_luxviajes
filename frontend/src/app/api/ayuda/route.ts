@@ -52,7 +52,7 @@ interface StrapiAyudaResponse {
   data: {
     id: number;
     documentId: string;
-    pdfPoliticasAgencia?: StrapiPDF;
+    pdfPoliticasVisas?: StrapiPDF;
     pdfPoliticasViaje?: StrapiPDF;
     preguntas_frecuentas?: PreguntaFrecuente[];
     createdAt: string;
@@ -75,7 +75,7 @@ export async function GET() {
     const query = qs.stringify(
       {
         populate: {
-          pdfPoliticasAgencia: {
+          pdfPoliticasVisas: {
             populate: "*",
           },
           pdfPoliticasViaje: {
@@ -125,7 +125,7 @@ export async function GET() {
     const transformedData = {
       id: data.data.id,
       documentId: data.data.documentId,
-      pdfPoliticasAgencia: getPdfUrl(data.data.pdfPoliticasAgencia),
+      pdfPoliticasVisas: getPdfUrl(data.data.pdfPoliticasVisas),
       pdfPoliticasViaje: getPdfUrl(data.data.pdfPoliticasViaje),
       preguntasFrecuentes: (data.data.preguntas_frecuentas || []).map(
         (pregunta) => ({

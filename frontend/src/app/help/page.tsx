@@ -30,7 +30,7 @@ const helpTopics = [
     description:
       "Informacion detallada sobre politicas de visas, procesos de solicitud y consejos para viajeros internacionales.",
     icon: CreditCardIcon,
-    downloadKey: "pdfPoliticasAgencia",
+    downloadKey: "pdfPoliticasVisas",
   },
   {
     title: "Politicas de Viaje",

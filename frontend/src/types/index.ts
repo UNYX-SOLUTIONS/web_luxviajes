@@ -313,7 +313,7 @@ export interface PreguntaFrecuente {
 export interface Help {
   id: number;
   documentId: string;
-  pdfPoliticasAgencia?: string; // URL completa del PDF
+  pdfPoliticasVisas?: string; // URL completa del PDF
   pdfPoliticasViaje?: string; // URL completa del PDF
   preguntasFrecuentes?: PreguntaFrecuente[];
   createdAt: string;

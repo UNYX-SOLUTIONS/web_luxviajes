@@ -66,7 +66,9 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
     identificationDocId: "",
   });
 
-  const [formErrors, setFormErrors] = useState<Partial<Record<keyof CustomerFormData, string>>>({});
+  const [formErrors, setFormErrors] = useState<
+    Partial<Record<keyof CustomerFormData, string>>
+  >({});
 
   const formatPrice = (price: number) => {
     return `${currency} ${price.toFixed(2)}`;
@@ -85,9 +87,13 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
 
     if (!formData.givenName.trim()) errors.givenName = "Requerido";
     if (!formData.surname.trim()) errors.surname = "Requerido";
-    if (!formData.email.trim() || !formData.email.includes("@")) errors.email = "Email inválido";
+    if (!formData.email.trim() || !formData.email.includes("@"))
+      errors.email = "Email inválido";
     if (!formData.phone.trim()) errors.phone = "Requerido";
-    if (!formData.identificationDocId.trim() || formData.identificationDocId.length !== 10)
+    if (
+      !formData.identificationDocId.trim() ||
+      formData.identificationDocId.length !== 10
+    )
       errors.identificationDocId = "Cédula debe tener 10 dígitos";
 
     setFormErrors(errors);
@@ -148,7 +154,10 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-50">
                       <ShoppingBagIcon className="h-6 w-6 text-primary-700" />
                     </div>
-                    <Dialog.Title as="h3" className="text-xl font-bold text-neutral-900">
+                    <Dialog.Title
+                      as="h3"
+                      className="text-xl font-bold text-neutral-900"
+                    >
                       {showForm ? "Tus Datos" : "Resumen de tu Solicitud"}
                     </Dialog.Title>
                   </div>
@@ -164,12 +173,20 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                             <GlobeAltIcon className="h-7 w-7 text-primary-700" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h4 className="text-base font-bold text-neutral-900">{service.name}</h4>
-                            <p className="text-sm text-neutral-600">{service.type}</p>
+                            <h4 className="text-base font-bold text-neutral-900">
+                              {service.name}
+                            </h4>
+                            <p className="text-sm text-neutral-600">
+                              {service.type}
+                            </p>
                           </div>
                           <div className="text-right">
-                            <span className="text-sm font-medium text-neutral-500">Precio</span>
-                            <p className="text-lg font-bold text-primary-700">{formatPrice(service.price)}</p>
+                            <span className="text-sm font-medium text-neutral-500">
+                              Precio
+                            </span>
+                            <p className="text-lg font-bold text-primary-700">
+                              {formatPrice(service.price)}
+                            </p>
                           </div>
                         </div>
 
@@ -180,7 +197,9 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                 <CalendarIcon className="h-3.5 w-3.5" />
                                 Validez
                               </p>
-                              <p className="text-sm font-semibold text-neutral-900">{service.validity}</p>
+                              <p className="text-sm font-semibold text-neutral-900">
+                                {service.validity}
+                              </p>
                             </div>
                           )}
                           {service.processing && (
@@ -189,7 +208,9 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                 <DocumentTextIcon className="h-3.5 w-3.5" />
                                 Procesamiento
                               </p>
-                              <p className="text-sm font-semibold text-neutral-900">{service.processing}</p>
+                              <p className="text-sm font-semibold text-neutral-900">
+                                {service.processing}
+                              </p>
                             </div>
                           )}
                         </div>
@@ -197,12 +218,19 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
 
                       {service.includes && service.includes.length > 0 && (
                         <div className="mt-5">
-                          <h5 className="text-sm font-semibold text-neutral-900 mb-3">Lo que incluye el servicio:</h5>
+                          <h5 className="text-sm font-semibold text-neutral-900 mb-3">
+                            Lo que incluye el servicio:
+                          </h5>
                           <div className="space-y-2">
                             {service.includes.map((item, index) => (
-                              <div key={index} className="flex items-start gap-2.5">
+                              <div
+                                key={index}
+                                className="flex items-start gap-2.5"
+                              >
                                 <CheckBadgeIcon className="h-4 w-4 shrink-0 text-accent-green mt-0.5" />
-                                <span className="text-sm text-neutral-700">{item}</span>
+                                <span className="text-sm text-neutral-700">
+                                  {item}
+                                </span>
                               </div>
                             ))}
                           </div>
@@ -213,28 +241,71 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span className="text-neutral-600">Subtotal</span>
-                            <span className="font-medium text-neutral-900">{formatPrice(service.price)}</span>
+                            <span className="font-medium text-neutral-900">
+                              {formatPrice(service.price)}
+                            </span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-neutral-600">IVA ({Math.round(taxRate * 100)}%)</span>
-                            <span className="font-medium text-neutral-900">{formatPrice(tax)}</span>
+                            <span className="text-neutral-600">
+                              IVA ({Math.round(taxRate * 100)}%)
+                            </span>
+                            <span className="font-medium text-neutral-900">
+                              {formatPrice(tax)}
+                            </span>
                           </div>
                           <div className="border-t border-neutral-200 pt-2 mt-2">
                             <div className="flex justify-between text-base font-bold">
                               <span className="text-neutral-900">Total</span>
-                              <span className="text-primary-700">{formatPrice(total)}</span>
+                              <span className="text-primary-700">
+                                {formatPrice(total)}
+                              </span>
                             </div>
                           </div>
                         </div>
                       </div>
-
-                      <div className="mt-4 flex items-center justify-center gap-2">
-                        <CheckCircleIcon className="h-4 w-4 text-accent-green" />
-                        <span className="text-xs text-neutral-500">Pago 100% seguro. Tus datos están protegidos.</span>
+                      <div className="mt-6 flex flex-row items-center justify-center gap-2 px-2">
+                        {/* Un checkbox */}
+                        <input
+                          type="checkbox"
+                          id="terms"
+                          name="terms"
+                          className="h-4 w-4 rounded border-neutral-300 text-primary-700 focus:ring-primary-500"
+                        />
+                        <label
+                          htmlFor="terms"
+                          className="text-xs text-neutral-600"
+                        >
+                          <p className="mt-3 text-justify">
+                            Confirmo que he leído los{" "}
+                            <a
+                              href="/terms"
+                              className="text-primary-700 hover:underline"
+                            >
+                              términos y condiciones
+                            </a>
+                            ,{" "}
+                            <a
+                              href="/privacy"
+                              className="text-primary-700 hover:underline"
+                            >
+                              políticas de privacidad{" "}
+                            </a>
+                            y{" "}
+                            <a
+                              href="/refund"
+                              className="text-primary-700 hover:underline"
+                            >
+                              políticas de visas
+                            </a>
+                            .
+                          </p>
+                        </label>
                       </div>
 
                       {error && (
-                        <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+                        <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                          {error}
+                        </div>
                       )}
 
                       <div className="mt-6">
@@ -263,12 +334,18 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                           <input
                             type="text"
                             value={formData.givenName}
-                            onChange={(e) => handleInputChange("givenName", e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange("givenName", e.target.value)
+                            }
                             className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
                             placeholder="Tu nombre"
                             disabled={isLoading}
                           />
-                          {formErrors.givenName && <p className="text-xs text-red-600 mt-1">{formErrors.givenName}</p>}
+                          {formErrors.givenName && (
+                            <p className="text-xs text-red-600 mt-1">
+                              {formErrors.givenName}
+                            </p>
+                          )}
                         </div>
 
                         <div>
@@ -278,12 +355,18 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                           <input
                             type="text"
                             value={formData.surname}
-                            onChange={(e) => handleInputChange("surname", e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange("surname", e.target.value)
+                            }
                             className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
                             placeholder="Tu apellido"
                             disabled={isLoading}
                           />
-                          {formErrors.surname && <p className="text-xs text-red-600 mt-1">{formErrors.surname}</p>}
+                          {formErrors.surname && (
+                            <p className="text-xs text-red-600 mt-1">
+                              {formErrors.surname}
+                            </p>
+                          )}
                         </div>
 
                         <div>
@@ -293,12 +376,18 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                           <input
                             type="email"
                             value={formData.email}
-                            onChange={(e) => handleInputChange("email", e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange("email", e.target.value)
+                            }
                             className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
                             placeholder="tu@email.com"
                             disabled={isLoading}
                           />
-                          {formErrors.email && <p className="text-xs text-red-600 mt-1">{formErrors.email}</p>}
+                          {formErrors.email && (
+                            <p className="text-xs text-red-600 mt-1">
+                              {formErrors.email}
+                            </p>
+                          )}
                         </div>
 
                         <div>
@@ -308,35 +397,51 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                           <input
                             type="tel"
                             value={formData.phone}
-                            onChange={(e) => handleInputChange("phone", e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange("phone", e.target.value)
+                            }
                             className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
                             placeholder="0991234567"
                             disabled={isLoading}
                           />
-                          {formErrors.phone && <p className="text-xs text-red-600 mt-1">{formErrors.phone}</p>}
+                          {formErrors.phone && (
+                            <p className="text-xs text-red-600 mt-1">
+                              {formErrors.phone}
+                            </p>
+                          )}
                         </div>
 
                         <div>
                           <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                            <IdentificationIcon className="h-3.5 w-3.5" /> Cédula
+                            <IdentificationIcon className="h-3.5 w-3.5" />{" "}
+                            Cédula
                           </label>
                           <input
                             type="text"
                             value={formData.identificationDocId}
-                            onChange={(e) => handleInputChange("identificationDocId", e.target.value)}
+                            onChange={(e) =>
+                              handleInputChange(
+                                "identificationDocId",
+                                e.target.value,
+                              )
+                            }
                             className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
                             placeholder="10 dígitos"
                             maxLength={10}
                             disabled={isLoading}
                           />
                           {formErrors.identificationDocId && (
-                            <p className="text-xs text-red-600 mt-1">{formErrors.identificationDocId}</p>
+                            <p className="text-xs text-red-600 mt-1">
+                              {formErrors.identificationDocId}
+                            </p>
                           )}
                         </div>
                       </div>
 
                       {error && (
-                        <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</div>
+                        <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                          {error}
+                        </div>
                       )}
 
                       <div className="mt-6 flex gap-3">
@@ -354,9 +459,25 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                         >
                           {isLoading ? (
                             <>
-                              <svg className="h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                              <svg
+                                className="h-5 w-5 animate-spin text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                />
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                />
                               </svg>
                               Procesando...
                             </>
@@ -373,13 +494,13 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                 </div>
 
                 {!showForm && (
-                  <div className="border-t border-neutral-200 bg-neutral-50/50 px-6 py-5">
-                    <p className="mt-3 text-center text-xs text-neutral-400">
-                      Al hacer clic en pagar, aceptas nuestros{" "}
-                      <a href="/terms" className="text-primary-700 hover:underline">
-                        términos y condiciones
-                      </a>
-                    </p>
+                  <div className="border-t border-neutral-200 bg-neutral-50/50 px-6! py-5!">
+                    <div className="my-1 flex items-center justify-center gap-2">
+                      <CheckCircleIcon className="h-4 w-4 text-accent-green" />
+                      <span className="text-xs text-neutral-500">
+                        Pago 100% seguro. Tus datos están protegidos.
+                      </span>
+                    </div>
                   </div>
                 )}
               </Dialog.Panel>
