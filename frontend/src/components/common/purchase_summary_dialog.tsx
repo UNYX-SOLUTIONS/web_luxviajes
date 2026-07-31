@@ -307,7 +307,12 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                             </a>
                             y{" "}
                             <a
-                              href="/refund"
+                              href={helpData?.pdfPoliticasVisas || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }}
                               className="text-primary-700 hover:underline"
                             >
                               políticas de visas
