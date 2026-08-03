@@ -416,7 +416,7 @@ export default function BlogPage() {
           <h3 className="text-3xl md:text-4xl font-bold text-white">
             ¿Quieres más inspiración?
           </h3>
-          <p className="mx-auto mt-3 max-w-2xl text-primary-100">
+          <p className="mx-auto mt-3 max-w-2xl text-primary-100!">
             Suscríbete a nuestro boletín y recibe las últimas historias de
             viajes, ofertas exclusivas y consejos de nuestros expertos.
           </p>

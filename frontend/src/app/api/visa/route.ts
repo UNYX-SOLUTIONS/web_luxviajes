@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import qs from "qs";
-import { Visa, VisasPage } from "@/types";
+import { VisasPage } from "@/types";
 
 const STRAPI_URL = "http://localhost:1337/api";
 const STRAPI_ORIGIN = "http://localhost:1337";
