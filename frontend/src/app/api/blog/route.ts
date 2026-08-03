@@ -38,7 +38,7 @@ interface StrapiBlogPost {
   fecha?: string;
   tiempoLectura?: string;
   categoria?: string;
-  etiquetas?: string[];
+  etiquetas?: string;
   destacado?: boolean;
   createdAt: string;
   updatedAt: string;
@@ -88,7 +88,9 @@ function mapBlogPost(post: StrapiBlogPost): BlogPost {
     date: post.fecha ?? "",
     readTime: post.tiempoLectura ?? "5 min",
     category: post.categoria ?? "General",
-    tags: post.etiquetas ?? [],
+    tags: post.etiquetas
+      ? post.etiquetas.split(",").map((t) => t.trim()).filter(Boolean)
+      : [],
     featured: post.destacado ?? false,
   };
 }
