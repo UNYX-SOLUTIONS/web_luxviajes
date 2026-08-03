@@ -15,50 +15,83 @@ interface HeaderProps {
 export function Header({ activeLink }: HeaderProps) {
   const pathname = usePathname();
   const currentActiveLink = activeLink || pathname;
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 w-full z-50 bg-[#2D0D46]/95 shadow-sm">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20 md:h-32">
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <div className="relative w-45 h-17.5 md:w-55 md:h-15 lg:w-65 lg:h-25">
+    <header className="fixed left-0 right-0 top-0 z-50 w-full bg-[#2D0D46]/95 shadow-sm">
+      <div className="w-full px-4 sm:px-6 md:px-5 lg:px-8 xl:px-10">
+        <div className="flex h-20 items-center md:h-24 lg:h-28 xl:h-32">
+             {/* Logo */}
+          <Link href="/" className="flex items-center shrink-0">
+            <div className="relative w-45 h-17.5 md:w-55 md:h-15 2xl:w-65 2xl:h-25">
               <Image
                 src="/images/logo_white.png"
                 alt="Luxviajes Logo"
                 fill
-                className="object-contain"
+                className="object-contain object-left"
                 loading="eager"
                 priority
-                sizes="(max-width: 768px) 180px, (max-width: 1024px) 260px, 320px"
+                sizes="(max-width: 768px) 180px, (max-width: 1535px) 220px, 320px"
               />
             </div>
           </Link>
 
+
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex gap-6">
-            {NAVIGATION_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "font-medium transition-colors",
-                  currentActiveLink === link.href
-                    ? "text-white text-sm md:text-md lg:text-lg xl:text-xl font-black border-b-2 border-[#500088]"
-                    : "text-[#CCC6D0] text-sm md:text-md lg:text-lg xl:text-xl hover:text-purple-400",
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+          <nav
+            className="
+              ml-4 hidden min-w-0 flex-1
+              items-center justify-end
+              gap-2
+              md:flex
+              lg:ml-8 lg:gap-4
+              xl:ml-12 xl:gap-6
+            "
+          >
+            {NAVIGATION_LINKS.map((link) => {
+              const isActive = currentActiveLink === link.href;
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    `
+                      whitespace-nowrap
+                      border-b-2 border-transparent
+                      pb-1
+                      text-[12px] font-medium
+                      leading-none
+                      transition-colors
+                      lg:text-sm
+                      xl:text-lg
+                      2xl:text-xl
+                    `,
+                    isActive
+                      ? "border-[#8A3BB7] font-black text-white"
+                      : "text-[#CCC6D0] hover:text-purple-400",
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Mobile Menu Button */}
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-white/10 transition"
-            aria-label="Toggle menu"
+            type="button"
+            onClick={() => setIsMobileMenuOpen((current) => !current)}
+            className="
+              ml-auto rounded-lg p-2
+              transition hover:bg-white/10
+              md:hidden
+            "
+            aria-label={
+              isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"
+            }
+            aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? (
               <XMarkIcon className="h-6 w-6 text-white" />
@@ -70,23 +103,32 @@ export function Header({ activeLink }: HeaderProps) {
 
         {/* Mobile Navigation Menu */}
         {isMobileMenuOpen && (
-          <nav className="md:hidden pb-4 pt-2 border-t border-white/10">
+          <nav className="border-t border-white/10 pb-4 pt-2 md:hidden">
             <div className="flex flex-col gap-3">
-              {NAVIGATION_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    "px-4 py-2 rounded-lg font-medium transition-colors",
-                    currentActiveLink === link.href
-                      ? "text-white bg-[#500088]"
-                      : "text-[#CCC6D0] hover:bg-white/10 hover:text-white",
-                  )}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {NAVIGATION_LINKS.map((link) => {
+                const isActive = currentActiveLink === link.href;
+
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      `
+                        rounded-lg
+                        px-4 py-2
+                        font-medium
+                        transition-colors
+                      `,
+                      isActive
+                        ? "bg-[#500088] text-white"
+                        : "text-[#CCC6D0] hover:bg-white/10 hover:text-white",
+                    )}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
           </nav>
         )}
