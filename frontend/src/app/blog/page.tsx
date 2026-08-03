@@ -24,7 +24,7 @@ function parseStyledText(text: string): string {
   if (!text) return "";
   let parsed = text.replace(
     /\*([^*]+)\*/g,
-    '<span class="text-primary-600">$1</span>',
+    '<span class="text-white">$1</span>',
   );
   parsed = parsed.replace(/<br\s*\/?>/gi, "<br />");
   parsed = parsed.replace(/\n/g, "<br />");
@@ -206,17 +206,23 @@ export default function BlogPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-neutral-900">
+      <section className="relative overflow-hidden bg-primary-950">
         <div className="absolute inset-0">
           <Image
             src={
               blogData?.heroImagen ||
-              "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=1800&h=900&fit=crop"
+              "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=1920&h=1080&fit=crop&q=80"
             }
             alt="Blog de viajes"
             fill
-            className="h-full w-full object-cover"
+            sizes="100vw"
+            quality={90}
             priority
+            className="h-full w-full object-cover transition-opacity duration-700"
+            onLoad={(e) => {
+              (e.target as HTMLImageElement).classList.remove("opacity-0");
+            }}
+            style={{ opacity: blogData?.heroImagen ? 1 : 0.85 }}
           />
           <div className="absolute inset-0 bg-linear-to-r from-primary-950/85 via-primary-900/60 to-primary-900/40" />
         </div>

@@ -219,17 +219,19 @@ export default function BlogPostPage() {
   return (
     <>
       {/* Hero Section - SIN CAMBIOS EN PADDING TOP */}
-      <section className="relative overflow-hidden bg-neutral-900 min-h-[50vh] flex items-end pt-10! sm:pt-15! md:pt-20! lg:pt-25!">
+      <section className="relative overflow-hidden bg-primary-950 min-h-[50vh] flex items-end pt-10! sm:pt-15! md:pt-20! lg:pt-25!">
         <div className="absolute inset-0">
           <Image
             src={
               postData.image ||
-              "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=1800&h=900&fit=crop"
+              "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=1920&h=1080&fit=crop&q=80"
             }
             alt={postData.title}
             fill
-            className="object-cover"
+            sizes="100vw"
+            quality={90}
             priority
+            className="object-cover transition-opacity duration-700"
           />
           <div className="absolute inset-0 bg-linear-to-t from-neutral-950/90 via-neutral-900/50 to-neutral-900/30" />
         </div>
