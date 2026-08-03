@@ -41,32 +41,6 @@ const steps = [
   },
 ];
 
-//
-// PRECIOS DE VISAS — Hardcodeados temporalmente (sin IVA)
-//
-// Cuando agregues el campo "precio" en Strapi (Visa Item), la API lo
-// reenviará como visa.precio y este código lo usará automáticamente.
-// Mientras tanto, asigna precios por documentId aquí.
-//
-// Para obtener el documentId: Strapi Admin > Visa Item > [visa] >
-// panel lateral derecho > "Document ID". Copialo y pegalo como key.
-//
-// Precio default: $7.00  (total con IVA ≈ $8.05)
-// Cupo max tarjeta:  $50
-// Montos bloqueados: $2, $3, $4, $5, $50, $999, $1000
-//
-const VISA_PRICES: Record<string, number> = {
-  // "aq5xz8..." : 10,  ← ejemplo: reemplaza con documentId real
-};
-
-const DEFAULT_VISA_PRICE = 1.0;
-
-function getVisaPrice(visa: Visa): number {
-  if (visa.precio != null && visa.precio > 0) return visa.precio;
-  if (VISA_PRICES[visa.documentId] != null) return VISA_PRICES[visa.documentId];
-  return DEFAULT_VISA_PRICE;
-}
-
 export default function VisasPage() {
   const [selectedVisa, setSelectedVisa] = useState<Visa | null>(null);
   const [showRequirementsDialog, setShowRequirementsDialog] = useState(false);
@@ -116,7 +90,7 @@ export default function VisasPage() {
       documentId: selectedVisa.documentId,
       name: selectedVisa.titulo,
       type: selectedVisa.subtitulo || "Visado",
-      price: getVisaPrice(selectedVisa),
+      price: selectedVisa.precio ?? 0,
       validity: selectedVisa.validez || "Variable según destino",
       processing: selectedVisa.procesamiento || "15-30 días hábiles",
       includes: [
@@ -327,28 +301,31 @@ export default function VisasPage() {
                       </span>
                     </button>
 
-                    {/* <button
-                      onClick={() => openPurchaseDialog({
-                        id: visa.id,
-                        documentId: visa.documentId,
-                        name: visa.titulo,
-                        type: visa.subtitulo || "Visado",
-                        price: getVisaPrice(visa),
-                        validity: visa.validez || "Variable según destino",
-                        processing: visa.procesamiento || "15-30 días hábiles",
-                        includes: [
-                          "Documentos requeridos",
-                          "Asesoría personalizada",
-                          "Seguimiento del proceso"
-                        ]
-                      })}
+                    <button
+                      onClick={() =>
+                        openPurchaseDialog({
+                          id: visa.id,
+                          documentId: visa.documentId,
+                          name: visa.titulo,
+                          type: visa.subtitulo || "Visado",
+                          price: visa.precio ?? 0,
+                          validity: visa.validez || "Variable según destino",
+                          processing:
+                            visa.procesamiento || "15-30 días hábiles",
+                          includes: [
+                            "Documentos requeridos",
+                            "Asesoría personalizada",
+                            "Seguimiento del proceso",
+                          ],
+                        })
+                      }
                       className="group relative w-full overflow-hidden rounded-full bg-secondary-50 px-6 py-3.5 text-sm font-semibold text-primary-700 transition-all duration-300 hover:bg-primary-100 hover:scale-[1.02] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-700/20 active:scale-95 cursor-pointer"
                     >
                       <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                       <span className="relative flex items-center justify-center gap-2">
                         Solicitar
                       </span>
-                    </button> */}
+                    </button>
                   </div>
                 </article>
               ))
@@ -654,15 +631,12 @@ export default function VisasPage() {
 
             {/* Footer */}
             <div className="shrink-0 border-t border-neutral-200 bg-white px-8 py-6 flex flex-col gap-3 sm:flex-row">
-
-
-              
-              {/* <button
+              <button
                 onClick={handleStartProcess}
                 className="flex-1 rounded-full bg-primary-700 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-primary-800 cursor-pointer"
               >
                 Iniciar Trámite
-              </button> */}
+              </button>
               {selectedVisa.pdf && (
                 <a
                   href={selectedVisa.pdf}

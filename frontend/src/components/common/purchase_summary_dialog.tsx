@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { Fragment, useState } from "react";
@@ -54,7 +55,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
   onPay,
   isLoading = false,
   currency = "$",
-  taxRate = 0.15,
+  taxRate: _taxRate,
   error = null,
 }) => {
   const { data: helpData } = useHelpData();
@@ -76,9 +77,6 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
   const formatPrice = (price: number) => {
     return `${currency} ${price.toFixed(2)}`;
   };
-
-  const tax = service.price * taxRate;
-  const total = service.price + tax;
 
   const handleInputChange = (field: keyof CustomerFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -240,31 +238,18 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                         </div>
                       )}
 
-                      <div className="mt-6 rounded-2xl bg-neutral-50 p-4">
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-neutral-600">Subtotal</span>
-                            <span className="font-medium text-neutral-900">
-                              {formatPrice(service.price)}
-                            </span>
-                          </div>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-neutral-600">
-                              IVA ({Math.round(taxRate * 100)}%)
-                            </span>
-                            <span className="font-medium text-neutral-900">
-                              {formatPrice(tax)}
-                            </span>
-                          </div>
-                          <div className="border-t border-neutral-200 pt-2 mt-2">
-                            <div className="flex justify-between text-base font-bold">
-                              <span className="text-neutral-900">Total</span>
-                              <span className="text-primary-700">
-                                {formatPrice(total)}
-                              </span>
-                            </div>
-                          </div>
+                      <div className="mt-6 rounded-2xl bg-primary-50 p-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-base font-bold text-neutral-900">
+                            Total a pagar
+                          </span>
+                          <span className="text-xl font-bold text-primary-700">
+                            {formatPrice(service.price)}
+                          </span>
                         </div>
+                        <p className="mt-1 text-xs text-neutral-500 text-right">
+                          IVA incluido
+                        </p>
                       </div>
                       <div className="mt-6 flex flex-row items-center justify-center gap-2 px-2">
                         {/* Un checkbox obligatoio si no no puede avanzar */}
@@ -335,7 +320,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                           className="flex w-full items-center justify-center gap-3 rounded-full bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                         >
                           <CreditCardIcon className="h-5 w-5" />
-                          Pagar {formatPrice(total)}
+                              Pagar {formatPrice(service.price)}
                         </button>
                       </div>
                     </>
@@ -504,7 +489,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                           ) : (
                             <>
                               <CreditCardIcon className="h-5 w-5" />
-                              Pagar {formatPrice(total)}
+                          Pagar {formatPrice(service.price)}
                             </>
                           )}
                         </button>
