@@ -9,7 +9,7 @@ El proyecto está configurado para obtener datos progresivamente desde la API de
 En `.env.local`:
 
 ```
-NEXT_PUBLIC_STRAPI_API_URL=http://localhost:1337
+NEXT_PUBLIC_STRAPI_API_URL=https://cms.agencialuxviajes.com/admin
 ```
 
 ### Rutas API Disponibles

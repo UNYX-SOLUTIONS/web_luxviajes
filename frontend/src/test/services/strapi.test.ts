@@ -14,7 +14,7 @@ vi.mock("@/lib/env", async () => {
     ...actual,
     env: {
       ...actual.env,
-      strapiApiUrl: "http://localhost:1337",
+      strapiApiUrl: "https://cms.agencialuxviajes.com/admin",
       strapiApiToken: "",
     },
   };
@@ -43,7 +43,7 @@ describe("getStrapiData", () => {
     const result = await getStrapiData("home");
     expect(result).toEqual(mockData);
     expect(mockFetch).toHaveBeenCalledWith(
-      "http://localhost:1337/api/home",
+      "https://cms.agencialuxviajes.com/admin/api/home",
       expect.objectContaining({
         cache: "no-store",
         headers: expect.objectContaining({

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const STRAPI_URL = "http://localhost:1337/api";
+const STRAPI_URL = "https://cms.agencialuxviajes.com/admin/api";
 
 interface StrapiRedSocialResponse {
   data: {
