@@ -107,8 +107,8 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
                 {post.author}
               </span>
             </div>
-            <span className="text-xs font-semibold text-primary-600 group-hover:text-primary-700 transition-colors shrink-0 ml-2">
-              Leer más →
+            <span className="text-xs font-semibold text-primary-600 group-hover:text-primary-700 transition-colors shrink-0 ml-2 flex items-center gap-2">
+              Leer más <ArrowRightIcon className="h-4 w-4" />
             </span>
           </div>
         </div>
@@ -319,10 +319,10 @@ export default function BlogPage() {
                     <span className="inline-block rounded-full bg-primary-100 px-3! py-1! text-xs! md:text-md! font-semibold text-primary-700 mb-3! max-w-35 text-center items-center justify-center">
                       Artículo Destacado
                     </span>
-                    <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 group-hover:text-primary-700 transition-colors">
+                    <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 group-hover:text-primary-700 transition-colors line-clamp-3">
                       {featuredPost.title}
                     </h2>
-                    <p className="mt-3 text-neutral-600">
+                    <p className="mt-3 text-neutral-600 line-clamp-3">
                       {featuredPost.excerpt}
                     </p>
                     {/* Boton de leer mas, que sea fondo morado y texto blanco */}

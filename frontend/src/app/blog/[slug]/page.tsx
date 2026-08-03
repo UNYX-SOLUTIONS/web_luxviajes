@@ -31,21 +31,21 @@ function ContentBlocks({ blocks }: { blocks: ContentBlock[] }) {
           return (
             <figure
               key={`${block.__component}-${block.id}`}
-              className="overflow-hidden rounded-xl bg-neutral-50"
+              className="overflow-hidden rounded-xl bg-neutral-50!"
             >
               {block.titulo && (
-                <h3 className="text-xl md:text-2xl font-bold text-neutral-900 mb-2 px-1">
+                <h3 className="text-xl! md:text-2xl! font-bold text-neutral-900! mb-2 px-1">
                   {block.titulo}
                 </h3>
               )}
               {block.subtitulo && (
-                <p className="text-sm text-neutral-500 mb-3 px-1">
+                <p className="text-sm! text-neutral-500! mb-3! px-1!">
                   {block.subtitulo}
                 </p>
               )}
               <div className="relative w-full overflow-hidden rounded-lg">
                 {block.imagen && (
-                  // eslint-disable-next-line @next/next/no-img-element
+                   
                   <img
                     src={block.imagen}
                     alt={block.texto || block.titulo || "Imagen del artículo"}
@@ -524,10 +524,10 @@ export default function BlogPostPage() {
       {/* CTA Section */}
       <section className="bg-primary-700 py-12 md:py-16">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <h3 className="text-2xl md:text-3xl font-bold text-white">
+          <h3 className="text-2xl md:text-3xl font-bold text-white!">
             ¿Listo para vivir tu propia aventura?
           </h3>
-          <p className="mt-3 text-primary-100 max-w-2xl mx-auto">
+          <p className="mt-3 text-primary-100! max-w-2xl mx-auto">
             Nuestros expertos están listos para diseñar el viaje de tus sueños.
             Planificación personalizada y sin compromiso.
           </p>
