@@ -59,7 +59,7 @@ export const usePurchaseDialog = () => {
       setIsLoading(true);
 
       try {
-        const total = currentService.price * 1.15;
+        const total = currentService.price;
 
         const result = await createCheckout({
           amount: total,
