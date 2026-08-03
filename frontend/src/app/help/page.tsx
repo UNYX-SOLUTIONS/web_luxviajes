@@ -46,7 +46,14 @@ const helpTopics = [
     icon: ShieldCheckIcon,
     downloadKey: "pdfPoliticasPrivacidad",
   },
- /*  {
+  {
+    title: "Politicas de Uso Web",
+    description:
+      "Informacion detallada sobre nuestras politicas de uso web y como interactuar con nuestra plataforma.",
+    icon: MapIcon,
+    downloadKey: "pdfPoliticasUsoWeb",
+  },
+  /*  {
     title: "Vuelos internacionales",
     description:
       "Consejos para reservar vuelos internacionales, incluyendo mejores prácticas, opciones de aerolíneas y cómo encontrar las mejores ofertas.",
@@ -90,7 +97,9 @@ export default function HelpPage() {
       title: "WhatsApp Directo",
       description: "Mensajeria instantanea con nuestros expertos locales.",
       icon: ChatBubbleLeftIcon,
-      href: redes?.whatsapp ? `https://wa.me/${redes.whatsapp.replace(/[^0-9]/g, '')}` : "",
+      href: redes?.whatsapp
+        ? `https://wa.me/${redes.whatsapp.replace(/[^0-9]/g, "")}`
+        : "",
       isExternal: true,
       bgColor: "bg-secondary-100",
       bgColorSelected: "bg-primary-700",
@@ -220,9 +229,15 @@ export default function HelpPage() {
                         >
                           Ver detalles
                         </Link>
-                      ) : topic.downloadKey && helpData && helpData[topic.downloadKey as keyof typeof helpData] ? (
+                      ) : topic.downloadKey &&
+                        helpData &&
+                        helpData[topic.downloadKey as keyof typeof helpData] ? (
                         <a
-                          href={helpData[topic.downloadKey as keyof typeof helpData] as string}
+                          href={
+                            helpData[
+                              topic.downloadKey as keyof typeof helpData
+                            ] as string
+                          }
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => {
@@ -265,11 +280,14 @@ export default function HelpPage() {
             </div>
           ) : error ? (
             <div className="mt-10 text-center">
-              <p className="text-red-600">Error al cargar preguntas frecuentes</p>
+              <p className="text-red-600">
+                Error al cargar preguntas frecuentes
+              </p>
             </div>
           ) : (
             <div className="mt-10 space-y-3">
-              {helpData?.preguntasFrecuentes && helpData.preguntasFrecuentes.length > 0 ? (
+              {helpData?.preguntasFrecuentes &&
+              helpData.preguntasFrecuentes.length > 0 ? (
                 helpData.preguntasFrecuentes.map((faq, index) => (
                   <details
                     key={faq.documentId}
@@ -286,7 +304,9 @@ export default function HelpPage() {
                   </details>
                 ))
               ) : (
-                <p className="text-center text-neutral-600">No hay preguntas frecuentes disponibles.</p>
+                <p className="text-center text-neutral-600">
+                  No hay preguntas frecuentes disponibles.
+                </p>
               )}
             </div>
           )}
@@ -371,7 +391,11 @@ export default function HelpPage() {
             </p>
             {/* Boton que envia a correo */}
             <a
-              href={redes?.email_trabajos ? `mailto:${redes.email_trabajos}` : "mailto:agencia@luxviajes.com"}
+              href={
+                redes?.email_trabajos
+                  ? `mailto:${redes.email_trabajos}`
+                  : "mailto:agencia@luxviajes.com"
+              }
               className="mt-6 inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary-700 transition hover:bg-primary-50"
             >
               Haznos llegar tu CV
