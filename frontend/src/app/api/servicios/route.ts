@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const STRAPI_URL = "https://cms.agencialuxviajes.com/admin/api";
+const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
 
 interface TarjetaServicioResponse {
   id: number;

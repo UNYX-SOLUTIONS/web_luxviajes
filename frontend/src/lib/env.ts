@@ -2,7 +2,7 @@
 export const env = {
   // Public variables
   apiUrl:
-    process.env.NEXT_PUBLIC_API_URL || "https://cms.agencialuxviajes.com/admin/api",
+    process.env.NEXT_PUBLIC_API_URL || "https://cms.agencialuxviajes.com/api",
   appName: process.env.NEXT_PUBLIC_APP_NAME || "Luxviajes",
   appDomain: process.env.NEXT_PUBLIC_APP_DOMAIN || "agencialuxviajes.com",
   enableAnalytics: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === "true",
@@ -11,7 +11,7 @@ export const env = {
   // Strapi API base URL (distinta de NEXT_PUBLIC_API_URL)
   strapiApiUrl:
     process.env.NEXT_PUBLIC_STRAPI_API_URL ||
-    "https://cms.agencialuxviajes.com/admin/api",
+    "https://cms.agencialuxviajes.com/api",
   strapiApiToken: process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || "",
 
   // Private variables (server-side only)

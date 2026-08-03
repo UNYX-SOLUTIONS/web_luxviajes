@@ -13,8 +13,8 @@ interface StrapiFormat {
   url: string;
 }
 
-const STRAPI_URL = "https://cms.agencialuxviajes.com/admin/api";
-const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com/admin";
+const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
+const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com";
 
 interface StrapiPDF {
   id: number;

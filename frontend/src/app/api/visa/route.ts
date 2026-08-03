@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import qs from "qs";
 import { VisasPage } from "@/types";
 
-const STRAPI_URL = "https://cms.agencialuxviajes.com/admin/api";
-const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com/admin";
+const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
+const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com";
 
 interface StrapiImagen {
   formats?: {

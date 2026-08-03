@@ -30,7 +30,7 @@ export const STATS = [
 ] as const;
 
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://cms.agencialuxviajes.com/admin/api";
+  process.env.NEXT_PUBLIC_API_URL || "https://cms.agencialuxviajes.com/api";
 
 export const ROUTES = {
   home: "/",

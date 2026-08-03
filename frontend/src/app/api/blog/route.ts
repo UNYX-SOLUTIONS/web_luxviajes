@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import qs from "qs";
 import { BlogPost, ContentBlock } from "@/types";
 
-const STRAPI_URL = "https://cms.agencialuxviajes.com/admin/api";
-const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com/admin";
+const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
+const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com";
 const STRAPI_TOKEN = process.env.NEXT_PUBLIC_STRAPI_API_TOKEN || "";
 
 function getHeaders(): Record<string, string> {
