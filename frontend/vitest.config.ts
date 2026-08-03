@@ -5,7 +5,6 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     pool: "forks",
-    poolTimeout: 30000,
     include: ["src/test/**/*.{test,spec}.{ts,tsx}"],
     coverage: {
       provider: "v8",
