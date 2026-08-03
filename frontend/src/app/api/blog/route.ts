@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import qs from "qs";
-import { BlogPost } from "@/types";
+import { BlogPost, ContentBlock } from "@/types";
 
 const STRAPI_URL = "http://localhost:1337/api";
 const STRAPI_ORIGIN = "http://localhost:1337";
@@ -26,13 +26,22 @@ interface StrapiImagen {
   };
 }
 
+interface StrapiDynamicZoneBlock {
+  __component: string;
+  id: number;
+  imagen?: StrapiImagen;
+  texto?: string;
+  titulo?: string;
+  subtitulo?: string;
+}
+
 interface StrapiBlogPost {
   id: number;
   documentId: string;
   titulo: string;
   slug: string;
   resumen?: string;
-  contenido?: string;
+  contenido?: StrapiDynamicZoneBlock[];
   imagen?: StrapiImagen;
   autor?: string;
   fecha?: string;
@@ -81,7 +90,17 @@ function mapBlogPost(post: StrapiBlogPost): BlogPost {
     title: post.titulo,
     slug: post.slug,
     excerpt: post.resumen ?? "",
-    content: post.contenido ?? "",
+    content: (post.contenido ?? []).map(
+      (block) =>
+        ({
+          __component: block.__component,
+          id: block.id,
+          imagen: block.imagen ? getImageUrl(block.imagen) : undefined,
+          texto: block.texto,
+          titulo: block.titulo,
+          subtitulo: block.subtitulo,
+        }) as ContentBlock,
+    ),
     image: post.imagen ? getImageUrl(post.imagen) : undefined,
     author: authorName,
     authorAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=500088&color=fff`,
@@ -104,7 +123,19 @@ export async function GET(request: Request) {
       const query = qs.stringify(
         {
           filters: { slug: { $eq: slug } },
-          populate: { imagen: { populate: "*" } },
+          populate: {
+            imagen: { populate: "*" },
+            contenido: {
+              on: {
+                "content.image-block": {
+                  populate: { imagen: { populate: "*" } },
+                },
+                "content.text-block": {
+                  populate: "*",
+                },
+              },
+            },
+          },
           pagination: { pageSize: 1 },
         },
         { encodeValuesOnly: true },
@@ -147,6 +178,16 @@ export async function GET(request: Request) {
           blog_posts: {
             populate: {
               imagen: { populate: "*" },
+              contenido: {
+                on: {
+                  "content.image-block": {
+                    populate: { imagen: { populate: "*" } },
+                  },
+                  "content.text-block": {
+                    populate: "*",
+                  },
+                },
+              },
             },
             sort: "fecha:desc",
           },

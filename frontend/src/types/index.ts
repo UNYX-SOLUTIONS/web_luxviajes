@@ -324,13 +324,32 @@ export interface Help {
 
 // ─── Blog Types ───────────────────────────────────────────
 
+export interface ImageBlock {
+  __component: "content.image-block";
+  id: number;
+  imagen?: string;
+  texto?: string;
+  titulo?: string;
+  subtitulo?: string;
+}
+
+export interface TextBlock {
+  __component: "content.text-block";
+  id: number;
+  texto?: string;
+  titulo?: string;
+  subtitulo?: string;
+}
+
+export type ContentBlock = ImageBlock | TextBlock;
+
 export interface BlogPost {
   id: number;
   documentId: string;
   title: string;
   slug: string;
   excerpt: string;
-  content: string;
+  content: ContentBlock[];
   image?: string;
   author: string;
   authorAvatar?: string;

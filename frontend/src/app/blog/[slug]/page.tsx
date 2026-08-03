@@ -13,9 +13,75 @@ import {
 } from "@heroicons/react/24/outline";
 import { useState, useMemo } from "react";
 import { useBlogData } from "@/hooks/useBlogData";
-import { BlogPost } from "@/types";
+import { BlogPost, ContentBlock } from "@/types";
 import { ContactDialog } from "@/components/common/contact_dialog";
 import { useRedSocial } from "@/hooks";
+
+function ContentBlocks({ blocks }: { blocks: ContentBlock[] }) {
+  if (!blocks || blocks.length === 0) return null;
+
+  return (
+    <div className="space-y-8">
+      {blocks.map((block) => {
+        if (block.__component === "content.image-block") {
+          return (
+            <figure key={`${block.__component}-${block.id}`} className="overflow-hidden rounded-xl">
+              {block.titulo && (
+                <h3 className="text-xl font-bold text-neutral-900 mb-1">
+                  {block.titulo}
+                </h3>
+              )}
+              {block.subtitulo && (
+                <p className="text-sm text-neutral-500 mb-3">
+                  {block.subtitulo}
+                </p>
+              )}
+              {block.imagen && (
+                <img
+                  src={block.imagen}
+                  alt={block.texto || block.titulo || ""}
+                  className="w-full object-cover rounded-xl"
+                />
+              )}
+              {block.texto && (
+                <figcaption className="mt-2 text-sm text-center text-neutral-500">
+                  {block.texto}
+                </figcaption>
+              )}
+            </figure>
+          );
+        }
+
+        if (block.__component === "content.text-block") {
+          return (
+            <div
+              key={`${block.__component}-${block.id}`}
+            >
+              {block.titulo && (
+                <h3 className="text-xl font-bold text-neutral-900 mb-1">
+                  {block.titulo}
+                </h3>
+              )}
+              {block.subtitulo && (
+                <p className="text-sm text-neutral-500 mb-3">
+                  {block.subtitulo}
+                </p>
+              )}
+              <div
+                className="prose prose-lg max-w-none prose-headings:text-neutral-900 prose-p:text-neutral-700 prose-a:text-primary-600"
+                dangerouslySetInnerHTML={{
+                  __html: block.texto || "",
+                }}
+              />
+            </div>
+          );
+        }
+
+        return null;
+      })}
+    </div>
+  );
+}
 
 export default function BlogPostPage() {
   const params = useParams();
@@ -49,7 +115,7 @@ export default function BlogPostPage() {
       title: post.title,
       slug: post.slug,
       excerpt: post.excerpt || "",
-      content: post.content || "",
+      content: post.content || [],
       image: post.image || "",
       author: post.author || "Luxviajes",
       authorAvatar:
@@ -156,12 +222,7 @@ export default function BlogPostPage() {
             {postData.excerpt}
           </div>
 
-          <div
-            className="prose prose-lg max-w-none prose-headings:text-neutral-900 prose-p:text-neutral-700 prose-a:text-primary-600"
-            dangerouslySetInnerHTML={{
-              __html: postData.content || postData.excerpt || "",
-            }}
-          />
+          <ContentBlocks blocks={postData.content} />
 
           {postData.tags && postData.tags.length > 0 && (
             <div className="mt-8 pt-8 border-t border-neutral-200">

@@ -12,6 +12,7 @@ import {
   UserIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
+import {ArrowRightIcon} from "@heroicons/react/24/bold"
 import { motion } from "framer-motion";
 import { useBlogData } from "@/hooks/useBlogData";
 import { BlogPost } from "@/types";
@@ -43,7 +44,10 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
         {/* Image */}
         <div className="relative h-52 w-full overflow-hidden shrink-0">
           <Image
-            src={post.image || "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=800&h=600&fit=crop"}
+            src={
+              post.image ||
+              "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=800&h=600&fit=crop"
+            }
             alt={post.title}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -88,7 +92,10 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
           <div className="mt-4 flex items-center justify-between pt-4 border-t border-neutral-100">
             <div className="flex items-center gap-2">
               <img
-                src={post.authorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author)}&background=500088&color=fff`}
+                src={
+                  post.authorAvatar ||
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author)}&background=500088&color=fff`
+                }
                 alt={post.author}
                 className="h-6 w-6 rounded-full"
               />
@@ -195,7 +202,7 @@ export default function BlogPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-neutral-900 h-screen">
+      <section className="relative overflow-hidden bg-neutral-900">
         <div className="absolute inset-0">
           <Image
             src={
@@ -210,13 +217,13 @@ export default function BlogPage() {
           <div className="absolute inset-0 bg-linear-to-r from-primary-950/85 via-primary-900/60 to-primary-900/40" />
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-4! py-30! sm:py-40! md:py-50! sm:px-6! lg:px-8! mt-10! flex flex-col justify-center">
+        <div className="relative mx-auto max-w-7xl px-4! py-10! sm:py-15! md:py-20! sm:px-6! lg:px-8! mt-25! flex flex-col justify-center">
           <div className="mx-auto max-w-3xl text-center justify-center text-white">
             <span className="inline-block rounded-full bg-primary-600/30 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary-100 backdrop-blur-sm mb-4">
               Inspiración para tu próximo viaje
             </span>
             <h1
-              className="text-2xl! sm:text-3xl! md:text-4xl! lg:text-5xl! xl:text-6xl! font-bold leading-tight!"
+              className="text-3xl! sm:text-4xl! md:text-5xl! lg:text-6xl! xl:text-7xl! font-bold leading-tight!"
               dangerouslySetInnerHTML={{
                 __html: parseStyledText(
                   blogData?.heroTitulo || "Blog *Luxviajes*",
@@ -237,7 +244,7 @@ export default function BlogPage() {
                   placeholder="Busca artículos, destinos o temas..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full rounded-full bg-white/10 backdrop-blur-sm border border-white/20 px-12 py-3 text-white placeholder:text-neutral-400 outline-none focus:border-white/50 transition"
+                  className="w-full rounded-full bg-white/10 backdrop-blur-lg border border-white/35! px-12 py-3 text-white! placeholder:text-neutral-300 outline-none focus:border-white/65! transition!"
                 />
               </div>
             </div>
@@ -292,17 +299,20 @@ export default function BlogPage() {
                 href={`/blog/${featuredPost.slug}`}
                 className="group block overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200 hover:shadow-xl transition-all duration-300"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-                  <div className="relative h-64 md:h-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 sm:gap-2 gap-6">
+                  <div className="relative md:h-auto min-h-90 w-full overflow-hidden shrink-0">
                     <Image
-                      src={featuredPost.image || "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=800&h=600&fit=crop"}
+                      src={
+                        featuredPost.image ||
+                        "https://images.unsplash.com/photo-1431274172761-fca41d930114?w=800&h=600&fit=crop"
+                      }
                       alt={featuredPost.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  <div className="p-6 md:p-8 flex flex-col justify-center">
-                    <span className="inline-block rounded-full bg-primary-100 px-3 py-1 text-xs font-semibold text-primary-700 mb-3">
+                  <div className="p-6 md:p-8 flex flex-col justify-center gap-2">
+                    <span className="inline-block rounded-full bg-primary-100 px-3! py-1! text-xs! md:text-md! font-semibold text-primary-700 mb-3! max-w-35 text-center items-center justify-center">
                       Artículo Destacado
                     </span>
                     <h2 className="text-2xl md:text-3xl font-bold text-neutral-900 group-hover:text-primary-700 transition-colors">
@@ -311,6 +321,14 @@ export default function BlogPage() {
                     <p className="mt-3 text-neutral-600">
                       {featuredPost.excerpt}
                     </p>
+                    {/* Boton de leer mas, que sea fondo morado y texto blanco */}
+                    <div className="mt-3 bg-primary-700! text-white hover:bg-primary-500! transition-colors duration-300 px-4 py-2 rounded-full inline-flex items-center gap-2 text-sm font-semibold max-w-30 justify-center">
+                      <span className="flex items-center gap-2">
+                        Leer más
+                        <ArrowRightIcon className="h-4 w-4" />
+                      </span>
+                    </div>
+                    {/* Autor y fecha */}
                     <div className="mt-4 flex items-center gap-4 text-sm text-neutral-500">
                       <span className="flex items-center gap-1">
                         <UserIcon className="h-4 w-4" />
