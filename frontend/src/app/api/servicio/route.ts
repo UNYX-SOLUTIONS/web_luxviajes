@@ -131,7 +131,7 @@ export async function GET() {
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 3600 }, // Revalidar cada hora
+      next: { revalidate: 0 }, // Revalidar cada hora
     });
 
     if (!response.ok) {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import qs from "qs";
-import { Visa, VisasPage } from "@/types";
+import { VisasPage } from "@/types";
 
 const STRAPI_URL = "https://cms.agencialuxviajes.com/api";
 const STRAPI_ORIGIN = "https://cms.agencialuxviajes.com";
@@ -26,6 +26,7 @@ interface StrapiVisaItem {
   validez: string;
   procesamiento: string;
   requisitos: string;
+  precio?: number;
   bandera?: StrapiImagen;
   pdf?: StrapiPdf;
   createdAt: string;
@@ -128,6 +129,7 @@ export async function GET() {
         ...visa,
         imagen: getImageUrl(visa.bandera),
         pdf: getPdfUrl(visa.pdf),
+        precio: visa.precio,
       })),
     };
 

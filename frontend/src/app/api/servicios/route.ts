@@ -30,7 +30,7 @@ export async function GET() {
       `${STRAPI_URL}/inicio?populate=tarjetasServicio`,
       {
         next: {
-          revalidate: 3600, // Revalidar cada hora
+          revalidate: 0, // Revalidar cada hora
         },
       },
     );

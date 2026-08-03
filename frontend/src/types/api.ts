@@ -2,7 +2,7 @@
  * Type definitions for common API responses
  */
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
     data?: T;
     error?: string;
     status: 'success' | 'error';
@@ -20,5 +20,5 @@ export interface PaginatedResponse<T> {
 export interface ErrorResponse {
     message: string;
     code: string;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
 }

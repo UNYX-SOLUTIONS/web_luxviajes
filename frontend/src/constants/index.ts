@@ -19,6 +19,7 @@ export const NAVIGATION_LINKS = [
   { label: "Contáctanos", href: "/contact" },
   { label: "Trabaja con nosotros", href: "/help#trabaja-con-nosotros" },
   { label: "Ayuda", href: "/help" },
+  { label: "Blog", href: "/blog" },
 ] as const;
 
 export const STATS = [
@@ -40,6 +41,7 @@ export const ROUTES = {
   contact: "/contact",
   help: "/help",
   workWithUs: "/work-with-us",
+  blog: "/blog",
 } as const;
 
 export const CACHE_DURATION = {

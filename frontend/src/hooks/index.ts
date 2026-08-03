@@ -11,3 +11,4 @@ export { usePaqueteData } from "./usePaqueteData";
 export { useVisasData } from "./useVisasData";
 export { useContactData } from "./useContactData";
 export { useHelpData } from "./useHelpData";
+export { useBlogData } from "./useBlogData";

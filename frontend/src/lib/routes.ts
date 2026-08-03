@@ -1,18 +1,18 @@
-// Routes configuration
 export const ROUTES = {
     HOME: '/',
     ABOUT: '/about',
     SERVICES: '/services',
     PACKAGES: '/packages',
     CONTACT: '/contact',
+    BLOG: '/blog',
 
-    // Admin routes (example)
-    // ADMIN_DASHBOARD: '/admin/dashboard',
-    // ADMIN_USERS: '/admin/users',
+    // API routes
+    API_BLOG: '/api/blog',
+    API_HERO: '/api/hero',
 };
 
-// API routes
 export const API_ROUTES = {
     HEALTH: '/api/health',
-    // Add your API routes here
+    BLOG: '/api/blog',
+    HERO: '/api/hero',
 };

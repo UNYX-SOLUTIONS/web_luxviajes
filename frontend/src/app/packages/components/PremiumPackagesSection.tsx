@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/24/solid";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { ClockIcon, DocumentArrowDownIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import type { FC } from "react";
@@ -13,13 +10,36 @@ import type { PremiumPackage } from "../data/packages-data";
 interface PremiumPackagesSectionProps {
   packages: PremiumPackage[];
   onDetalles: (pkg: PremiumPackage) => void;
+  isLoading?: boolean;
 }
 
 const ITEMS_PER_VIEW = 4;
 
+// ✅ Componente Skeleton para Premium Packages
+function PremiumPackageSkeleton() {
+  return (
+    <article className="overflow-hidden rounded-lg sm:rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200 animate-pulse">
+      <div className="relative w-full aspect-4/3 sm:aspect-auto sm:h-56 md:h-80 bg-neutral-200" />
+      <div className="p-3 sm:p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-3 bg-neutral-200 rounded w-16" />
+            <div className="h-6 bg-neutral-200 rounded w-24" />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <div className="flex-1 h-10 bg-neutral-200 rounded-full" />
+          <div className="flex-1 h-10 bg-neutral-200 rounded-full" />
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
   packages,
   onDetalles,
+  isLoading = false,
 }) => {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -27,27 +47,21 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
 
   const handleDownloadPDF = (pdfUrl?: string, title?: string) => {
     if (!pdfUrl) return;
-    
     const link = document.createElement("a");
     link.href = pdfUrl;
-    link.download = title ? `${title.toLowerCase().replace(/\s+/g, "-")}.pdf` : "download.pdf";
+    link.download = title
+      ? `${title.toLowerCase().replace(/\s+/g, "-")}.pdf`
+      : "download.pdf";
     link.target = "_blank";
     link.click();
   };
 
   const handlePageChange = (newIndex: number) => {
     if (newIndex === carouselIndex) return;
-
-    const sectionTop =
-      sectionRef.current?.getBoundingClientRect().top ?? 0;
-
+    const sectionTop = sectionRef.current?.getBoundingClientRect().top ?? 0;
     setCarouselIndex(newIndex);
-
     requestAnimationFrame(() => {
-      window.scrollBy({
-        top: sectionTop - 100,
-        behavior: "instant",
-      });
+      window.scrollBy({ top: sectionTop - 100, behavior: "instant" });
     });
   };
 
@@ -107,77 +121,93 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
               Paquetes Premium
             </h2>
             <p className="mt-1 sm:mt-2 max-w-4xl text-xs sm:text-sm text-neutral-600 md:text-md lg:text-lg">
-              Nuestra seleccion exclusiva de itinerarios curados para ofrecer el maximo confort y experiencias autenticas.
+              Nuestra seleccion exclusiva de itinerarios curados para ofrecer el
+              maximo confort y experiencias autenticas.
             </p>
           </div>
         </div>
 
+        {/* GRID */}
         <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {visiblePackages.map((item) => (
-            <article
-              key={item.title}
-              className="overflow-hidden rounded-lg sm:rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200"
-            >
-              <div className="relative w-full aspect-4/3 sm:aspect-auto sm:h-56 md:h-80">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  className="object-cover object-center"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-primary-900 via-primary-900/10 to-transparent" />
-                <span className="absolute left-2 sm:left-3 top-2 sm:top-3 rounded-full bg-neutral-900/60 px-2 sm:px-3 py-0.5 sm:py-1 text-[8px] sm:text-[10px] font-semibold uppercase tracking-wider text-white">
-                  {item.tag}
-                </span>
-                <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 text-white">
-                  <div className="flex text-center items-center gap-1">
-                    <ClockIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 inline-block mr-1" />
-                    <p className="text-[10px] sm:text-xs text-white">{item.days}</p>
+          {isLoading ? (
+            // ✅ Mostrar skeletons mientras carga
+            Array.from({ length: ITEMS_PER_VIEW }).map((_, i) => (
+              <PremiumPackageSkeleton key={`skeleton-${i}`} />
+            ))
+          ) : packages.length === 0 ? (
+            // ✅ Mostrar mensaje si no hay paquetes
+            <div className="col-span-full text-center py-12">
+              <p className="text-neutral-600">
+                No hay paquetes premium disponibles
+              </p>
+            </div>
+          ) : (
+            visiblePackages.map((item) => (
+              <article
+                key={item.title}
+                className="overflow-hidden rounded-lg sm:rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200"
+              >
+                <div className="relative w-full aspect-4/3 sm:aspect-auto sm:h-56 md:h-80">
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-primary-900 via-primary-900/10 to-transparent" />
+                  <span className="absolute left-2 sm:left-3 top-2 sm:top-3 rounded-full bg-neutral-900/60 px-2 sm:px-3 py-0.5 sm:py-1 text-[8px] sm:text-[10px] font-semibold uppercase tracking-wider text-white">
+                    {item.tag}
+                  </span>
+                  <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 text-white">
+                    <div className="flex text-center items-center gap-1">
+                      <ClockIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 inline-block mr-1" />
+                      <p className="text-[10px] sm:text-xs text-white">
+                        {item.days}
+                      </p>
+                    </div>
+                    <h4 className="font-bold text-sm sm:text-base">
+                      {item.title}
+                    </h4>
                   </div>
-                  <h4 className="font-bold text-sm sm:text-base">{item.title}</h4>
                 </div>
-              </div>
 
-              <div className="p-3 sm:p-4">
-                <div className="flex items-center justify-between mb-2 sm:mb-3">
-                  <div>
-                    <p className="text-[8px] sm:text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">
-                      Desde
-                    </p>
-                    <p className="text-lg sm:text-xl font-bold text-primary-700">
-                      ${item.price} USD
-                    </p>
+                <div className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <div>
+                      <p className="text-[8px] sm:text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">
+                        Desde
+                      </p>
+                      <p className="text-lg sm:text-xl font-bold text-primary-700">
+                        ${item.price} USD
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2.5 sm:mt-3 flex gap-2">
+                    <button
+                      onClick={() => onDetalles(item)}
+                      className="flex-1 rounded-full bg-primary-700 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-800"
+                    >
+                      Ver detalles
+                    </button>
+                    {item.pdf && (
+                      <button
+                        onClick={() => handleDownloadPDF(item.pdf, item.title)}
+                        className="flex-1 rounded-full border-2 border-primary-700 p-2 sm:p-2.5 text-primary-700 transition hover:bg-primary-50 flex items-center justify-center gap-1 text-xs sm:text-sm font-semibold"
+                      >
+                        <DocumentArrowDownIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="hidden sm:inline">Descargar</span>
+                      </button>
+                    )}
                   </div>
                 </div>
-                <div className="mt-2.5 sm:mt-3 flex gap-2">
-                  <button
-                    onClick={() => onDetalles(item)}
-                    className="flex-1 rounded-full bg-primary-700 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-800"
-                  >
-                    Ver detalles
-                  </button>
-                
-                          {item.pdf && (
-                            <button
-                              onClick={() =>
-                                handleDownloadPDF(item.pdf, item.title)
-                              }
-                              className="flex-1 rounded-full border-2 border-primary-700 p-2 sm:p-2.5 text-primary-700 transition hover:bg-primary-50 flex items-center justify-center gap-1 text-xs sm:text-sm font-semibold"
-                            >
-                              <DocumentArrowDownIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-                              <span className="hidden sm:inline">Descargar</span>
-                            </button>
-                          )}
-                  
-                </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            ))
+          )}
         </div>
 
         {/* PAGINACIÓN */}
-        {maxIndex > 0 && (
+        {!isLoading && maxIndex > 0 && packages.length > 0 && (
           <div className="mt-8 flex justify-center items-center gap-2">
             <button
               onClick={handlePrev}
@@ -191,27 +221,24 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
               <ChevronLeftIcon className="h-4 w-4" />
             </button>
 
-            {getPaginationItems().map(
-              (item, index) => (
-                <button
-                  key={index}
-                  onClick={() =>
-                    typeof item === "number" &&
-                    handlePageChange(item - 1)
-                  }
-                  disabled={typeof item !== "number"}
-                  className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
-                    item === carouselIndex + 1
-                      ? "bg-primary-700 text-white"
-                      : typeof item === "number"
+            {getPaginationItems().map((item, index) => (
+              <button
+                key={index}
+                onClick={() =>
+                  typeof item === "number" && handlePageChange(item - 1)
+                }
+                disabled={typeof item !== "number"}
+                className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
+                  item === carouselIndex + 1
+                    ? "bg-primary-700 text-white"
+                    : typeof item === "number"
                       ? "bg-neutral-200 hover:bg-neutral-300"
                       : "text-neutral-500 cursor-default"
-                  }`}
-                >
-                  {item}
-                </button>
-              )
-            )}
+                }`}
+              >
+                {item}
+              </button>
+            ))}
 
             <button
               onClick={handleNext}

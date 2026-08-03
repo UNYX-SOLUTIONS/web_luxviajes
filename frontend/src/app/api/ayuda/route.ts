@@ -52,8 +52,10 @@ interface StrapiAyudaResponse {
   data: {
     id: number;
     documentId: string;
-    pdfPoliticasAgencia?: StrapiPDF;
+    pdfPoliticasVisas?: StrapiPDF;
     pdfPoliticasViaje?: StrapiPDF;
+    pdfPoliticasPrivacidad?: StrapiPDF;
+    pdfPoliticasUsoWeb?: StrapiPDF;
     preguntas_frecuentas?: PreguntaFrecuente[];
     createdAt: string;
     updatedAt: string;
@@ -75,10 +77,16 @@ export async function GET() {
     const query = qs.stringify(
       {
         populate: {
-          pdfPoliticasAgencia: {
+          pdfPoliticasVisas: {
             populate: "*",
           },
           pdfPoliticasViaje: {
+            populate: "*",
+          },
+          pdfPoliticasPrivacidad: {
+            populate: "*",
+          },
+          pdfPoliticasUsoWeb: {
             populate: "*",
           },
           preguntas_frecuentas: {
@@ -96,7 +104,7 @@ export async function GET() {
       headers: {
         "Content-Type": "application/json",
       },
-      next: { revalidate: 3600 }, // Revalidar cada hora
+      next: { revalidate: 0 }, // Revalidar cada hora
     });
 
     if (!response.ok) {
@@ -125,8 +133,10 @@ export async function GET() {
     const transformedData = {
       id: data.data.id,
       documentId: data.data.documentId,
-      pdfPoliticasAgencia: getPdfUrl(data.data.pdfPoliticasAgencia),
+      pdfPoliticasVisas: getPdfUrl(data.data.pdfPoliticasVisas),
       pdfPoliticasViaje: getPdfUrl(data.data.pdfPoliticasViaje),
+      pdfPoliticasPrivacidad: getPdfUrl(data.data.pdfPoliticasPrivacidad),
+      pdfPoliticasUsoWeb: getPdfUrl(data.data.pdfPoliticasUsoWeb),
       preguntasFrecuentes: (data.data.preguntas_frecuentas || []).map(
         (pregunta) => ({
           id: pregunta.id,

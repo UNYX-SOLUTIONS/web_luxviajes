@@ -39,6 +39,7 @@ export interface Visa {
   validez: string;
   procesamiento: string;
   requisitos: string;
+  precio?: number;
   imagen?: string;
   pdf?: string;
   createdAt: string;
@@ -120,11 +121,6 @@ export interface HomeStats {
   years_experience: string;
   destinations: string;
   rating: string;
-}
-
-export interface StatCard {
-  label: string;
-  value: string;
 }
 
 export interface Home {
@@ -317,10 +313,98 @@ export interface PreguntaFrecuente {
 export interface Help {
   id: number;
   documentId: string;
-  pdfPoliticasAgencia?: string; // URL completa del PDF
+  pdfPoliticasVisas?: string; // URL completa del PDF
   pdfPoliticasViaje?: string; // URL completa del PDF
+  pdfPoliticasPrivacidad?: string; // URL completa del PDF
+  pdfPoliticasUsoWeb?: string; // URL completa del PDF
   preguntasFrecuentes?: PreguntaFrecuente[];
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
+}
+
+// ─── Blog Types ───────────────────────────────────────────
+
+export interface ImageBlock {
+  __component: "content.image-block";
+  id: number;
+  imagen?: string;
+  texto?: string;
+  titulo?: string;
+  subtitulo?: string;
+}
+
+export interface TextBlock {
+  __component: "content.text-block";
+  id: number;
+  texto?: string;
+  titulo?: string;
+  subtitulo?: string;
+}
+
+export type ContentBlock = ImageBlock | TextBlock;
+
+export interface BlogPost {
+  id: number;
+  documentId: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: ContentBlock[];
+  image?: string;
+  author: string;
+  authorAvatar?: string;
+  date: string;
+  readTime: string;
+  category: string;
+  tags: string[];
+  featured: boolean;
+}
+
+export interface HeroSection {
+  heroTitulo: string;
+  heroSubtitulo: string;
+  heroImagen?: string; // URL completa de la imagen
+}
+
+export interface BlogPageData {
+  id: number;
+  documentId: string;
+  heroTitulo?: string;
+  heroSubtitulo?: string;
+  heroImagen?: string;
+  posts?: BlogPost[];
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface StrapiImage {
+  url?: string;
+  formats?: {
+    large?: { url?: string };
+    medium?: { url?: string };
+    small?: { url?: string };
+    thumbnail?: { url?: string };
+  };
+}
+
+export interface GetBlogPostsResponse {
+  data: BlogPost[];
+  meta: {
+    pagination: {
+      page: number;
+      pageSize: number;
+      pageCount: number;
+      total: number;
+    };
+  };
+}
+
+export interface GetBlogPostBySlugResponse {
+  data: BlogPost;
+}
+
+export interface GetBlogPageResponse {
+  data: BlogPageData;
 }

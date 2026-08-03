@@ -28,10 +28,8 @@ interface PackageDetails {
   highlights?: string[];
 }
 
-// Funciones de mapeo para convertir datos del API a interfaces locales
+// Funciones de mapeo...
 function mapDestinoToDestination(destino: TopDestinosMes): DreamDestination {
-  // console.log("Mapeando destino:", destino);
-
   return {
     title: destino.titulo,
     image: destino.imagen || "",
@@ -40,21 +38,23 @@ function mapDestinoToDestination(destino: TopDestinosMes): DreamDestination {
     nights: destino.subtitulo,
     season: destino.disponibilidad,
     price: destino.precio,
-    included: (destino.descripcion || "").split("\n").filter(line => line.trim()), // Para las cards
-    detailIncluded: (destino.descripcionDetallada || "").split("\n").filter(line => line.trim()), // Para el diálogo
+    included: (destino.descripcion || "")
+      .split("\n")
+      .filter((line) => line.trim()),
+    detailIncluded: (destino.descripcionDetallada || "")
+      .split("\n")
+      .filter((line) => line.trim()),
     pdf: destino.pdf || undefined,
   };
 }
 
 function mapPaqueteToPremium(paquete: PaquetePremium): PremiumPackage {
-  // Parsear descripcion para extraer highlights/included
   const lines = paquete.descripcion
     ? paquete.descripcion
         .split(/\n|•/)
         .filter((line) => line.trim())
         .map((line) => line.trim())
     : [];
-
   return {
     tag: paquete.etiqueta,
     title: paquete.titulo,
@@ -80,10 +80,12 @@ function mapParqueToThemePark(parque: ParqueTematico) {
 }
 
 export default function PackagesPage() {
-  const { data: paqueteData, loading, error } = usePaqueteData();
+  const { data: paqueteData, loading } = usePaqueteData();
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
-  const [selectedPackage, setSelectedPackage] = useState<PackageDetails | null>(null);
+  const [selectedPackage, setSelectedPackage] = useState<PackageDetails | null>(
+    null,
+  );
 
   // Mapear datos del API a interfaces locales usando useMemo
   const dreamDestinations = useMemo(() => {
@@ -104,7 +106,7 @@ export default function PackagesPage() {
       description: pkg.season,
       duration: pkg.duration,
       price: pkg.price || "Consultar",
-      included: pkg.detailIncluded || pkg.included || [], // Usar detailIncluded en el diálogo
+      included: pkg.detailIncluded || pkg.included || [],
       pdf: pkg.pdf,
     };
     setSelectedPackage(packageDetails);
@@ -118,66 +120,37 @@ export default function PackagesPage() {
 
   return (
     <>
-      <HeroSection />
-
-      {/* Dream Destinations Section with Loading */}
-      {loading ? (
-        <div className="w-full py-20 flex items-center justify-center bg-neutral-50">
-          <div className="text-center">
-            <div className="mb-4 flex justify-center">
-              <div className="h-12 w-12 border-4 border-primary-200 border-t-primary-700 rounded-full animate-spin"></div>
-            </div>
-            <p className="text-lg text-neutral-700">Cargando destinos...</p>
-          </div>
-        </div>
-      ) : error ? (
-        <div className="w-full py-20 flex items-center justify-center bg-neutral-50">
-          <div className="text-center">
-            <p className="text-lg text-neutral-900 mb-2">Error al cargar los destinos</p>
-            <p className="text-sm text-neutral-600">Por favor, recarga la página</p>
-          </div>
-        </div>
-      ) : dreamDestinations.length > 0 ? (
-        <DreamDestinationsSection
-          destinations={dreamDestinations}
-          onDetalles={(destination) => handleOpenDetails(destination)}
-          maxCards={8}
-          showScrollControls={true}
-        />
-      ) : null}
-
-      {/* Premium Packages Section with Loading */}
-      {!loading && error ? (
-        <div className="w-full py-20 flex items-center justify-center bg-neutral-50">
-          <div className="text-center">
-            <p className="text-lg text-neutral-900 mb-2">Error al cargar los paquetes</p>
-            <p className="text-sm text-neutral-600">Por favor, recarga la página</p>
-          </div>
-        </div>
-      ) : !loading && premiumPackages.length > 0 ? (
+      <HeroSection /> {/* ✅ Ya tiene su propio loading interno */}
+      {/* ✅ Dream Destinations Section - Pasamos isLoading */}
+      <DreamDestinationsSection
+        destinations={dreamDestinations}
+        onDetalles={(destination) => handleOpenDetails(destination)}
+        maxCards={8}
+        showScrollControls={true}
+        isLoading={loading} // ✅ Pasamos el estado de loading
+      />
+      {/* ✅ Premium Packages Section - También necesita isLoading */}
+      {!loading && premiumPackages.length > 0 && (
         <PremiumPackagesSection
           packages={premiumPackages}
           onDetalles={(pkg) => handleOpenDetails(pkg)}
+          isLoading={loading} // ✅ Pasamos loading
         />
-      ) : null}
-
+      )}
       {!loading && <ThemeParksSection parks={themeParks} />}
-
       {!loading && (
         <>
-          <CtaSection 
+          <CtaSection
             onContactClick={() => setShowContactDialog(true)}
             titulo={paqueteData?.llamadaTitulo}
             subtitulo={paqueteData?.llamadaSubtitulo}
           />
-
-          <NewsletterSection 
+          <NewsletterSection
             titulo={paqueteData?.boletinTitulo}
             descripcion={paqueteData?.boletinDescripcion}
           />
         </>
       )}
-
       {/* Details Dialog */}
       {showDetailsDialog && selectedPackage && (
         <div className="fixed inset-0 z-999 flex items-center justify-center bg-black/50 p-4 rounded-lg">
@@ -190,20 +163,18 @@ export default function PackagesPage() {
               >
                 <XMarkIcon className="h-6 w-6 text-neutral-700" />
               </button>
-
               <div className="pr-10">
                 <h2 className="text-3xl font-bold text-neutral-900">
                   {selectedPackage.title}
                 </h2>
                 <p className="text-sm text-neutral-600 mt-2">
-                  {selectedPackage.description }
-                </p>  
+                  {selectedPackage.description}
+                </p>
               </div>
             </div>
 
-            {/* Dialog Content - Scrollable */}
+            {/* Content */}
             <div className="flex-1 overflow-y-auto p-8 md:p-10">
-              {/* Quick Info */}
               <div className="mb-8 grid grid-cols-2 gap-4">
                 <div className="rounded-lg bg-primary-50 p-4">
                   <p className="text-xs font-semibold text-primary-700 uppercase tracking-wider">
@@ -223,13 +194,12 @@ export default function PackagesPage() {
                 </div>
               </div>
 
-            
-            
-
-              {/* Included */}
               <div>
                 <h3 className="text-xl font-bold text-neutral-900 mb-4">
-                  {selectedPackage.highlights && selectedPackage.highlights.length > 0 ? "Lo que está incluido" : "Incluye"}
+                  {selectedPackage.highlights &&
+                  selectedPackage.highlights.length > 0
+                    ? "Lo que está incluido"
+                    : "Incluye"}
                 </h3>
                 <ul className="space-y-3">
                   {selectedPackage.included.map((item: string, idx: number) => (
@@ -242,7 +212,7 @@ export default function PackagesPage() {
               </div>
             </div>
 
-            {/* CTA Buttons - Fixed at bottom */}
+            {/* CTA Buttons */}
             <div className="shrink-0 border-t border-neutral-200 bg-white px-8 py-6 flex flex-col gap-3 sm:flex-row items-center justify-center">
               <button
                 onClick={() => {
@@ -252,7 +222,7 @@ export default function PackagesPage() {
                 className="flex-1 max-w-xs rounded-full bg-primary-700 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-primary-800 cursor-pointer"
               >
                 Reservar Ahora
-              </button> 
+              </button>
               {selectedPackage.pdf && (
                 <button className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 cursor-pointer">
                   <a
@@ -268,7 +238,6 @@ export default function PackagesPage() {
           </div>
         </div>
       )}
-
       <ContactDialog
         isOpen={showContactDialog}
         onClose={() => setShowContactDialog(false)}

@@ -4,16 +4,41 @@ import Image from "next/image";
 import Link from "next/link";
 import { DocumentArrowDownIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-
 import type { FC } from "react";
 import type { DreamDestination } from "../data/packages-data";
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
 interface DreamDestinationsSectionProps {
   destinations: DreamDestination[];
   onDetalles: (destination: DreamDestination) => void;
   maxCards?: number;
   showScrollControls?: boolean;
+  isLoading?: boolean;
+}
+
+// ✅ Componente Skeleton para cards
+function DestinationCardSkeleton() {
+  return (
+    <article className="overflow-hidden rounded-lg sm:rounded-2xl bg-white shadow-sm ring-1 ring-primary-100 flex flex-col h-full animate-pulse">
+      <div className="relative w-full shrink-0 aspect-4/3 sm:aspect-auto sm:h-36 md:h-40 bg-neutral-200" />
+      <div className="p-3 sm:p-4 flex flex-col h-full">
+        <div className="shrink-0 space-y-2">
+          <div className="h-4 bg-neutral-200 rounded w-3/4" />
+          <div className="h-3 bg-neutral-200 rounded w-1/2" />
+        </div>
+        <div className="mt-2 space-y-2">
+          <div className="h-3 bg-neutral-200 rounded w-full" />
+          <div className="h-3 bg-neutral-200 rounded w-2/3" />
+          <div className="h-3 bg-neutral-200 rounded w-1/2" />
+        </div>
+        <div className="grow" />
+        <div className="shrink-0 mt-3">
+          <div className="h-8 bg-neutral-200 rounded-full w-full" />
+        </div>
+      </div>
+    </article>
+  );
 }
 
 export const DreamDestinationsSection: FC<DreamDestinationsSectionProps> = ({
@@ -21,13 +46,13 @@ export const DreamDestinationsSection: FC<DreamDestinationsSectionProps> = ({
   onDetalles,
   maxCards = destinations.length,
   showScrollControls = false,
+  isLoading = false,
 }) => {
   const [page, setPage] = useState(0);
-
   const sectionRef = useRef<HTMLDivElement>(null);
 
+  // ✅ Calcular totalPages correctamente incluso con isLoading
   const totalPages = Math.ceil(destinations.length / maxCards);
-
   const startIndex = page * maxCards;
   const visibleDestinations = destinations.slice(
     startIndex,
@@ -36,7 +61,6 @@ export const DreamDestinationsSection: FC<DreamDestinationsSectionProps> = ({
 
   const handleDownloadPDF = (pdfUrl?: string, title?: string) => {
     if (!pdfUrl) return;
-
     const link = document.createElement("a");
     link.href = pdfUrl;
     link.download = title
@@ -46,19 +70,12 @@ export const DreamDestinationsSection: FC<DreamDestinationsSectionProps> = ({
     link.click();
   };
 
-  // ✅ FIX REAL: evita salto de scroll
   const handlePageChange = (newPage: number) => {
     if (newPage === page) return;
-
     const sectionTop = sectionRef.current?.getBoundingClientRect().top ?? 0;
-
     setPage(newPage);
-
     requestAnimationFrame(() => {
-      window.scrollBy({
-        top: sectionTop - 100, // ajusta según altura de tu navbar
-        behavior: "instant", // usa "smooth" si quieres animación
-      });
+      window.scrollBy({ top: sectionTop - 100, behavior: "instant" });
     });
   };
 
@@ -120,143 +137,151 @@ export const DreamDestinationsSection: FC<DreamDestinationsSectionProps> = ({
           )}
         </div>
 
-        {/* GRID ANIMADO */}
+        {/* GRID */}
         <div className="relative overflow-hidden">
           <div style={{ minHeight: "380px" }}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={page}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{
-                  duration: 0.35,
-                  ease: [0.4, 0, 0.2, 1],
-                }}
-                className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-4"
-              >
-                {visibleDestinations.map((item) => (
-                  <article
-                    key={item.title}
-                    className="overflow-hidden rounded-lg sm:rounded-2xl bg-white shadow-sm ring-1 ring-primary-100 flex flex-col h-full"
-                  >
-                    {/* IMAGE */}
-                    <div className="relative w-full shrink-0 aspect-[4/3] sm:aspect-auto sm:h-36 md:h-40">
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        fill
-                        className="object-cover object-center"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      />
-                    </div>
-
-                    {/* CONTENT */}
-                    <div className="p-3 sm:p-4 flex flex-col h-full">
-                      <div className="shrink-0">
-                        <h4 className="text-sm sm:text-base md:text-lg font-bold text-neutral-900 line-clamp-2">
-                          {item.title}
-                        </h4>
-                        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-primary-700 font-semibold">
-                          ● {item.nights}
-                        </p>
+            {isLoading ? (
+              // ✅ Mostrar skeletons mientras carga
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {Array.from({ length: maxCards || 4 }).map((_, i) => (
+                  <DestinationCardSkeleton key={`skeleton-${i}`} />
+                ))}
+              </div>
+            ) : destinations.length === 0 ? (
+              // ✅ Mostrar mensaje si no hay destinos
+              <div className="text-center py-12">
+                <p className="text-neutral-600">No hay destinos disponibles</p>
+              </div>
+            ) : (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={page}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                  className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-4"
+                >
+                  {visibleDestinations.map((item) => (
+                    <article
+                      key={item.title}
+                      className="overflow-hidden rounded-lg sm:rounded-2xl bg-white shadow-sm ring-1 ring-primary-100 flex flex-col h-full"
+                    >
+                      <div className="relative w-full shrink-0 aspect-4/3 sm:aspect-auto sm:h-36 md:h-40">
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          className="object-cover object-center"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        />
                       </div>
-
-                      <ul className="mt-1.5 sm:mt-2 space-y-0.5 text-xs text-neutral-700 shrink-0">
-                        {item.included.slice(0, 3).map((includedItem, idx) => (
-                          <li key={idx} className="line-clamp-1">
-                            {includedItem}
-                          </li>
-                        ))}
-                      </ul>
-
-                      <div className="grow" />
-
-                      <div className="shrink-0">
-                        <p className="mt-2 text-xs text-tertiary-700 font-medium text-center">
-                          {item.season}
-                        </p>
-
-                        <div className="mt-2.5 sm:mt-3 flex gap-2">
-                          <button
-                            onClick={() => onDetalles(item)}
-                            className="flex-1 rounded-full bg-primary-700 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-800"
-                          >
-                            Ver detalles
-                          </button>
-
-                          {item.pdf && (
+                      <div className="p-3 sm:p-4 flex flex-col h-full">
+                        <div className="shrink-0">
+                          <h4 className="text-sm sm:text-base md:text-lg font-bold text-neutral-900 line-clamp-2">
+                            {item.title}
+                          </h4>
+                          <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-primary-700 font-semibold">
+                            ● {item.nights}
+                          </p>
+                        </div>
+                        <ul className="mt-1.5 sm:mt-2 space-y-0.5 text-xs text-neutral-700 shrink-0">
+                          {item.included
+                            .slice(0, 3)
+                            .map((includedItem, idx) => (
+                              <li key={idx} className="line-clamp-1">
+                                {includedItem}
+                              </li>
+                            ))}
+                        </ul>
+                        <div className="grow" />
+                        <div className="shrink-0">
+                          <p className="mt-2 text-xs text-tertiary-700 font-medium text-center">
+                            {item.season}
+                          </p>
+                          <div className="mt-2.5 sm:mt-3 flex gap-2">
                             <button
-                              onClick={() =>
-                                handleDownloadPDF(item.pdf, item.title)
-                              }
-                              className="flex-1 rounded-full border-2 border-primary-700 p-2 sm:p-2.5 text-primary-700 transition hover:bg-primary-50 flex items-center justify-center gap-1 text-xs sm:text-sm font-semibold"
+                              onClick={() => onDetalles(item)}
+                              className="flex-1 rounded-full bg-primary-700 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary-800"
                             >
-                              <DocumentArrowDownIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-                              <span className="hidden sm:inline">
-                                Descargar
-                              </span>
+                              Ver detalles
                             </button>
-                          )}
+                            {item.pdf && (
+                              <button
+                                onClick={() =>
+                                  handleDownloadPDF(item.pdf, item.title)
+                                }
+                                className="flex-1 rounded-full border-2 border-primary-700 p-2 sm:p-2.5 text-primary-700 transition hover:bg-primary-50 flex items-center justify-center gap-1 text-xs sm:text-sm font-semibold"
+                              >
+                                <DocumentArrowDownIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="hidden sm:inline">
+                                  Descargar
+                                </span>
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </article>
-                ))}
-              </motion.div>
-            </AnimatePresence>
+                    </article>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
+            )}
           </div>
         </div>
 
         {/* PAGINACIÓN */}
-        {showScrollControls && totalPages > 1 && (
-          <div className="mt-6 sm:mt-8 flex justify-center items-center gap-1 sm:gap-2">
-            <button
-              onClick={() => handlePageChange(Math.max(0, page - 1))}
-              disabled={page === 0}
-              className={`p-1.5 sm:p-2 rounded-full transition ${
-                page === 0
-                  ? "bg-neutral-200 text-neutral-400"
-                  : "bg-neutral-200 hover:bg-neutral-300"
-              }`}
-            >
-              <ChevronLeftIcon className="h-4 w-4" />
-            </button>
-
-            {getPaginationItems(page, totalPages).map((item, index) => (
+        {showScrollControls &&
+          totalPages > 1 &&
+          !isLoading &&
+          destinations.length > 0 && (
+            <div className="mt-6 sm:mt-8 flex justify-center items-center gap-1 sm:gap-2">
               <button
-                key={index}
-                onClick={() =>
-                  typeof item === "number" && handlePageChange(item - 1)
-                }
-                disabled={typeof item !== "number"}
-                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold ${
-                  item === page + 1
-                    ? "bg-primary-700 text-white"
-                    : typeof item === "number"
-                      ? "bg-neutral-200 hover:bg-neutral-300"
-                      : "text-neutral-500 cursor-default"
+                onClick={() => handlePageChange(Math.max(0, page - 1))}
+                disabled={page === 0}
+                className={`p-1.5 sm:p-2 rounded-full transition ${
+                  page === 0
+                    ? "bg-neutral-200 text-neutral-400"
+                    : "bg-neutral-200 hover:bg-neutral-300"
                 }`}
               >
-                {item}
+                <ChevronLeftIcon className="h-4 w-4" />
               </button>
-            ))}
 
-            <button
-              onClick={() =>
-                handlePageChange(Math.min(totalPages - 1, page + 1))
-              }
-              disabled={page === totalPages - 1}
-              className={`p-2 rounded-full transition ${
-                page === totalPages - 1
-                  ? "bg-neutral-200 text-neutral-400"
-                  : "bg-neutral-200 hover:bg-neutral-300"
-              }`}
-            >
-              <ChevronRightIcon className="h-4 w-4" />
-            </button>
-          </div>
-        )}
+              {getPaginationItems(page, totalPages).map((item, index) => (
+                <button
+                  key={index}
+                  onClick={() =>
+                    typeof item === "number" && handlePageChange(item - 1)
+                  }
+                  disabled={typeof item !== "number"}
+                  className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold ${
+                    item === page + 1
+                      ? "bg-primary-700 text-white"
+                      : typeof item === "number"
+                        ? "bg-neutral-200 hover:bg-neutral-300"
+                        : "text-neutral-500 cursor-default"
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+
+              <button
+                onClick={() =>
+                  handlePageChange(Math.min(totalPages - 1, page + 1))
+                }
+                disabled={page === totalPages - 1}
+                className={`p-2 rounded-full transition ${
+                  page === totalPages - 1
+                    ? "bg-neutral-200 text-neutral-400"
+                    : "bg-neutral-200 hover:bg-neutral-300"
+                }`}
+              >
+                <ChevronRightIcon className="h-4 w-4" />
+              </button>
+            </div>
+          )}
       </div>
     </section>
   );

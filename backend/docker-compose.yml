@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: datafast_postgres
+    environment:
+      POSTGRES_USER: datafast
+      POSTGRES_PASSWORD: datafast123
+      POSTGRES_DB: datafast_payments
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - datafast_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: datafast_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - datafast_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: datafast_backend
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://datafast:datafast123@postgres:5432/datafast_payments?schema=public
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+    networks:
+      - datafast_network
+
+volumes:
+  postgres_data:
+
+networks:
+  datafast_network:
+    driver: bridge
