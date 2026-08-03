@@ -4,8 +4,7 @@ import path from "path";
 export default defineConfig({
   test: {
     environment: "jsdom",
-    pool: "forks",
-    poolTimeout: 30000,
+    pool: "forks", 
     include: ["src/test/**/*.{test,spec}.{ts,tsx}"],
     coverage: {
       provider: "v8",
