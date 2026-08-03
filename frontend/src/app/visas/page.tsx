@@ -327,7 +327,7 @@ export default function VisasPage() {
                       </span>
                     </button>
 
-                    <button
+                    {/* <button
                       onClick={() => openPurchaseDialog({
                         id: visa.id,
                         documentId: visa.documentId,
@@ -348,7 +348,7 @@ export default function VisasPage() {
                       <span className="relative flex items-center justify-center gap-2">
                         Solicitar
                       </span>
-                    </button>
+                    </button> */}
                   </div>
                 </article>
               ))
@@ -654,12 +654,12 @@ export default function VisasPage() {
 
             {/* Footer */}
             <div className="shrink-0 border-t border-neutral-200 bg-white px-8 py-6 flex flex-col gap-3 sm:flex-row">
-              <button
+              {/* <button
                 onClick={handleStartProcess}
                 className="flex-1 rounded-full bg-primary-700 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-primary-800 cursor-pointer"
               >
                 Iniciar Trámite
-              </button>
+              </button> */}
               {selectedVisa.pdf && (
                 <a
                   href={selectedVisa.pdf}
