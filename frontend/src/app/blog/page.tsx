@@ -12,7 +12,7 @@ import {
   UserIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import {ArrowRightIcon} from "@heroicons/react/24/bold"
+import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { motion } from "framer-motion";
 import { useBlogData } from "@/hooks/useBlogData";
 import { BlogPost } from "@/types";
@@ -40,8 +40,8 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full flex flex-col"
     >
-      <Link href={`/blog/${post.slug}`} className="block h-full flex-col">
-        {/* Image */}
+      <Link href={`/blog/${post.slug}`} className="h-full flex flex-col">
+        {/* Image - altura fija */}
         <div className="relative h-52 w-full overflow-hidden shrink-0">
           <Image
             src={
@@ -50,7 +50,7 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
             }
             alt={post.title}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover:scale-105 rounded-t-2xl"
           />
           {post.featured && (
             <span className="absolute left-3 top-3 rounded-full bg-primary-700 px-3 py-1 text-xs font-semibold text-white">
@@ -64,9 +64,10 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
           </div>
         </div>
 
-        {/* Content */}
-        <div className="p-5 flex flex-col flex-1">
-          <div className="flex items-center gap-4 text-xs text-neutral-500 mb-2">
+        {/* Content - flex col con altura consistente */}
+        <div className="p-5 flex flex-col flex-1 min-h-65 gap-1">
+          {/* Metadatos - altura fija, no crece */}
+          <div className="flex items-center gap-4 text-xs text-neutral-500 mb-2 shrink-0">
             <span className="flex items-center gap-1">
               <CalendarIcon className="h-3.5 w-3.5" />
               {new Date(post.date).toLocaleDateString("es-ES", {
@@ -81,29 +82,32 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
             </span>
           </div>
 
-          <h3 className="text-lg font-bold text-neutral-900 line-clamp-2 group-hover:text-primary-700 transition-colors">
+          {/* Título - líneas limitadas, no crece */}
+          <h3 className="text-md! lg:text-lg! xl:text-xl! font-bold text-neutral-900 line-clamp-2 group-hover:text-primary-700 transition-colors shrink-0">
             {post.title}
           </h3>
 
+          {/* Excerpt - ocupa espacio flexible con límite */}
           <p className="mt-2 text-sm text-neutral-600 line-clamp-3 flex-1">
             {post.excerpt}
           </p>
 
-          <div className="mt-4 flex items-center justify-between pt-4 border-t border-neutral-100">
-            <div className="flex items-center gap-2">
+          {/* Footer - siempre al final con mt-auto */}
+          <div className="mt-auto pt-4 flex items-center justify-between border-t border-neutral-100 shrink-0">
+            <div className="flex items-center gap-2 min-w-0">
               <img
                 src={
                   post.authorAvatar ||
-                  `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author)}&background=500088&color=fff`
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author)}&background=500088&color=fff&size=24`
                 }
                 alt={post.author}
-                className="h-6 w-6 rounded-full"
+                className="h-6 w-6 rounded-full shrink-0"
               />
-              <span className="text-xs font-medium text-neutral-700">
+              <span className="text-xs font-medium text-neutral-700 truncate max-w-30">
                 {post.author}
               </span>
             </div>
-            <span className="text-xs font-semibold text-primary-600 group-hover:text-primary-700 transition-colors">
+            <span className="text-xs font-semibold text-primary-600 group-hover:text-primary-700 transition-colors shrink-0 ml-2">
               Leer más →
             </span>
           </div>
