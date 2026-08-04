@@ -144,6 +144,7 @@ model User {
   rol                   String    @default("USER")
   emailVerificado       Boolean   @default(false)
   emailVerificationToken String?
+  emailVerifiedAt       DateTime?
   loginAttempts         Int       @default(0)
   lockedUntil           DateTime?
   tokenVersion          Int       @default(0)
@@ -162,6 +163,24 @@ model SecurityLog {
   ip        String?
   userAgent String?
   createdAt DateTime @default(now())
+}
+
+model PendingRegistration {
+  id                   String   @id @default(cuid())
+  nombre               String
+  email                String   @unique
+  password             String
+  telefono             String?
+  cedula               String?
+  direccion            String?
+  pais                 String   @default("EC")
+  verificationCode     String
+  codeExpiresAt        DateTime
+  verificationAttempts Int      @default(0)
+  maxAttempts          Int      @default(5)
+  metadata             Json?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }
 
 enum PaymentStatus {

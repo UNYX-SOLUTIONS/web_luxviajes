@@ -23,6 +23,8 @@ interface CreateCheckoutRequest {
     street1: string;
     country: string;
   };
+  creditType?: number;
+  installments?: number;
 }
 
 interface CreateCheckoutResponse {
@@ -60,7 +62,7 @@ export function useDatafastPayment() {
       const baseImp = ROUND(data.amount / (1 + taxRate));
       const iva = ROUND(data.amount - baseImp);
 
-      const payload = {
+      const payload: Record<string, unknown> = {
         amount: ROUND(data.amount),
         customer: {
           ...data.customer,
@@ -82,6 +84,9 @@ export function useDatafastPayment() {
           },
         ],
       };
+
+      if (data.creditType !== undefined) payload.creditType = data.creditType;
+      if (data.installments !== undefined) payload.installments = data.installments;
 
       const response = await fetch("/api/payments/create-checkout", {
         method: "POST",

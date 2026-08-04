@@ -18,6 +18,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { useHelpData } from "@/hooks";
+import { useAuth } from "@/lib/auth-context";
 
 interface ServiceItem {
   id: string | number;
@@ -59,8 +60,10 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
   error = null,
 }) => {
   const { data: helpData } = useHelpData();
+  const { isAuthenticated } = useAuth();
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showAuthGate, setShowAuthGate] = useState(false);
 
   const [formData, setFormData] = useState<CustomerFormData>({
     givenName: "",
@@ -165,7 +168,19 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                 </div>
 
                 <div className="px-6 py-6 max-h-[60vh] overflow-y-auto">
-                  {!showForm ? (
+                  {showAuthGate ? (
+                    <div className="text-center py-8">
+                      <UserIcon className="h-12 w-12 text-primary-400 mx-auto" />
+                      <h3 className="text-lg font-bold text-neutral-900 mt-3">Inicia sesión para continuar</h3>
+                      <p className="text-sm text-neutral-500 mt-1">Necesitas una cuenta registrada para realizar compras</p>
+                      <div className="mt-4 space-y-2">
+                        <a href="/auth/register" className="block w-full bg-primary-700 hover:bg-primary-800 text-white font-semibold py-3 rounded-xl transition text-center">Registrarse</a>
+                        <a href="/auth/login" className="block w-full border border-primary-300 text-primary-700 font-semibold py-3 rounded-xl hover:bg-primary-50 transition text-center">Iniciar sesión</a>
+                      </div>
+                      <button onClick={() => setShowAuthGate(false)} className="mt-3 text-sm text-neutral-500 hover:text-neutral-700">Cancelar</button>
+                    </div>
+                  ) : (
+                  <>{!showForm ? (
                     <>
                       {/* Service Card */}
                       <div className="rounded-2xl bg-primary-50/50 p-4 ring-1 ring-primary-200/50">
@@ -504,6 +519,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                       </div>
                     </>
                   )}
+                </>)}
                 </div>
 
                 {!showForm && (
