@@ -11,7 +11,6 @@ import {
   XCircleIcon,
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 
 interface AuthDialogProps {
@@ -21,7 +20,6 @@ interface AuthDialogProps {
 export function AuthDialog({ onClose }: AuthDialogProps) {
   const [mode, setMode] = useState<"login" | "register">("login");
   const { login, register, isLoading, error, clearError } = useAuth();
-  const router = useRouter();
 
   const [formData, setFormData] = useState({
     fullName: "",

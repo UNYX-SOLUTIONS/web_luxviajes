@@ -3,14 +3,12 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import {
   EnvelopeIcon,
   LockClosedIcon,
   EyeIcon,
   EyeSlashIcon,
   XCircleIcon,
-  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "@/lib/auth-context";
 
@@ -83,7 +81,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-purple-50 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-primary-50 via-white to-purple-50 px-4! pt-45! pb-15!">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-xl p-8">
           {/* Logo y encabezado */}
@@ -93,10 +91,10 @@ export default function LoginPage() {
                 <span className="text-3xl font-bold text-primary-700">L</span>
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-neutral-900">
+            <h1 className="text-3xl! font-bold text-neutral-900">
               Bienvenido de vuelta
             </h1>
-            <p className="text-neutral-500 mt-2 text-sm">
+            <p className="text-neutral-500 mt-2 text-sm!">
               Inicia sesión para continuar tu viaje con Lux Viajes
             </p>
           </div>
@@ -104,7 +102,7 @@ export default function LoginPage() {
           {/* Error general */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-start gap-2">
-              <XCircleIcon className="h-5 w-5 flex-shrink-0 mt-0.5" />
+              <XCircleIcon className="h-5 w-5 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}

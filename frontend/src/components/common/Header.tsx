@@ -48,14 +48,16 @@ export function Header({ activeLink }: HeaderProps) {
     if (!name) return "U";
     const parts = name.trim().split(/\s+/);
     if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    return (
+      parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
+    ).toUpperCase();
   };
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 w-full bg-[#2D0D46]/95 shadow-sm">
       <div className="w-full px-4 sm:px-6 md:px-5 lg:px-8 xl:px-10">
         <div className="flex h-20 items-center md:h-24 lg:h-28 xl:h-32">
-             {/* Logo */}
+          {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
             <div className="relative w-45 h-17.5 md:w-55 md:h-15 2xl:w-65 2xl:h-25">
               <Image
@@ -69,7 +71,6 @@ export function Header({ activeLink }: HeaderProps) {
               />
             </div>
           </Link>
-
 
           {/* Desktop Navigation */}
           <nav
@@ -128,7 +129,7 @@ export function Header({ activeLink }: HeaderProps) {
                   <svg
                     className={cn(
                       "hidden h-3 w-3 text-[#CCC6D0] transition-transform lg:inline",
-                      showUserMenu && "rotate-180"
+                      showUserMenu && "rotate-180",
                     )}
                     fill="none"
                     viewBox="0 0 24 24"
@@ -178,7 +179,7 @@ export function Header({ activeLink }: HeaderProps) {
               </div>
             ) : (
               <div className="flex items-center gap-2 ml-2">
-                <Link
+                {/* <Link
                   href="/auth/login"
                   className="
                     whitespace-nowrap
@@ -193,7 +194,7 @@ export function Header({ activeLink }: HeaderProps) {
                   "
                 >
                   Iniciar sesión
-                </Link>
+                </Link> */}
                 <button
                   onClick={() => setShowAuthDialog(true)}
                   className="
@@ -209,7 +210,7 @@ export function Header({ activeLink }: HeaderProps) {
                     xl:text-sm
                   "
                 >
-                  Registrarse
+                  Iniciar sesión
                 </button>
               </div>
             )}
@@ -224,9 +225,7 @@ export function Header({ activeLink }: HeaderProps) {
               transition hover:bg-white/10
               md:hidden
             "
-            aria-label={
-              isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"
-            }
+            aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
             aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? (
@@ -280,7 +279,7 @@ export function Header({ activeLink }: HeaderProps) {
                         <span className="text-sm font-medium text-white">
                           {user?.nombre || "Mi Cuenta"}
                         </span>
-                        <span className="text-xs text-[#CCC6D0] truncate max-w-[200px]">
+                        <span className="text-xs text-[#CCC6D0] truncate max-w-50">
                           {user?.email}
                         </span>
                       </div>
@@ -304,13 +303,13 @@ export function Header({ activeLink }: HeaderProps) {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    <Link
+                    {/* <Link
                       href="/auth/login"
                       className="rounded-lg px-4 py-2 font-medium text-[#CCC6D0] hover:bg-white/10 hover:text-white transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Iniciar sesión
-                    </Link>
+                    </Link> */}
                     <button
                       onClick={() => {
                         setShowAuthDialog(true);
@@ -318,7 +317,7 @@ export function Header({ activeLink }: HeaderProps) {
                       }}
                       className="rounded-lg bg-[#8A3BB7] px-4 py-2 text-left font-semibold text-white hover:bg-[#7B33A5] transition-colors"
                     >
-                      Registrarse
+                      Inciar sesión
                     </button>
                   </div>
                 )}
