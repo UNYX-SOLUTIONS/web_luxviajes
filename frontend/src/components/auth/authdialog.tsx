@@ -22,9 +22,9 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
   const { login, register, isLoading, error, clearError } = useAuth();
 
   const [formData, setFormData] = useState({
-    fullName: "",
+    primerNombre: "",
+    apellido: "",
     email: "",
-    username: "",
     password: "",
     confirmPassword: "",
     acceptTerms: false,
@@ -104,24 +104,26 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
   const validateRegisterForm = () => {
     const errors: Record<string, string> = {};
 
-    if (!formData.fullName.trim()) {
-      errors.fullName = "Nombre completo es requerido";
-    } else if (formData.fullName.trim().length < 3) {
-      errors.fullName = "El nombre debe tener al menos 3 caracteres";
+    if (!formData.primerNombre.trim()) {
+      errors.primerNombre = "El nombre es requerido";
+    } else if (formData.primerNombre.trim().length < 2) {
+      errors.primerNombre = "Mínimo 2 caracteres";
+    } else if (!/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/.test(formData.primerNombre)) {
+      errors.primerNombre = "Solo letras y espacios";
+    }
+
+    if (!formData.apellido.trim()) {
+      errors.apellido = "El apellido es requerido";
+    } else if (formData.apellido.trim().length < 2) {
+      errors.apellido = "Mínimo 2 caracteres";
+    } else if (!/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/.test(formData.apellido)) {
+      errors.apellido = "Solo letras y espacios";
     }
 
     if (!formData.email) {
       errors.email = "Email es requerido";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = "Email no válido";
-    }
-
-    if (!formData.username) {
-      errors.username = "Usuario es requerido";
-    } else if (formData.username.length < 3) {
-      errors.username = "El usuario debe tener al menos 3 caracteres";
-    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
-      errors.username = "Solo letras, números y guión bajo";
     }
 
     if (!formData.password) {
@@ -166,7 +168,8 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
       try {
         await register(
           formData.email,
-          formData.username,
+          formData.primerNombre,
+          formData.apellido,
           formData.password,
           formData.confirmPassword
         );
@@ -183,9 +186,9 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
   const handleModeSwitch = (newMode: "login" | "register") => {
     setMode(newMode);
     setFormData({
-      fullName: "",
+      primerNombre: "",
+      apellido: "",
       email: "",
-      username: "",
       password: "",
       confirmPassword: "",
       acceptTerms: false,
@@ -247,36 +250,25 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Nombre completo (solo registro) */}
+              {/* Nombre y Apellido (solo registro) */}
               {mode === "register" && (
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                    Nombre completo
-                  </label>
-                  <div className="relative">
-                    <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
-                    <input
-                      type="text"
-                      id="fullName"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      placeholder="Juan Pérez"
-                      autoComplete="name"
-                      disabled={isLoading}
-                      className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${
-                        validationErrors.fullName
-                          ? "border-red-300 focus:ring-red-200"
-                          : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"
-                      }`}
-                    />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1.5">Nombre</label>
+                    <div className="relative">
+                      <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                      <input type="text" id="primerNombre" name="primerNombre" value={formData.primerNombre} onChange={handleChange} placeholder="Juan" autoComplete="given-name" disabled={isLoading} className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${validationErrors.primerNombre ? "border-red-300 focus:ring-red-200" : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"}`} />
+                    </div>
+                    {validationErrors.primerNombre && (<p className="mt-1 text-red-500 text-xs flex items-center gap-1"><XCircleIcon className="h-3.5 w-3.5" />{validationErrors.primerNombre}</p>)}
                   </div>
-                  {validationErrors.fullName && (
-                    <p className="mt-1 text-red-500 text-xs flex items-center gap-1">
-                      <XCircleIcon className="h-3.5 w-3.5" />
-                      {validationErrors.fullName}
-                    </p>
-                  )}
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1.5">Apellido</label>
+                    <div className="relative">
+                      <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                      <input type="text" id="apellido" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Pérez" autoComplete="family-name" disabled={isLoading} className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${validationErrors.apellido ? "border-red-300 focus:ring-red-200" : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"}`} />
+                    </div>
+                    {validationErrors.apellido && (<p className="mt-1 text-red-500 text-xs flex items-center gap-1"><XCircleIcon className="h-3.5 w-3.5" />{validationErrors.apellido}</p>)}
+                  </div>
                 </div>
               )}
 
@@ -310,45 +302,6 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
                   </p>
                 )}
               </div>
-
-              {/* Username (solo registro) */}
-              {mode === "register" && (
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                    Nombre de usuario
-                  </label>
-                  <div className="relative">
-                    <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
-                    <input
-                      type="text"
-                      id="username"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleChange}
-                      placeholder="tu_usuario"
-                      autoComplete="username"
-                      disabled={isLoading}
-                      className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${
-                        validationErrors.username
-                          ? "border-red-300 focus:ring-red-200"
-                          : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"
-                      }`}
-                    />
-                  </div>
-                  {validationErrors.username && (
-                    <p className="mt-1 text-red-500 text-xs flex items-center gap-1">
-                      <XCircleIcon className="h-3.5 w-3.5" />
-                      {validationErrors.username}
-                    </p>
-                  )}
-                  {!validationErrors.username && formData.username && mode === "register" && (
-                    <p className="mt-1 text-green-500 text-xs flex items-center gap-1">
-                      <CheckCircleIcon className="h-3.5 w-3.5" />
-                      Usuario disponible
-                    </p>
-                  )}
-                </div>
-              )}
 
               {/* Password */}
               <div>

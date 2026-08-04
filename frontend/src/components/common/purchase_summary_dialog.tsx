@@ -60,10 +60,27 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
   error = null,
 }) => {
   const { data: helpData } = useHelpData();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
+
+  const handleContinueToForm = () => {
+    if (!isAuthenticated) {
+      setShowAuthGate(true);
+      return;
+    }
+    if (user) {
+      setFormData({
+        givenName: user.primerNombre || "",
+        surname: user.apellido || "",
+        email: user.email || "",
+        phone: "",
+        identificationDocId: "",
+      });
+    }
+    setShowForm(true);
+  };
 
   const [formData, setFormData] = useState<CustomerFormData>({
     givenName: "",
@@ -160,7 +177,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                     </div>
                     <Dialog.Title
                       as="h3"
-                      className="text-xl font-bold text-neutral-900"
+                      className="text-xl! font-bold text-neutral-900"
                     >
                       {showForm ? "Tus Datos" : "Resumen de tu Solicitud"}
                     </Dialog.Title>
@@ -171,355 +188,377 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                   {showAuthGate ? (
                     <div className="text-center py-8">
                       <UserIcon className="h-12 w-12 text-primary-400 mx-auto" />
-                      <h3 className="text-lg font-bold text-neutral-900 mt-3">Inicia sesión para continuar</h3>
-                      <p className="text-sm text-neutral-500 mt-1">Necesitas una cuenta registrada para realizar compras</p>
-                      <div className="mt-4 space-y-2">
-                        <a href="/auth/register" className="block w-full bg-primary-700 hover:bg-primary-800 text-white font-semibold py-3 rounded-xl transition text-center">Registrarse</a>
-                        <a href="/auth/login" className="block w-full border border-primary-300 text-primary-700 font-semibold py-3 rounded-xl hover:bg-primary-50 transition text-center">Iniciar sesión</a>
+                      <h3 className="text-lg! font-bold text-neutral-900 mt-3">
+                        Inicia sesión para continuar
+                      </h3>
+                      <p className="text-sm! text-neutral-500 mt-1">
+                        Necesitas una cuenta registrada para realizar compras
+                      </p>
+                      <div className="mt-6 space-y-3">
+                        <a
+                          href="/auth/register"
+                          className="block w-full bg-primary-700 hover:bg-primary-800 text-white font-semibold py-3 rounded-xl transition text-center"
+                        >
+                          Registrarse
+                        </a>
+                        <a
+                          href="/auth/login"
+                          className="block w-full border border-primary-300 text-primary-700 font-semibold py-3 rounded-xl hover:bg-primary-50 transition text-center"
+                        >
+                          Iniciar sesión
+                        </a>
                       </div>
-                      <button onClick={() => setShowAuthGate(false)} className="mt-3 text-sm text-neutral-500 hover:text-neutral-700">Cancelar</button>
+                      <button
+                        onClick={() => setShowAuthGate(false)}
+                        className="mt-5! text-sm text-neutral-500 hover:text-neutral-700"
+                      >
+                        Cancelar
+                      </button>
                     </div>
                   ) : (
-                  <>{!showForm ? (
                     <>
-                      {/* Service Card */}
-                      <div className="rounded-2xl bg-primary-50/50 p-4 ring-1 ring-primary-200/50">
-                        <div className="flex items-start gap-4">
-                          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary-100">
-                            <GlobeAltIcon className="h-7 w-7 text-primary-700" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-base font-bold text-neutral-900">
-                              {service.name}
-                            </h4>
-                            <p className="text-sm text-neutral-600">
-                              {service.type}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-sm font-medium text-neutral-500">
-                              Precio
-                            </span>
-                            <p className="text-lg font-bold text-primary-700">
-                              {formatPrice(service.price)}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="mt-4 grid grid-cols-2 gap-3">
-                          {service.validity && (
-                            <div className="rounded-lg bg-white/80 p-2.5">
-                              <p className="flex items-center gap-1.5 text-xs font-medium text-neutral-500">
-                                <CalendarIcon className="h-3.5 w-3.5" />
-                                Validez
-                              </p>
-                              <p className="text-sm font-semibold text-neutral-900">
-                                {service.validity}
-                              </p>
-                            </div>
-                          )}
-                          {service.processing && (
-                            <div className="rounded-lg bg-white/80 p-2.5">
-                              <p className="flex items-center gap-1.5 text-xs font-medium text-neutral-500">
-                                <DocumentTextIcon className="h-3.5 w-3.5" />
-                                Procesamiento
-                              </p>
-                              <p className="text-sm font-semibold text-neutral-900">
-                                {service.processing}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {service.includes && service.includes.length > 0 && (
-                        <div className="mt-5">
-                          <h5 className="text-sm font-semibold text-neutral-900 mb-3">
-                            Lo que incluye el servicio:
-                          </h5>
-                          <div className="space-y-2">
-                            {service.includes.map((item, index) => (
-                              <div
-                                key={index}
-                                className="flex items-start gap-2.5"
-                              >
-                                <CheckBadgeIcon className="h-4 w-4 shrink-0 text-accent-green mt-0.5" />
-                                <span className="text-sm text-neutral-700">
-                                  {item}
-                                </span>
+                      {!showForm ? (
+                        <>
+                          {/* Service Card */}
+                          <div className="rounded-2xl bg-primary-50/50 p-4 ring-1 ring-primary-200/50">
+                            <div className="flex items-start gap-4">
+                              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary-100">
+                                <GlobeAltIcon className="h-7 w-7 text-primary-700" />
                               </div>
-                            ))}
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-base font-bold text-neutral-900">
+                                  {service.name}
+                                </h4>
+                                <p className="text-sm text-neutral-600">
+                                  {service.type}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <span className="text-sm font-medium text-neutral-500">
+                                  Precio
+                                </span>
+                                <p className="text-lg font-bold text-primary-700">
+                                  {formatPrice(service.price)}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="mt-4 grid grid-cols-2 gap-3">
+                              {service.validity && (
+                                <div className="rounded-lg bg-white/80 p-2.5">
+                                  <p className="flex items-center gap-1.5 text-xs font-medium text-neutral-500">
+                                    <CalendarIcon className="h-3.5 w-3.5" />
+                                    Validez
+                                  </p>
+                                  <p className="text-sm font-semibold text-neutral-900">
+                                    {service.validity}
+                                  </p>
+                                </div>
+                              )}
+                              {service.processing && (
+                                <div className="rounded-lg bg-white/80 p-2.5">
+                                  <p className="flex items-center gap-1.5 text-xs font-medium text-neutral-500">
+                                    <DocumentTextIcon className="h-3.5 w-3.5" />
+                                    Procesamiento
+                                  </p>
+                                  <p className="text-sm font-semibold text-neutral-900">
+                                    {service.processing}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )}
 
-                      <div className="mt-6 rounded-2xl bg-primary-50 p-4">
-                        <div className="flex justify-between items-center">
-                          <span className="text-base font-bold text-neutral-900">
-                            Total a pagar
-                          </span>
-                          <span className="text-xl font-bold text-primary-700">
-                            {formatPrice(service.price)}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-xs text-neutral-500 text-right">
-                          IVA incluido
-                        </p>
-                      </div>
-                      <div className="mt-6 flex flex-row items-center justify-center gap-2 px-2">
-                        {/* Un checkbox obligatoio si no no puede avanzar */}
-                        <input
-                          type="checkbox"
-                          id="terms"
-                          name="terms"
-                          checked={termsAccepted}
-                          onChange={(e) => setTermsAccepted(e.target.checked)}
-                          className="h-4 w-4 rounded border-neutral-300 text-primary-700 focus:ring-primary-500 accent-primary-700"
-                        />
-                        <label
-                          htmlFor="terms"
-                          className="text-xs text-neutral-600"
-                        >
-                          <p className="mt-3 text-justify">
-                            Confirmo que he leído los{" "}
-                            <a
-                              href={helpData?.pdfPoliticasViaje || "#"}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }}
-                              className="text-primary-700 hover:underline"
+                          {service.includes && service.includes.length > 0 && (
+                            <div className="mt-5">
+                              <h5 className="text-sm font-semibold text-neutral-900 mb-3">
+                                Lo que incluye el servicio:
+                              </h5>
+                              <div className="space-y-2">
+                                {service.includes.map((item, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-start gap-2.5"
+                                  >
+                                    <CheckBadgeIcon className="h-4 w-4 shrink-0 text-accent-green mt-0.5" />
+                                    <span className="text-sm text-neutral-700">
+                                      {item}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="mt-6 rounded-2xl bg-primary-50 p-4">
+                            <div className="flex justify-between items-center">
+                              <span className="text-base font-bold text-neutral-900">
+                                Total a pagar
+                              </span>
+                              <span className="text-xl font-bold text-primary-700">
+                                {formatPrice(service.price)}
+                              </span>
+                            </div>
+                            <p className="mt-1 text-xs text-neutral-500 text-right">
+                              IVA incluido
+                            </p>
+                          </div>
+                          <div className="mt-6 flex flex-row items-center justify-center gap-2 px-2">
+                            {/* Un checkbox obligatoio si no no puede avanzar */}
+                            <input
+                              type="checkbox"
+                              id="terms"
+                              name="terms"
+                              checked={termsAccepted}
+                              onChange={(e) =>
+                                setTermsAccepted(e.target.checked)
+                              }
+                              className="h-4 w-4 rounded border-neutral-300 text-primary-700 focus:ring-primary-500 accent-primary-700"
+                            />
+                            <label
+                              htmlFor="terms"
+                              className="text-xs text-neutral-600"
                             >
-                              términos y condiciones
-                            </a>
-                            ,{" "}
-                            <a
-                              href={helpData?.pdfPoliticasPrivacidad || "#"}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }}
-                              className="text-primary-700 hover:underline"
+                              <p className="mt-3 text-justify">
+                                Confirmo que he leído los{" "}
+                                <a
+                                  href={helpData?.pdfPoliticasViaje || "#"}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                  }}
+                                  className="text-primary-700 hover:underline"
+                                >
+                                  términos y condiciones
+                                </a>
+                                ,{" "}
+                                <a
+                                  href={helpData?.pdfPoliticasPrivacidad || "#"}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                  }}
+                                  className="text-primary-700 hover:underline"
+                                >
+                                  políticas de privacidad{" "}
+                                </a>
+                                y{" "}
+                                <a
+                                  href={helpData?.pdfPoliticasVisas || "#"}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                  }}
+                                  className="text-primary-700 hover:underline"
+                                >
+                                  políticas de visas
+                                </a>
+                                .
+                              </p>
+                            </label>
+                          </div>
+
+                          {error && (
+                            <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                              {error}
+                            </div>
+                          )}
+
+                          <div className="mt-6">
+                            <button
+                              onClick={handleContinueToForm}
+                              disabled={isLoading || !termsAccepted}
+                              className="flex w-full items-center justify-center gap-3 rounded-full bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                             >
-                              políticas de privacidad{" "}
-                            </a>
-                            y{" "}
-                            <a
-                              href={helpData?.pdfPoliticasVisas || "#"}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }}
-                              className="text-primary-700 hover:underline"
-                            >
-                              políticas de visas
-                            </a>
-                            .
-                          </p>
-                        </label>
-                      </div>
-
-                      {error && (
-                        <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
-                          {error}
-                        </div>
-                      )}
-
-                      <div className="mt-6">
-                        {/* <button
-                          onClick={() => setShowForm(true)}
-                          disabled={isLoading || !termsAccepted}
-                          className="flex w-full items-center justify-center gap-3 rounded-full bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
-                        >
-                          <CreditCardIcon className="h-5 w-5" />
-                              Pagar {formatPrice(service.price)}
-                        </button> */}
-                        <button
-                          onClick={() => setShowForm(true)}
-                          disabled={true}
-                          className="flex w-full items-center justify-center gap-3 rounded-full bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
-                        >
-                          <CreditCardIcon className="h-5 w-5" />
-                              Proximamente
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {/* Customer Form */}
-                      <p className="text-sm text-neutral-600 mb-5">
-                        Ingresa tus datos para continuar con el pago seguro
-                      </p>
-
-                      <div className="space-y-4">
-                        <div>
-                          <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                            <UserIcon className="h-3.5 w-3.5" /> Nombre
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.givenName}
-                            onChange={(e) =>
-                              handleInputChange("givenName", e.target.value)
-                            }
-                            className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
-                            placeholder="Tu nombre"
-                            disabled={isLoading}
-                          />
-                          {formErrors.givenName && (
-                            <p className="text-xs text-red-600 mt-1">
-                              {formErrors.givenName}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                            <UserIcon className="h-3.5 w-3.5" /> Apellido
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.surname}
-                            onChange={(e) =>
-                              handleInputChange("surname", e.target.value)
-                            }
-                            className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
-                            placeholder="Tu apellido"
-                            disabled={isLoading}
-                          />
-                          {formErrors.surname && (
-                            <p className="text-xs text-red-600 mt-1">
-                              {formErrors.surname}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                            <EnvelopeIcon className="h-3.5 w-3.5" /> Email
-                          </label>
-                          <input
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) =>
-                              handleInputChange("email", e.target.value)
-                            }
-                            className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
-                            placeholder="tu@email.com"
-                            disabled={isLoading}
-                          />
-                          {formErrors.email && (
-                            <p className="text-xs text-red-600 mt-1">
-                              {formErrors.email}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                            <PhoneIcon className="h-3.5 w-3.5" /> Teléfono
-                          </label>
-                          <input
-                            type="tel"
-                            value={formData.phone}
-                            onChange={(e) =>
-                              handleInputChange("phone", e.target.value)
-                            }
-                            className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
-                            placeholder="0991234567"
-                            disabled={isLoading}
-                          />
-                          {formErrors.phone && (
-                            <p className="text-xs text-red-600 mt-1">
-                              {formErrors.phone}
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                            <IdentificationIcon className="h-3.5 w-3.5" />{" "}
-                            Cédula
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.identificationDocId}
-                            onChange={(e) =>
-                              handleInputChange(
-                                "identificationDocId",
-                                e.target.value,
-                              )
-                            }
-                            className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
-                            placeholder="10 dígitos"
-                            maxLength={10}
-                            disabled={isLoading}
-                          />
-                          {formErrors.identificationDocId && (
-                            <p className="text-xs text-red-600 mt-1">
-                              {formErrors.identificationDocId}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      {error && (
-                        <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
-                          {error}
-                        </div>
-                      )}
-
-                      <div className="mt-6 flex gap-3">
-                        <button
-                          onClick={() => setShowForm(false)}
-                          disabled={isLoading}
-                          className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 disabled:opacity-50"
-                        >
-                          Volver
-                        </button>
-                        <button
-                          onClick={handlePayClick}
-                          disabled={isLoading}
-                          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
-                        >
-                          {isLoading ? (
-                            <>
-                              <svg
-                                className="h-5 w-5 animate-spin text-white"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                              >
-                                <circle
-                                  className="opacity-25"
-                                  cx="12"
-                                  cy="12"
-                                  r="10"
-                                  stroke="currentColor"
-                                  strokeWidth="4"
-                                />
-                                <path
-                                  className="opacity-75"
-                                  fill="currentColor"
-                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                />
-                              </svg>
-                              Procesando...
-                            </>
-                          ) : (
-                            <>
                               <CreditCardIcon className="h-5 w-5" />
-                          Pagar {formatPrice(service.price)}
-                            </>
+                              Pagar {formatPrice(service.price)}
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          {/* Customer Form */}
+                          <p className="text-sm text-neutral-600 mb-3">
+                            Ingresa tus datos para continuar con el pago seguro
+                          </p>
+
+                          {isAuthenticated && user && (
+                            <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary-50 px-3 py-2 text-xs text-primary-700">
+                              <CheckCircleIcon className="h-4 w-4 flex-shrink-0" />
+                              <span>Datos precargados de tu perfil. Puedes editarlos si es necesario.</span>
+                            </div>
                           )}
-                        </button>
-                      </div>
+
+                          <div className="space-y-4">
+                            <div>
+                              <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
+                                <UserIcon className="h-3.5 w-3.5" /> Nombre
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.givenName}
+                                onChange={(e) =>
+                                  handleInputChange("givenName", e.target.value)
+                                }
+                                className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
+                                placeholder="Tu nombre"
+                                disabled={isLoading}
+                              />
+                              {formErrors.givenName && (
+                                <p className="text-xs text-red-600 mt-1">
+                                  {formErrors.givenName}
+                                </p>
+                              )}
+                            </div>
+
+                            <div>
+                              <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
+                                <UserIcon className="h-3.5 w-3.5" /> Apellido
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.surname}
+                                onChange={(e) =>
+                                  handleInputChange("surname", e.target.value)
+                                }
+                                className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
+                                placeholder="Tu apellido"
+                                disabled={isLoading}
+                              />
+                              {formErrors.surname && (
+                                <p className="text-xs text-red-600 mt-1">
+                                  {formErrors.surname}
+                                </p>
+                              )}
+                            </div>
+
+                            <div>
+                              <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
+                                <EnvelopeIcon className="h-3.5 w-3.5" /> Email
+                              </label>
+                              <input
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) =>
+                                  handleInputChange("email", e.target.value)
+                                }
+                                className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
+                                placeholder="tu@email.com"
+                                disabled={isLoading}
+                              />
+                              {formErrors.email && (
+                                <p className="text-xs text-red-600 mt-1">
+                                  {formErrors.email}
+                                </p>
+                              )}
+                            </div>
+
+                            <div>
+                              <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
+                                <PhoneIcon className="h-3.5 w-3.5" /> Teléfono
+                              </label>
+                              <input
+                                type="tel"
+                                value={formData.phone}
+                                onChange={(e) =>
+                                  handleInputChange("phone", e.target.value)
+                                }
+                                className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
+                                placeholder="0991234567"
+                                disabled={isLoading}
+                              />
+                              {formErrors.phone && (
+                                <p className="text-xs text-red-600 mt-1">
+                                  {formErrors.phone}
+                                </p>
+                              )}
+                            </div>
+
+                            <div>
+                              <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
+                                <IdentificationIcon className="h-3.5 w-3.5" />{" "}
+                                Cédula
+                              </label>
+                              <input
+                                type="text"
+                                value={formData.identificationDocId}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    "identificationDocId",
+                                    e.target.value,
+                                  )
+                                }
+                                className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
+                                placeholder="10 dígitos"
+                                maxLength={10}
+                                disabled={isLoading}
+                              />
+                              {formErrors.identificationDocId && (
+                                <p className="text-xs text-red-600 mt-1">
+                                  {formErrors.identificationDocId}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          {error && (
+                            <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                              {error}
+                            </div>
+                          )}
+
+                          <div className="mt-6 flex gap-3">
+                            <button
+                              onClick={() => setShowForm(false)}
+                              disabled={isLoading}
+                              className="flex-1 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 disabled:opacity-50"
+                            >
+                              Volver
+                            </button>
+                            <button
+                              onClick={handlePayClick}
+                              disabled={isLoading}
+                              className="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+                            >
+                              {isLoading ? (
+                                <>
+                                  <svg
+                                    className="h-5 w-5 animate-spin text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle
+                                      className="opacity-25"
+                                      cx="12"
+                                      cy="12"
+                                      r="10"
+                                      stroke="currentColor"
+                                      strokeWidth="4"
+                                    />
+                                    <path
+                                      className="opacity-75"
+                                      fill="currentColor"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    />
+                                  </svg>
+                                  Procesando...
+                                </>
+                              ) : (
+                                <>
+                                  <CreditCardIcon className="h-5 w-5" />
+                                  Pagar {formatPrice(service.price)}
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </>
                   )}
-                </>)}
                 </div>
 
                 {!showForm && (

@@ -27,9 +27,9 @@ export default function RegisterPage() {
   const { register, isLoading, error, clearError } = useAuth();
 
   const [formData, setFormData] = useState({
-    fullName: "",
+    primerNombre: "",
+    apellido: "",
     email: "",
-    username: "",
     password: "",
     confirmPassword: "",
     acceptTerms: false,
@@ -45,9 +45,9 @@ export default function RegisterPage() {
     special: false,
   });
   const [validationErrors, setValidationErrors] = useState<{
-    fullName?: string;
+    primerNombre?: string;
+    apellido?: string;
     email?: string;
-    username?: string;
     password?: string;
     confirmPassword?: string;
     acceptTerms?: string;
@@ -95,24 +95,26 @@ export default function RegisterPage() {
   const validateForm = () => {
     const errors: typeof validationErrors = {};
 
-    if (!formData.fullName.trim()) {
-      errors.fullName = "Nombre completo es requerido";
-    } else if (formData.fullName.trim().length < 3) {
-      errors.fullName = "El nombre debe tener al menos 3 caracteres";
+    if (!formData.primerNombre.trim()) {
+      errors.primerNombre = "El nombre es requerido";
+    } else if (formData.primerNombre.trim().length < 2) {
+      errors.primerNombre = "Mínimo 2 caracteres";
+    } else if (!/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/.test(formData.primerNombre)) {
+      errors.primerNombre = "Solo letras y espacios";
+    }
+
+    if (!formData.apellido.trim()) {
+      errors.apellido = "El apellido es requerido";
+    } else if (formData.apellido.trim().length < 2) {
+      errors.apellido = "Mínimo 2 caracteres";
+    } else if (!/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/.test(formData.apellido)) {
+      errors.apellido = "Solo letras y espacios";
     }
 
     if (!formData.email) {
       errors.email = "Email es requerido";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = "Email no válido";
-    }
-
-    if (!formData.username) {
-      errors.username = "Usuario es requerido";
-    } else if (formData.username.length < 3) {
-      errors.username = "El usuario debe tener al menos 3 caracteres";
-    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
-      errors.username = "Solo letras, números y guión bajo";
     }
 
     if (!formData.password) {
@@ -146,7 +148,8 @@ export default function RegisterPage() {
     try {
       await register(
         formData.email,
-        formData.username,
+        formData.primerNombre,
+        formData.apellido,
         formData.password,
         formData.confirmPassword
       );
@@ -157,20 +160,16 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-primary-50 via-white to-purple-50 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-primary-50 via-white to-purple-50 px-4 pt-20! pb-10! md:pt-40! md:pb-20!">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl shadow-xl p-8">
           {/* Logo y encabezado */}
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center">
-                <span className="text-3xl font-bold text-primary-700">L</span>
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold text-neutral-900">
+  
+            <h1 className="text-3xl! font-bold text-neutral-900">
               Crear cuenta
             </h1>
-            <p className="text-neutral-500 mt-2 text-sm">
+            <p className="text-neutral-500 mt-2 text-sm!">
               Únete a Lux Viajes y comienza a planificar tus aventuras
             </p>
           </div>
@@ -184,35 +183,24 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Nombre completo */}
-            <div className="form-group">
-              <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                Nombre completo
-              </label>
-              <div className="relative">
-                <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
-                <input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  placeholder="Juan Pérez"
-                  autoComplete="name"
-                  disabled={isLoading}
-                  className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${
-                    validationErrors.fullName
-                      ? "border-red-300 focus:ring-red-200"
-                      : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"
-                  }`}
-                />
+            {/* Nombre y Apellido */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="form-group">
+                <label className="block text-sm font-medium text-neutral-700 mb-1.5">Nombre</label>
+                <div className="relative">
+                  <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                  <input type="text" id="primerNombre" name="primerNombre" value={formData.primerNombre} onChange={handleChange} placeholder="Juan" autoComplete="given-name" disabled={isLoading} className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${validationErrors.primerNombre ? "border-red-300 focus:ring-red-200" : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"}`} />
+                </div>
+                {validationErrors.primerNombre && (<span className="text-red-500 text-xs mt-1 flex items-center gap-1"><XCircleIcon className="h-3.5 w-3.5" />{validationErrors.primerNombre}</span>)}
               </div>
-              {validationErrors.fullName && (
-                <span className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                  <XCircleIcon className="h-3.5 w-3.5" />
-                  {validationErrors.fullName}
-                </span>
-              )}
+              <div className="form-group">
+                <label className="block text-sm font-medium text-neutral-700 mb-1.5">Apellido</label>
+                <div className="relative">
+                  <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                  <input type="text" id="apellido" name="apellido" value={formData.apellido} onChange={handleChange} placeholder="Pérez" autoComplete="family-name" disabled={isLoading} className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${validationErrors.apellido ? "border-red-300 focus:ring-red-200" : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"}`} />
+                </div>
+                {validationErrors.apellido && (<span className="text-red-500 text-xs mt-1 flex items-center gap-1"><XCircleIcon className="h-3.5 w-3.5" />{validationErrors.apellido}</span>)}
+              </div>
             </div>
 
             {/* Email */}
@@ -242,43 +230,6 @@ export default function RegisterPage() {
                 <span className="text-red-500 text-xs mt-1 flex items-center gap-1">
                   <XCircleIcon className="h-3.5 w-3.5" />
                   {validationErrors.email}
-                </span>
-              )}
-            </div>
-
-            {/* Usuario */}
-            <div className="form-group">
-              <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-                Nombre de usuario
-              </label>
-              <div className="relative">
-                <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
-                <input
-                  type="text"
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  placeholder="tu_usuario"
-                  autoComplete="username"
-                  disabled={isLoading}
-                  className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${
-                    validationErrors.username
-                      ? "border-red-300 focus:ring-red-200"
-                      : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"
-                  }`}
-                />
-              </div>
-              {validationErrors.username && (
-                <span className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                  <XCircleIcon className="h-3.5 w-3.5" />
-                  {validationErrors.username}
-                </span>
-              )}
-              {!validationErrors.username && formData.username && (
-                <span className="text-green-500 text-xs mt-1 flex items-center gap-1">
-                  <CheckCircleIcon className="h-3.5 w-3.5" />
-                  Usuario disponible
                 </span>
               )}
             </div>

@@ -28,9 +28,11 @@ interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (
     email: string,
-    username: string,
+    primerNombre: string,
+    apellido: string,
     password: string,
-    confirmPassword: string
+    confirmPassword: string,
+    extra?: { telefono?: string; cedula?: string; direccion?: string; pais?: string }
   ) => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
@@ -143,23 +145,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = useCallback(
     async (
       email: string,
-      username: string,
+      primerNombre: string,
+      apellido: string,
       password: string,
-      confirmPassword: string
+      confirmPassword: string,
+      extra?: { telefono?: string; cedula?: string; direccion?: string; pais?: string }
     ) => {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       try {
+        const body: Record<string, string> = {
+          primerNombre,
+          apellido,
+          email,
+          password,
+          confirmPassword,
+        };
+        if (extra?.telefono) body.telefono = extra.telefono;
+        if (extra?.cedula) body.cedula = extra.cedula;
+        if (extra?.direccion) body.direccion = extra.direccion;
+        if (extra?.pais) body.pais = extra.pais;
+
         const response = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            primerNombre: username,
-            apellido: "",
-            email,
-            password,
-            confirmPassword,
-          }),
+          body: JSON.stringify(body),
         });
 
         const data = await response.json();
