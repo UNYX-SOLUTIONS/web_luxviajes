@@ -33,7 +33,8 @@ interface AuthContextType extends AuthState {
     password: string,
     confirmPassword: string,
     extra?: { telefono?: string; cedula?: string; direccion?: string; pais?: string }
-  ) => Promise<void>;
+  ) => Promise<{ email: string }>;
+  verifyCode: (email: string, code: string) => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
   updateUser: (user: User) => void;
@@ -178,10 +179,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           throw new Error(data.message || "Error al registrar usuario");
         }
 
+        setState((prev) => ({ ...prev, isLoading: false }));
+        return { email: data.data?.email || email };
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Error de conexión";
+        setState((prev) => ({
+          ...prev,
+          isLoading: false,
+          error: message,
+        }));
+        throw error;
+      }
+    },
+    []
+  );
+
+  const verifyCode = useCallback(
+    async (email: string, code: string) => {
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+      try {
+        const response = await fetch("/api/auth/verify-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, code }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.message || "Código inválido");
+        }
+
         const user: User = {
           id: data.user.id,
           primerNombre: data.user.primerNombre,
-        apellido: data.user.apellido,
+          apellido: data.user.apellido,
           email: data.user.email,
           rol: data.user.rol,
           fotoPerfil: data.user.fotoPerfil ?? null,
@@ -195,8 +229,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           error: null,
         });
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Error de conexión";
+        const message = error instanceof Error ? error.message : "Error de conexión";
         setState((prev) => ({
           ...prev,
           isLoading: false,
@@ -238,6 +271,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ...state,
         login,
         register,
+        verifyCode,
         logout,
         clearError,
         updateUser,

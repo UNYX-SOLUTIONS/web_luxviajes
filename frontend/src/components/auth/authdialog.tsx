@@ -12,6 +12,7 @@ import {
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "@/lib/auth-context";
+import { VerificationDialog } from "@/components/auth/VerificationDialog";
 
 interface AuthDialogProps {
   onClose: () => void;
@@ -19,7 +20,9 @@ interface AuthDialogProps {
 
 export function AuthDialog({ onClose }: AuthDialogProps) {
   const [mode, setMode] = useState<"login" | "register">("login");
-  const { login, register, isLoading, error, clearError } = useAuth();
+  const { login, register, verifyCode, isLoading, error, clearError } = useAuth();
+  const [showVerification, setShowVerification] = useState(false);
+  const [verifyEmail, setVerifyEmail] = useState("");
 
   const [formData, setFormData] = useState({
     primerNombre: "",
@@ -166,17 +169,15 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
       if (!validateRegisterForm()) return;
 
       try {
-        await register(
+        const result = await register(
           formData.email,
           formData.primerNombre,
           formData.apellido,
           formData.password,
           formData.confirmPassword
         );
-        onClose();
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
+        setVerifyEmail(result.email);
+        setShowVerification(true);
       } catch (err) {
         // Error manejado por el contexto
       }
@@ -547,6 +548,14 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
           </div>
         </div>
       </div>
+
+      {showVerification && verifyEmail && (
+        <VerificationDialog
+          email={verifyEmail}
+          onVerified={() => { setShowVerification(false); onClose(); setTimeout(() => window.location.reload(), 500); }}
+          onCancel={() => { setShowVerification(false); }}
+        />
+      )}
     </>
   );
 }

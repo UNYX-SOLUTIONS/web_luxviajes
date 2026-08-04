@@ -3,16 +3,16 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { treeifyError } from "zod/v4/core";
 import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
+import { sendVerificationWebhook } from "@/lib/webhook";
 import bcrypt from "bcryptjs";
 
-const resendCodeSchema = z.object({
-  email: z.string().email(),
-});
+const resendCodeSchema = z.object({ email: z.string().email() });
 
 function generateCode(): string {
   const arr = new Uint8Array(3);
   crypto.getRandomValues(arr);
-  return String(Math.floor(100000 + (arr[0] << 16 | arr[1] << 8 | arr[2]) % 900000)).padStart(6, "0");
+  const num = Math.floor(100000 + ((arr[0] << 16 | arr[1] << 8 | arr[2]) % 900000));
+  return num.toString().padStart(6, "0");
 }
 
 export async function POST(request: Request) {
@@ -31,12 +31,10 @@ export async function POST(request: Request) {
 
     const { email } = parsed.data;
 
-    const pending = await prisma.pendingRegistration.findUnique({
-      where: { email },
-    });
+    const pending = await prisma.pendingRegistration.findUnique({ where: { email } });
 
     if (!pending) {
-      return NextResponse.json({ success: false, message: "No hay una verificación pendiente para este email" }, { status: 404 });
+      return NextResponse.json({ success: false, message: "No hay verificación pendiente para este email." }, { status: 404 });
     }
 
     const rawCode = generateCode();
@@ -48,12 +46,32 @@ export async function POST(request: Request) {
         verificationCode: hashedCode,
         codeExpiresAt: new Date(Date.now() + 15 * 60 * 1000),
         verificationAttempts: 0,
+        webhookSent: false,
       },
     });
 
-    console.log(`[DEV] New verification code for ${email}: ${rawCode}`);
+    const webhookOk = await sendVerificationWebhook(
+      email,
+      pending.primerNombre || "",
+      pending.apellido || "",
+      rawCode
+    );
 
-    return NextResponse.json({ success: true, message: "Nuevo código enviado" });
+    if (webhookOk) {
+      await prisma.pendingRegistration.update({
+        where: { id: pending.id },
+        data: { webhookSent: true, webhookSentAt: new Date() },
+      });
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.log(`[DEV] New code for ${email}: ${rawCode}`);
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: webhookOk ? "Nuevo código enviado. Revisa tu correo." : "Código generado. Intenta de nuevo si no lo recibes.",
+    });
   } catch (error) {
     console.error("Error al reenviar código:", error);
     return NextResponse.json({ success: false, message: "Error interno" }, { status: 500 });

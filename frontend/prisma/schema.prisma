@@ -171,23 +171,26 @@ model SecurityLog {
 }
 
 model PendingRegistration {
-  id                   String   @id @default(cuid())
+  id                   String    @id @default(cuid())
   primerNombre         String?
   segundoNombre        String?
   apellido             String?
-  email                String   @unique
+  email                String    @unique
   password             String
   telefono             String?
   cedula               String?
   direccion            String?
-  pais                 String   @default("EC")
+  pais                 String    @default("EC")
   verificationCode     String
   codeExpiresAt        DateTime
-  verificationAttempts Int      @default(0)
-  maxAttempts          Int      @default(5)
+  verificationAttempts Int       @default(0)
+  maxAttempts          Int       @default(5)
+  webhookSent          Boolean   @default(false)
+  webhookSentAt        DateTime?
+  verifiedAt           DateTime?
   metadata             Json?
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }
 
 enum PaymentStatus {

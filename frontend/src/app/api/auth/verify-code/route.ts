@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, generateToken, setAuthCookie } from "@/lib/auth";
+import { generateToken, setAuthCookie } from "@/lib/auth";
 import { z } from "zod";
 import { treeifyError } from "zod/v4/core";
 import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   const rlKey = getRateLimitKey(request, "verify_code");
   const rl = rateLimit(rlKey, 10, 60);
   if (!rl.allowed) {
-    return NextResponse.json({ success: false, message: "Demasiados intentos" }, { status: 429 });
+    return NextResponse.json({ success: false, message: "Demasiados intentos. Espera un minuto." }, { status: 429 });
   }
 
   try {
@@ -28,17 +28,15 @@ export async function POST(request: Request) {
 
     const { email, code } = parsed.data;
 
-    const pending = await prisma.pendingRegistration.findUnique({
-      where: { email },
-    });
+    const pending = await prisma.pendingRegistration.findUnique({ where: { email } });
 
     if (!pending) {
-      return NextResponse.json({ success: false, message: "Código inválido o expirado" }, { status: 400 });
+      return NextResponse.json({ success: false, message: "No hay verificación pendiente para este email." }, { status: 404 });
     }
 
     if (new Date() > pending.codeExpiresAt) {
       await prisma.pendingRegistration.delete({ where: { id: pending.id } });
-      return NextResponse.json({ success: false, message: "El código ha expirado. Solicita uno nuevo." }, { status: 400 });
+      return NextResponse.json({ success: false, message: "El código ha expirado. Regístrate de nuevo." }, { status: 400 });
     }
 
     if (pending.verificationAttempts >= pending.maxAttempts) {
@@ -55,7 +53,7 @@ export async function POST(request: Request) {
       const remaining = pending.maxAttempts - pending.verificationAttempts - 1;
       return NextResponse.json({
         success: false,
-        message: remaining > 0 ? `Código incorrecto. Te quedan ${remaining} intentos.` : "Demasiados intentos. Solicita un nuevo código.",
+        message: remaining > 0 ? `Código incorrecto. ${remaining} intentos restantes.` : "Demasiados intentos. Solicita un nuevo código.",
       }, { status: 400 });
     }
 
@@ -66,22 +64,37 @@ export async function POST(request: Request) {
         email: pending.email,
         password: pending.password,
         telefono: pending.telefono,
+        cedula: pending.cedula,
+        direccion: pending.direccion,
+        pais: pending.pais || "EC",
         emailVerificado: true,
         emailVerifiedAt: new Date(),
       },
       select: { id: true, primerNombre: true, apellido: true, email: true, rol: true, tokenVersion: true },
     });
 
+    await prisma.pendingRegistration.update({
+      where: { id: pending.id },
+      data: { verifiedAt: new Date() },
+    });
+
     await prisma.pendingRegistration.delete({ where: { id: pending.id } });
 
     await logSecurityEvent("REGISTER", user.id, request, { email, verified: true });
 
-    const token = generateToken({ id: user.id, email: user.email, primerNombre: user.primerNombre ?? "", apellido: user.apellido ?? "", rol: user.rol, tv: user.tokenVersion });
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      primerNombre: user.primerNombre ?? "",
+      apellido: user.apellido ?? "",
+      rol: user.rol,
+      tv: user.tokenVersion,
+    });
     await setAuthCookie(token);
 
     return NextResponse.json({
       success: true,
-      message: "Email verificado. Cuenta creada exitosamente.",
+      message: "Email verificado exitosamente.",
       user: { id: user.id, primerNombre: user.primerNombre, apellido: user.apellido, email: user.email, rol: user.rol },
     });
   } catch (error) {
