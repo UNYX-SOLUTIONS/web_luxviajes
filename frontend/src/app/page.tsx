@@ -143,18 +143,18 @@ export default function Home() {
       <div ref={heroRef}>
         {loading ? (
           <div className="w-full h-screen flex items-center justify-center bg-linear-to-b from-primary-900 to-primary-800">
-            <div className="text-center text-white">
+            <div className="text-center text-white!">
               <div className="mb-4 flex justify-center">
                 <div className="h-12 w-12 border-4 border-primary-200 border-t-white rounded-full animate-spin"></div>
               </div>
-              <p className="text-lg">Cargando experiencias...</p>
+              <p className="text-lg text-primary-100!">Cargando experiencias...</p>
             </div>
           </div>
         ) : error ? (
           <div className="w-full h-screen flex items-center justify-center bg-linear-to-b from-primary-900 to-primary-800">
-            <div className="text-center text-white">
-              <p className="text-lg mb-2">Error al cargar los datos</p>
-              <p className="text-sm opacity-75">Por favor, recarga la página</p>
+            <div className="text-center text-white!">
+              <p className="text-lg mb-2 text-red-500!">Error al cargar los datos</p>
+              <p className="text-sm opacity-75 text-primary-100!">Por favor, recarga la página</p>
             </div>
           </div>
         ) : heroSlides.length > 0 ? (
