@@ -2,9 +2,13 @@ const API_BASE = "/api/user/profile";
 
 export interface UserProfile {
   id: string;
-  nombre: string;
+  primerNombre: string;
+  apellido: string;
   email: string;
   telefono: string | null;
+  cedula: string | null;
+  direccion: string | null;
+  pais: string;
   fotoPerfil: string | null;
   rol: string;
   emailVerificado: boolean;

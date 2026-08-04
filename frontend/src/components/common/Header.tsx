@@ -44,13 +44,10 @@ export function Header({ activeLink }: HeaderProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const getUserInitials = (name?: string) => {
-    if (!name) return "U";
-    const parts = name.trim().split(/\s+/);
-    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-    return (
-      parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
-    ).toUpperCase();
+  const getUserInitials = (firstName?: string, lastName?: string) => {
+    const f = (firstName || "").charAt(0).toUpperCase() || "U";
+    const l = (lastName || "").charAt(0).toUpperCase();
+    return (f + (l || f)).substring(0, 2).toUpperCase();
   };
 
   return (
@@ -120,15 +117,15 @@ export function Header({ activeLink }: HeaderProps) {
                 >
                   <Avatar size="sm" variant="solid" shape="circle">
                     {user?.fotoPerfil ? (
-                      <AvatarImage src={user.fotoPerfil} alt={user.nombre} />
+                      <AvatarImage src={user.fotoPerfil} alt={user.primerNombre} />
                     ) : (
                       <AvatarFallback>
-                        {getUserInitials(user?.nombre)}
+                        {getUserInitials(user?.primerNombre, user?.apellido)}
                       </AvatarFallback>
                     )}
                   </Avatar>
                   <span className="hidden text-[11px] font-medium text-[#CCC6D0] lg:inline lg:text-xs xl:text-sm">
-                    {user?.nombre?.split(" ")[0]}
+                    {user?.primerNombre?.split(" ")[0]}
                   </span>
                   <svg
                     className={cn(
@@ -152,7 +149,7 @@ export function Header({ activeLink }: HeaderProps) {
                   <div className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-white shadow-lg ring-1 ring-black/5">
                     <div className="border-b border-neutral-100 px-4 py-3">
                       <p className="text-sm font-semibold text-neutral-900">
-                        {user?.nombre || "Usuario"}
+                        {user?.primerNombre || "Usuario"}
                       </p>
                       <p className="text-xs text-neutral-500 truncate">
                         {user?.email}
@@ -276,16 +273,16 @@ export function Header({ activeLink }: HeaderProps) {
                     <div className="flex items-center gap-3 px-4 py-2">
                       <Avatar size="sm" variant="solid" shape="circle">
                         {user?.fotoPerfil ? (
-                          <AvatarImage src={user.fotoPerfil} alt={user?.nombre || ""} />
+                          <AvatarImage src={user.fotoPerfil} alt={user?.primerNombre || ""} />
                         ) : (
                           <AvatarFallback>
-                            {getUserInitials(user?.nombre)}
+                            {getUserInitials(user?.primerNombre, user?.apellido)}
                           </AvatarFallback>
                         )}
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-white">
-                          {user?.nombre || "Mi Cuenta"}
+                          {user?.primerNombre || "Mi Cuenta"}
                         </span>
                         <span className="text-xs text-[#CCC6D0] truncate max-w-50">
                           {user?.email}

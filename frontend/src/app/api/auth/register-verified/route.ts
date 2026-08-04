@@ -9,7 +9,8 @@ import { logSecurityEvent } from "@/lib/security-logger";
 import bcrypt from "bcryptjs";
 
 const registerVerifiedSchema = z.object({
-  nombre: z.string().min(2).max(50).regex(/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/),
+  primerNombre: z.string().min(2).max(50).regex(/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/),
+  apellido: z.string().min(2).max(50).regex(/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/),
   email: z.string().email().max(100),
   password: z.string().min(8).max(50).regex(/[A-Z]/).regex(/[0-9]/),
   confirmPassword: z.string(),
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: "Datos inválidos", errors: treeifyError(parsed.error) }, { status: 400 });
     }
 
-    const { nombre, email, password, telefono, cedula, direccion, pais } = parsed.data;
+    const { primerNombre, apellido, email, password, telefono, cedula, direccion, pais } = parsed.data;
 
     const [existingUser, existingPending] = await Promise.all([
       prisma.user.findUnique({ where: { email }, select: { id: true } }),
@@ -56,7 +57,8 @@ export async function POST(request: Request) {
 
     await prisma.pendingRegistration.create({
       data: {
-        nombre,
+        primerNombre,
+        apellido,
         email,
         password: hashedPassword,
         telefono: telefono || null,

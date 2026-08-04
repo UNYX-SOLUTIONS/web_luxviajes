@@ -44,7 +44,8 @@ export function useUserProfile() {
       setProfile(updated);
       updateUser({
         id: updated.id,
-        nombre: updated.nombre,
+        primerNombre: updated.primerNombre ?? "",
+        apellido: updated.apellido ?? "",
         email: updated.email,
         rol: updated.rol,
         fotoPerfil: updated.fotoPerfil ?? null,
@@ -66,7 +67,8 @@ export function useUserProfile() {
       setProfile((prev) => prev ? { ...prev, fotoPerfil: result.fotoPerfil } : null);
       updateUser({
         id: profile?.id ?? "",
-        nombre: profile?.nombre ?? "",
+        primerNombre: profile?.primerNombre ?? "",
+        apellido: profile?.apellido ?? "",
         email: profile?.email ?? "",
         rol: profile?.rol ?? "",
         fotoPerfil: result.fotoPerfil,
@@ -88,7 +90,8 @@ export function useUserProfile() {
       setProfile((prev) => prev ? { ...prev, fotoPerfil: null } : null);
       updateUser({
         id: profile?.id ?? "",
-        nombre: profile?.nombre ?? "",
+        primerNombre: profile?.primerNombre ?? "",
+        apellido: profile?.apellido ?? "",
         email: profile?.email ?? "",
         rol: profile?.rol ?? "",
         fotoPerfil: null,

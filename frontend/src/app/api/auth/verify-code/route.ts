@@ -61,27 +61,28 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.create({
       data: {
-        nombre: pending.nombre,
+        primerNombre: pending.primerNombre,
+        apellido: pending.apellido,
         email: pending.email,
         password: pending.password,
         telefono: pending.telefono,
         emailVerificado: true,
         emailVerifiedAt: new Date(),
       },
-      select: { id: true, nombre: true, email: true, rol: true, tokenVersion: true },
+      select: { id: true, primerNombre: true, apellido: true, email: true, rol: true, tokenVersion: true },
     });
 
     await prisma.pendingRegistration.delete({ where: { id: pending.id } });
 
     await logSecurityEvent("REGISTER", user.id, request, { email, verified: true });
 
-    const token = generateToken({ id: user.id, email: user.email, nombre: user.nombre, rol: user.rol, tv: user.tokenVersion });
+    const token = generateToken({ id: user.id, email: user.email, primerNombre: user.primerNombre ?? "", apellido: user.apellido ?? "", rol: user.rol, tv: user.tokenVersion });
     await setAuthCookie(token);
 
     return NextResponse.json({
       success: true,
       message: "Email verificado. Cuenta creada exitosamente.",
-      user: { id: user.id, nombre: user.nombre, email: user.email, rol: user.rol },
+      user: { id: user.id, primerNombre: user.primerNombre, apellido: user.apellido, email: user.email, rol: user.rol },
     });
   } catch (error) {
     console.error("Error en verificación:", error);

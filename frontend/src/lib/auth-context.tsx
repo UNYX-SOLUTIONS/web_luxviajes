@@ -10,7 +10,8 @@ import React, {
 
 interface User {
   id: string;
-  nombre: string;
+  primerNombre: string;
+  apellido: string;
   email: string;
   rol: string;
   fotoPerfil: string | null;
@@ -113,7 +114,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const user: User = {
         id: data.user.id,
-        nombre: data.user.nombre,
+        primerNombre: data.user.primerNombre,
+        apellido: data.user.apellido,
         email: data.user.email,
         rol: data.user.rol,
         fotoPerfil: data.user.fotoPerfil ?? null,
@@ -152,7 +154,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            nombre: username,
+            primerNombre: username,
+            apellido: "",
             email,
             password,
             confirmPassword,
@@ -167,7 +170,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const user: User = {
           id: data.user.id,
-          nombre: data.user.nombre,
+          primerNombre: data.user.primerNombre,
+        apellido: data.user.apellido,
           email: data.user.email,
           rol: data.user.rol,
           fotoPerfil: data.user.fotoPerfil ?? null,

@@ -6,19 +6,12 @@ import { treeifyError } from "zod/v4/core";
 import { logSecurityEvent } from "@/lib/security-logger";
 
 const updateProfileSchema = z.object({
-  nombre: z
-    .string()
-    .min(2, "El nombre debe tener al menos 2 caracteres")
-    .max(50, "El nombre no puede exceder 50 caracteres")
-    .regex(/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/, "El nombre solo puede contener letras y espacios")
-    .optional(),
-  telefono: z
-    .string()
-    .min(7, "El teléfono debe tener al menos 7 caracteres")
-    .max(15, "El teléfono no puede exceder 15 caracteres")
-    .regex(/^[0-9+]+$/, "El teléfono solo puede contener números y el signo +")
-    .optional()
-    .or(z.literal("")),
+  primerNombre: z.string().min(2).max(50).regex(/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/).optional(),
+  apellido: z.string().min(2).max(50).regex(/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/).optional(),
+  telefono: z.string().min(7).max(25).regex(/^[0-9+]+$/).optional().or(z.literal("")),
+  cedula: z.string().length(10).regex(/^\d{10}$/).optional().or(z.literal("")),
+  direccion: z.string().max(100).optional().or(z.literal("")),
+  pais: z.string().length(2).optional(),
 });
 
 export async function GET() {
@@ -31,22 +24,15 @@ export async function GET() {
     const user = await prisma.user.findUnique({
       where: { id: userPayload.id },
       select: {
-        id: true,
-        nombre: true,
-        email: true,
-        telefono: true,
-        fotoPerfil: true,
-        rol: true,
-        emailVerificado: true,
-        createdAt: true,
-        updatedAt: true,
+        id: true, primerNombre: true, apellido: true, email: true,
+        telefono: true, cedula: true, direccion: true, pais: true,
+        fotoPerfil: true, rol: true, emailVerificado: true,
+        createdAt: true, updatedAt: true,
       },
     });
-
     if (!user) {
       return NextResponse.json({ success: false, message: "Usuario no encontrado" }, { status: 404 });
     }
-
     return NextResponse.json({ success: true, data: user });
   } catch (error) {
     console.error("Error al obtener perfil:", error);
@@ -63,17 +49,17 @@ export async function PUT(request: Request) {
   try {
     const body = await request.json();
     const parsed = updateProfileSchema.safeParse(body);
-
     if (!parsed.success) {
-      return NextResponse.json(
-        { success: false, message: "Datos inválidos", errors: treeifyError(parsed.error) },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, message: "Datos inválidos", errors: treeifyError(parsed.error) }, { status: 400 });
     }
 
     const updateData: Record<string, string> = {};
-    if (parsed.data.nombre !== undefined) updateData.nombre = parsed.data.nombre;
+    if (parsed.data.primerNombre !== undefined) updateData.primerNombre = parsed.data.primerNombre;
+    if (parsed.data.apellido !== undefined) updateData.apellido = parsed.data.apellido;
     if (parsed.data.telefono !== undefined) updateData.telefono = parsed.data.telefono || "";
+    if (parsed.data.cedula !== undefined) updateData.cedula = parsed.data.cedula || "";
+    if (parsed.data.direccion !== undefined) updateData.direccion = parsed.data.direccion || "";
+    if (parsed.data.pais !== undefined) updateData.pais = parsed.data.pais;
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ success: false, message: "No hay datos para actualizar" }, { status: 400 });
@@ -83,17 +69,13 @@ export async function PUT(request: Request) {
       where: { id: userPayload.id },
       data: updateData,
       select: {
-        id: true,
-        nombre: true,
-        email: true,
-        telefono: true,
-        fotoPerfil: true,
-        updatedAt: true,
+        id: true, primerNombre: true, apellido: true, email: true,
+        telefono: true, cedula: true, direccion: true, pais: true,
+        fotoPerfil: true, updatedAt: true,
       },
     });
 
     await logSecurityEvent("PROFILE_UPDATED", userPayload.id, request, updateData);
-
     return NextResponse.json({ success: true, data: user, message: "Perfil actualizado" });
   } catch (error) {
     console.error("Error al actualizar perfil:", error);

@@ -6,20 +6,20 @@ import { Avatar, AvatarFallback } from "@/components/auth/avatar";
 
 interface ProfilePhotoProps {
   fotoUrl: string | null;
-  nombre: string;
+  primerNombre: string;
+  apellido: string;
   onUpload: (file: File) => void;
   onDelete: () => void;
   isSaving: boolean;
 }
 
-export function ProfilePhoto({ fotoUrl, nombre, onUpload, onDelete, isSaving }: ProfilePhotoProps) {
+export function ProfilePhoto({ fotoUrl, primerNombre, apellido, onUpload, onDelete, isSaving }: ProfilePhotoProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const getUserInitials = (name?: string) => {
-    if (!name) return "U";
-    const parts = name.trim().split(/\s+/);
-    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  const getUserInitials = () => {
+    const f = (primerNombre || "").charAt(0).toUpperCase();
+    const l = (apellido || "").charAt(0).toUpperCase();
+    return (f + (l || f)).substring(0, 2);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +51,7 @@ export function ProfilePhoto({ fotoUrl, nombre, onUpload, onDelete, isSaving }: 
         ) : (
           <Avatar size="2xl" variant="solid" shape="circle">
             <AvatarFallback className="text-3xl">
-              {getUserInitials(nombre)}
+              {getUserInitials()}
             </AvatarFallback>
           </Avatar>
         )}
@@ -74,7 +74,7 @@ export function ProfilePhoto({ fotoUrl, nombre, onUpload, onDelete, isSaving }: 
       </div>
 
       <h3 className="font-semibold text-neutral-900 mt-4 truncate">
-        {nombre}
+        {primerNombre} {apellido}
       </h3>
 
       {fotoUrl && (

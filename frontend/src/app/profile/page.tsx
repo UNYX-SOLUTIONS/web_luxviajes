@@ -107,7 +107,8 @@ export default function ProfilePage() {
             <div className="bg-white rounded-2xl shadow-sm ring-1 ring-neutral-200 p-6">
               <ProfilePhoto
                 fotoUrl={profile.fotoPerfil}
-                nombre={profile.nombre}
+                primerNombre={profile.primerNombre ?? ""}
+                apellido={profile.apellido ?? ""}
                 onUpload={savePhoto}
                 onDelete={removePhoto}
                 isSaving={isSaving}
@@ -138,8 +139,12 @@ export default function ProfilePage() {
                 Información personal
               </h2>
               <ProfileForm
-                nombre={profile.nombre}
+                primerNombre={profile.primerNombre ?? ""}
+                apellido={profile.apellido ?? ""}
                 telefono={profile.telefono || ""}
+                cedula={profile.cedula || ""}
+                direccion={profile.direccion || ""}
+                pais={profile.pais || "EC"}
                 email={profile.email}
                 onSave={saveProfile}
                 isSaving={isSaving}

@@ -11,7 +11,8 @@ const COOKIE_NAME = "lux_viajes_token";
 export interface JWTPayload {
   id: string;
   email: string;
-  nombre: string;
+  primerNombre: string;
+  apellido: string;
   rol: string;
   tv: number;
 }

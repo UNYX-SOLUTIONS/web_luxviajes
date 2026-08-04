@@ -12,136 +12,58 @@ export async function POST(request: Request) {
   const rlKey = getRateLimitKey(request, "login");
   const rl = rateLimit(rlKey, 10, 60);
   if (!rl.allowed) {
-    return NextResponse.json(
-      { success: false, message: "Demasiadas solicitudes. Intenta de nuevo más tarde." },
-      { status: 429 }
-    );
+    return NextResponse.json({ success: false, message: "Demasiadas solicitudes." }, { status: 429 });
   }
 
   try {
     const body = await request.json();
     const parsed = loginSchema.safeParse(body);
-
     if (!parsed.success) {
-      return NextResponse.json(
-        { success: false, message: "Datos inválidos" },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, message: "Datos inválidos" }, { status: 400 });
     }
 
     const { email, password } = parsed.data;
-
     const user = await prisma.user.findUnique({
       where: { email },
-      select: {
-        id: true,
-        nombre: true,
-        email: true,
-        password: true,
-        rol: true,
-        tokenVersion: true,
-        loginAttempts: true,
-        lockedUntil: true,
-        emailVerificado: true,
-      },
+      select: { id: true, primerNombre: true, apellido: true, email: true, password: true, rol: true, tokenVersion: true, loginAttempts: true, lockedUntil: true, emailVerificado: true },
     });
 
     if (!user) {
       await logSecurityEvent("LOGIN_FAILED", null, request, { email, reason: "user_not_found" });
-      return NextResponse.json(
-        { success: false, message: "Credenciales inválidas" },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, message: "Credenciales inválidas" }, { status: 401 });
     }
 
     if (user.lockedUntil && new Date(user.lockedUntil) > new Date()) {
-      await logSecurityEvent("LOGIN_LOCKED", user.id, request, { email });
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Cuenta bloqueada temporalmente. Intenta de nuevo más tarde.",
-        },
-        { status: 423 }
-      );
+      return NextResponse.json({ success: false, message: "Cuenta bloqueada. Intenta más tarde." }, { status: 423 });
     }
 
     const isPasswordValid = await comparePassword(password, user.password);
-
     if (!isPasswordValid) {
       const newAttempts = user.loginAttempts + 1;
-      const lockedUntil =
-        newAttempts >= MAX_LOGIN_ATTEMPTS
-          ? new Date(Date.now() + LOCKOUT_DURATION * 60 * 1000)
-          : undefined;
-
       await prisma.user.update({
         where: { id: user.id },
-        data: {
-          loginAttempts: newAttempts,
-          lockedUntil: lockedUntil ?? null,
-        },
+        data: { loginAttempts: newAttempts, lockedUntil: newAttempts >= MAX_LOGIN_ATTEMPTS ? new Date(Date.now() + LOCKOUT_DURATION * 60 * 1000) : null },
       });
-
-      await logSecurityEvent("LOGIN_FAILED", user.id, request, {
-        email,
-        attempt: newAttempts,
-        reason: "wrong_password",
-      });
-
-      return NextResponse.json(
-        { success: false, message: "Credenciales inválidas" },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, message: "Credenciales inválidas" }, { status: 401 });
     }
 
     if (!user.emailVerificado) {
-      await logSecurityEvent("LOGIN_FAILED", user.id, request, {
-        email,
-        reason: "email_not_verified",
-      });
-      return NextResponse.json(
-        { success: false, message: "Debes verificar tu correo electrónico antes de iniciar sesión." },
-        { status: 403 }
-      );
+      return NextResponse.json({ success: false, message: "Debes verificar tu correo primero." }, { status: 403 });
     }
 
-    const tv = user.tokenVersion;
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      nombre: user.nombre,
-      rol: user.rol,
-      tv,
-    });
-
+    const token = generateToken({ id: user.id, email: user.email, primerNombre: user.primerNombre ?? "", apellido: user.apellido ?? "", rol: user.rol, tv: user.tokenVersion });
     await setAuthCookie(token);
 
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        loginAttempts: 0,
-        lockedUntil: null,
-        lastLogin: new Date(),
-      },
-    });
-
+    await prisma.user.update({ where: { id: user.id }, data: { loginAttempts: 0, lockedUntil: null, lastLogin: new Date() } });
     await logSecurityEvent("LOGIN_SUCCESS", user.id, request, { email });
 
     return NextResponse.json({
       success: true,
-      user: {
-        id: user.id,
-        nombre: user.nombre,
-        email: user.email,
-        rol: user.rol,
-      },
+      user: { id: user.id, primerNombre: user.primerNombre, apellido: user.apellido, email: user.email, rol: user.rol },
       message: "Inicio de sesión exitoso",
     });
   } catch (error) {
     console.error("Error en login:", error);
-    return NextResponse.json(
-      { success: false, message: "Error interno del servidor" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, message: "Error interno" }, { status: 500 });
   }
 }

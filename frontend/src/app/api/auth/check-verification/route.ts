@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userPayload.id },
-      select: { id: true, email: true, nombre: true, emailVerificado: true },
+      select: { id: true, email: true, primerNombre: true, apellido: true, emailVerificado: true },
     });
 
     if (!user) {
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       success: true,
       emailVerified: user.emailVerificado,
-      user: { id: user.id, email: user.email, nombre: user.nombre },
+      user: { id: user.id, email: user.email, primerNombre: user.primerNombre, apellido: user.apellido },
     });
   } catch (error) {
     console.error("Error al verificar estado:", error);

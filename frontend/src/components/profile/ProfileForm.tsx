@@ -1,38 +1,38 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { UserIcon, PhoneIcon, EnvelopeIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { UserIcon, PhoneIcon, EnvelopeIcon, IdentificationIcon, XCircleIcon } from "@heroicons/react/24/outline";
 
 interface ProfileFormProps {
-  nombre: string;
+  primerNombre: string;
+  apellido: string;
   telefono: string;
+  cedula: string;
+  direccion: string;
+  pais: string;
   email: string;
-  onSave: (fields: { nombre: string; telefono: string }) => Promise<void>;
+  onSave: (fields: Record<string, string>) => Promise<void>;
   isSaving: boolean;
 }
 
-export function ProfileForm({ nombre, telefono, email, onSave, isSaving }: ProfileFormProps) {
-  const [formData, setFormData] = useState({ nombre, telefono });
+export function ProfileForm({ primerNombre, apellido, telefono, cedula, direccion, pais, email, onSave, isSaving }: ProfileFormProps) {
+  const [formData, setFormData] = useState({ primerNombre, apellido, telefono, cedula, direccion, pais });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    setFormData({ nombre, telefono });
-  }, [nombre, telefono]);
+    setFormData({ primerNombre, apellido, telefono, cedula, direccion, pais });
+  }, [primerNombre, apellido, telefono, cedula, direccion, pais]);
 
   const validate = () => {
     const e: Record<string, string> = {};
-    if (!formData.nombre.trim()) {
-      e.nombre = "El nombre es requerido";
-    } else if (formData.nombre.trim().length < 2) {
-      e.nombre = "Mínimo 2 caracteres";
-    } else if (!/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/.test(formData.nombre)) {
-      e.nombre = "Solo letras y espacios";
-    }
-
-    if (formData.telefono && !/^[0-9+]+$/.test(formData.telefono)) {
-      e.telefono = "Solo números y (+)";
-    }
-
+    if (!formData.primerNombre.trim()) { e.primerNombre = "Requerido"; }
+    else if (formData.primerNombre.trim().length < 2) { e.primerNombre = "Mínimo 2 caracteres"; }
+    else if (!/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/.test(formData.primerNombre)) { e.primerNombre = "Solo letras y espacios"; }
+    if (!formData.apellido.trim()) { e.apellido = "Requerido"; }
+    else if (formData.apellido.trim().length < 2) { e.apellido = "Mínimo 2 caracteres"; }
+    else if (!/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/.test(formData.apellido)) { e.apellido = "Solo letras y espacios"; }
+    if (formData.telefono && !/^[0-9+]+$/.test(formData.telefono)) { e.telefono = "Solo números y (+)"; }
+    if (formData.cedula && !/^\d{10}$/.test(formData.cedula)) { e.cedula = "10 dígitos numéricos"; }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -40,38 +40,44 @@ export function ProfileForm({ nombre, telefono, email, onSave, isSaving }: Profi
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    await onSave({ nombre: formData.nombre.trim(), telefono: formData.telefono.trim() });
+    await onSave({
+      primerNombre: formData.primerNombre.trim(),
+      apellido: formData.apellido.trim(),
+      telefono: formData.telefono.trim(),
+      cedula: formData.cedula.trim(),
+      direccion: formData.direccion.trim(),
+      pais: formData.pais,
+    });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-neutral-700 mb-1.5">
-          Nombre completo
-        </label>
-        <div className="relative">
-          <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
-          <input
-            type="text"
-            value={formData.nombre}
-            onChange={(e) => {
-              setFormData((prev) => ({ ...prev, nombre: e.target.value }));
-              setErrors((prev) => ({ ...prev, nombre: "" }));
-            }}
-            disabled={isSaving}
-            className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${
-              errors.nombre
-                ? "border-red-300 focus:ring-red-200"
-                : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"
-            }`}
-            placeholder="Tu nombre completo"
-          />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5">Nombre</label>
+          <div className="relative">
+            <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+            <input type="text" value={formData.primerNombre} onChange={(e) => { setFormData((prev) => ({ ...prev, primerNombre: e.target.value })); setErrors((prev) => ({ ...prev, primerNombre: "" })); }} disabled={isSaving} className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${errors.primerNombre ? "border-red-300 focus:ring-red-200" : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"}`} placeholder="Ej: Juan" />
+          </div>
+          {errors.primerNombre && (<p className="mt-1 text-red-500 text-xs flex items-center gap-1"><XCircleIcon className="h-3.5 w-3.5" />{errors.primerNombre}</p>)}
         </div>
-        {errors.nombre && (
-          <p className="mt-1 text-red-500 text-xs flex items-center gap-1">
-            <XCircleIcon className="h-3.5 w-3.5" />{errors.nombre}
-          </p>
-        )}
+        <div>
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5">Apellido</label>
+          <div className="relative">
+            <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+            <input type="text" value={formData.apellido} onChange={(e) => { setFormData((prev) => ({ ...prev, apellido: e.target.value })); setErrors((prev) => ({ ...prev, apellido: "" })); }} disabled={isSaving} className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${errors.apellido ? "border-red-300 focus:ring-red-200" : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"}`} placeholder="Ej: Pérez" />
+          </div>
+          {errors.apellido && (<p className="mt-1 text-red-500 text-xs flex items-center gap-1"><XCircleIcon className="h-3.5 w-3.5" />{errors.apellido}</p>)}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-neutral-700 mb-1.5">Cédula</label>
+        <div className="relative">
+          <IdentificationIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-neutral-400" />
+          <input type="text" value={formData.cedula} onChange={(e) => { setFormData((prev) => ({ ...prev, cedula: e.target.value })); setErrors((prev) => ({ ...prev, cedula: "" })); }} disabled={isSaving} maxLength={10} className={`w-full pl-10 pr-4 py-2.5 border rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 ${errors.cedula ? "border-red-300 focus:ring-red-200" : "border-neutral-300 focus:ring-primary-200 focus:border-primary-500"}`} placeholder="10 dígitos" />
+        </div>
+        {errors.cedula && (<p className="mt-1 text-red-500 text-xs flex items-center gap-1"><XCircleIcon className="h-3.5 w-3.5" />{errors.cedula}</p>)}
       </div>
 
       <div>
@@ -119,6 +125,25 @@ export function ProfileForm({ nombre, telefono, email, onSave, isSaving }: Profi
         <p className="mt-1 text-xs text-neutral-500">
           El email no puede ser cambiado.
         </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5">Dirección</label>
+          <input type="text" value={formData.direccion} onChange={(e) => setFormData((prev) => ({ ...prev, direccion: e.target.value }))} disabled={isSaving} className="w-full px-4 py-2.5 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary-500 transition-colors duration-200" placeholder="Calle y ciudad" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5">País</label>
+          <select value={formData.pais} onChange={(e) => setFormData((prev) => ({ ...prev, pais: e.target.value }))} disabled={isSaving} className="w-full px-4 py-2.5 border border-neutral-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary-500 transition-colors duration-200">
+            <option value="EC">Ecuador</option>
+            <option value="CL">Chile</option>
+            <option value="US">Estados Unidos</option>
+            <option value="AR">Argentina</option>
+            <option value="CO">Colombia</option>
+            <option value="PE">Perú</option>
+            <option value="MX">México</option>
+          </select>
+        </div>
       </div>
 
       <button
