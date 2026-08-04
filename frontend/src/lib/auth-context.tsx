@@ -32,6 +32,7 @@ interface AuthContextType extends AuthState {
   ) => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -206,6 +207,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const updateUser = useCallback((updatedUser: User) => {
+    setCachedUser(updatedUser);
+    setState((prev) => ({
+      ...prev,
+      user: updatedUser,
+    }));
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -214,6 +223,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         register,
         logout,
         clearError,
+        updateUser,
       }}
     >
       {children}

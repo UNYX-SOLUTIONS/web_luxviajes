@@ -140,6 +140,7 @@ model User {
   email           String   @unique
   password        String
   telefono        String?
+  fotoPerfil      String?
   rol             String   @default("USER")
   emailVerificado Boolean  @default(false)
   createdAt       DateTime @default(now())

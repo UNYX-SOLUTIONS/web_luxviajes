@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 const COOKIE_NAME = "lux_viajes_token";
 
-const protectedRoutes = ["/perfil", "/mis-viajes", "/reservas"];
+const protectedRoutes = ["/profile", "/mi-perfil", "/mis-viajes", "/reservas"];
 const authRoutes = ["/auth/login", "/auth/register"];
 
 export function middleware(request: NextRequest) {

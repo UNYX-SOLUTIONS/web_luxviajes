@@ -99,6 +99,11 @@ const nextConfig: NextConfig = {
           source: "/api/auth/:path*",
           destination: "/api/auth/:path*",
         },
+        // User/profile API routes — handle locally
+        {
+          source: "/api/user/:path*",
+          destination: "/api/user/:path*",
+        },
       ],
       afterFiles: [],
       fallback: [

@@ -241,7 +241,7 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
             {/* Error general */}
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-start gap-2">
-                <XCircleIcon className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                <XCircleIcon className="h-5 w-5 shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}

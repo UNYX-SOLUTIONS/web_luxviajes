@@ -156,7 +156,7 @@ export function Header({ activeLink }: HeaderProps) {
                     </div>
                     <div className="py-1">
                       <Link
-                        href="/perfil"
+                        href="/profile"
                         className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-50"
                         onClick={() => setShowUserMenu(false)}
                       >
@@ -285,7 +285,7 @@ export function Header({ activeLink }: HeaderProps) {
                       </div>
                     </div>
                     <Link
-                      href="/perfil"
+                      href="/profile"
                       className="rounded-lg px-4 py-2 text-left font-medium text-[#CCC6D0] hover:bg-white/10 hover:text-white transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
