@@ -12,3 +12,4 @@ export { useVisasData } from "./useVisasData";
 export { useContactData } from "./useContactData";
 export { useHelpData } from "./useHelpData";
 export { useBlogData } from "./useBlogData";
+export { useAuth } from "@/lib/auth-context";

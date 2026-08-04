@@ -1,30 +1,35 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-// Middleware para proteger rutas, logging, etc.
-export function middleware(request: NextRequest) {
-  // Ejemplo: loguear rutas
-  // // console.log(`[${new Date().toISOString()}] ${request.method} ${request.nextUrl.pathname}`);
+const COOKIE_NAME = "lux_viajes_token";
 
-  // Ejemplo: redirigir rutas
-  // if (request.nextUrl.pathname.startsWith('/admin')) {
-  //   // Verificar autenticación aquí
-  //   return NextResponse.redirect(new URL('/login', request.url));
-  // }
+const protectedRoutes = ["/perfil", "/mis-viajes", "/reservas"];
+const authRoutes = ["/auth/login", "/auth/register"];
+
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get(COOKIE_NAME)?.value;
+  const { pathname } = request.nextUrl;
+
+  const isAuthenticated = !!token;
+
+  if (isAuthenticated && authRoutes.some((route) => pathname.startsWith(route))) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (
+    !isAuthenticated &&
+    protectedRoutes.some((route) => pathname.startsWith(route))
+  ) {
+    const loginUrl = new URL("/auth/login", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
 
   return NextResponse.next();
 }
 
-// Rutas donde aplicar el middleware
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|images|fonts).*)",
   ],
 };

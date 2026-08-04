@@ -93,7 +93,13 @@ const nextConfig: NextConfig = {
   /* Rewrites */
   async rewrites() {
     return {
-      beforeFiles: [],
+      beforeFiles: [
+        // Auth API routes — handle locally, do NOT proxy to CMS
+        {
+          source: "/api/auth/:path*",
+          destination: "/api/auth/:path*",
+        },
+      ],
       afterFiles: [],
       fallback: [
         {

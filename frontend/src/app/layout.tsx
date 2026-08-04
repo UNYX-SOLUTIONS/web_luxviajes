@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import { Header, Footer } from "@/components/common";
 import { COMPANY_INFO } from "@/constants";
+import { AuthProvider } from "@/lib/auth-context";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -80,9 +81,11 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="min-h-screen flex flex-col antialiased">
-        <Header />
-        <main className="grow">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Header />
+          <main className="grow">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
