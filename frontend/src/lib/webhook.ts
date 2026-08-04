@@ -1,6 +1,6 @@
 const WEBHOOK_URL =
   process.env.WEBHOOK_URL ||
-  "https://flow.agencialuxviajes.com/webhook-test/0db7e68e-c8f9-401d-8768-a0ecc41da336";
+  "https://flow.agencialuxviajes.com/webhook/0db7e68e-c8f9-401d-8768-a0ecc41da336";
 const WEBHOOK_TIMEOUT = parseInt(process.env.WEBHOOK_TIMEOUT || "10000", 10);
 
 interface WebhookPayload {
@@ -20,12 +20,14 @@ export async function sendVerificationWebhook(
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), WEBHOOK_TIMEOUT);
 
-    const payload: WebhookPayload = {
+    const payload = {
       email,
       name: primerNombre,
       last_name: apellido,
       code,
     };
+
+    console.log(`[Webhook] Sending:`, JSON.stringify(payload));
 
     const response = await fetch(WEBHOOK_URL, {
       method: "POST",
@@ -36,15 +38,16 @@ export async function sendVerificationWebhook(
 
     clearTimeout(timeout);
 
+    const responseBody = await response.text();
+    console.log(`[Webhook] Response ${response.status}: ${responseBody}`);
+
     if (!response.ok) {
-      console.error(`[Webhook] n8n responded with ${response.status}: ${response.statusText}`);
       return false;
     }
 
-    console.log(`[Webhook] Verification email sent for ${email}`);
     return true;
   } catch (error) {
-    console.error("[Webhook] Failed to send:", error);
+    console.error("[Webhook] Failed:", error);
     return false;
   }
 }
