@@ -47,6 +47,7 @@ export function useUserProfile() {
         nombre: updated.nombre,
         email: updated.email,
         rol: updated.rol,
+        fotoPerfil: updated.fotoPerfil ?? null,
       });
       setSuccess("Perfil actualizado exitosamente");
     } catch (err) {
@@ -63,6 +64,13 @@ export function useUserProfile() {
     try {
       const result = await uploadPhoto(file);
       setProfile((prev) => prev ? { ...prev, fotoPerfil: result.fotoPerfil } : null);
+      updateUser({
+        id: profile?.id ?? "",
+        nombre: profile?.nombre ?? "",
+        email: profile?.email ?? "",
+        rol: profile?.rol ?? "",
+        fotoPerfil: result.fotoPerfil,
+      });
       setSuccess("Foto de perfil actualizada");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al subir foto");
@@ -78,6 +86,13 @@ export function useUserProfile() {
     try {
       await deletePhoto();
       setProfile((prev) => prev ? { ...prev, fotoPerfil: null } : null);
+      updateUser({
+        id: profile?.id ?? "",
+        nombre: profile?.nombre ?? "",
+        email: profile?.email ?? "",
+        rol: profile?.rol ?? "",
+        fotoPerfil: null,
+      });
       setSuccess("Foto de perfil eliminada");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al eliminar foto");

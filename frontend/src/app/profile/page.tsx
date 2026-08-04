@@ -69,7 +69,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-neutral-50 pt-18! pb-6! px-4! sm:px-6! lg:px-8! md:pt-25! md:pb-10! lg:pt-30! lg:pb-15! xl:pt-40! xl:pb-20!">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <Link
@@ -89,14 +89,14 @@ export default function ProfilePage() {
 
         {success && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm flex items-start gap-2 animate-slideDown">
-            <CheckCircleIcon className="h-5 w-5 flex-shrink-0 mt-0.5" />
+            <CheckCircleIcon className="h-5 w-5 shrink-0 mt-0.5" />
             <span>{success}</span>
           </div>
         )}
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm flex items-start gap-2">
-            <XCircleIcon className="h-5 w-5 flex-shrink-0 mt-0.5" />
+            <XCircleIcon className="h-5 w-5 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}

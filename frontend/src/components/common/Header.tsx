@@ -14,7 +14,7 @@ import { NAVIGATION_LINKS } from "@/constants";
 import { cn } from "@/utils/cn";
 import { useAuth } from "@/lib/auth-context";
 import { AuthDialog } from "@/components/auth/authdialog";
-import { Avatar, AvatarFallback } from "@/components/auth/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/auth/avatar";
 
 interface HeaderProps {
   activeLink?: string;
@@ -119,9 +119,13 @@ export function Header({ activeLink }: HeaderProps) {
                   className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-white/10"
                 >
                   <Avatar size="sm" variant="solid" shape="circle">
-                    <AvatarFallback>
-                      {getUserInitials(user?.nombre)}
-                    </AvatarFallback>
+                    {user?.fotoPerfil ? (
+                      <AvatarImage src={user.fotoPerfil} alt={user.nombre} />
+                    ) : (
+                      <AvatarFallback>
+                        {getUserInitials(user?.nombre)}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                   <span className="hidden text-[11px] font-medium text-[#CCC6D0] lg:inline lg:text-xs xl:text-sm">
                     {user?.nombre?.split(" ")[0]}
@@ -271,9 +275,13 @@ export function Header({ activeLink }: HeaderProps) {
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-3 px-4 py-2">
                       <Avatar size="sm" variant="solid" shape="circle">
-                        <AvatarFallback>
-                          {getUserInitials(user?.nombre)}
-                        </AvatarFallback>
+                        {user?.fotoPerfil ? (
+                          <AvatarImage src={user.fotoPerfil} alt={user?.nombre || ""} />
+                        ) : (
+                          <AvatarFallback>
+                            {getUserInitials(user?.nombre)}
+                          </AvatarFallback>
+                        )}
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-white">

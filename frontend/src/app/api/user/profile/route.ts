@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getUserFromCookies } from "@/lib/auth";
 import { z } from "zod";
 import { treeifyError } from "zod/v4/core";
+import { logSecurityEvent } from "@/lib/security-logger";
 
 const updateProfileSchema = z.object({
   nombre: z
@@ -90,6 +91,8 @@ export async function PUT(request: Request) {
         updatedAt: true,
       },
     });
+
+    await logSecurityEvent("PROFILE_UPDATED", userPayload.id, request, updateData);
 
     return NextResponse.json({ success: true, data: user, message: "Perfil actualizado" });
   } catch (error) {

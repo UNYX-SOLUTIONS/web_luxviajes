@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getUserFromCookies, comparePassword, hashPassword } from "@/lib/auth";
 import { z } from "zod";
 import { treeifyError } from "zod/v4/core";
+import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
+import { logSecurityEvent } from "@/lib/security-logger";
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, "Contraseña actual requerida"),
@@ -15,6 +17,15 @@ const changePasswordSchema = z.object({
 });
 
 export async function PUT(request: Request) {
+  const rlKey = getRateLimitKey(request, "password_change");
+  const rl = rateLimit(rlKey, 3, 300);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { success: false, message: "Demasiadas solicitudes. Intenta de nuevo más tarde." },
+      { status: 429 }
+    );
+  }
+
   const userPayload = await getUserFromCookies();
   if (!userPayload) {
     return NextResponse.json({ success: false, message: "No autenticado" }, { status: 401 });
@@ -44,7 +55,13 @@ export async function PUT(request: Request) {
 
     const isValid = await comparePassword(currentPassword, user.password);
     if (!isValid) {
-      return NextResponse.json({ success: false, message: "Contraseña actual incorrecta" }, { status: 400 });
+      await logSecurityEvent("LOGIN_FAILED", userPayload.id, request, {
+        reason: "wrong_password_on_change",
+      });
+      return NextResponse.json(
+        { success: false, message: "Contraseña actual incorrecta" },
+        { status: 400 }
+      );
     }
 
     const isSamePassword = await comparePassword(newPassword, user.password);
@@ -56,12 +73,21 @@ export async function PUT(request: Request) {
     }
 
     const hashedNewPassword = await hashPassword(newPassword);
+
     await prisma.user.update({
       where: { id: userPayload.id },
-      data: { password: hashedNewPassword },
+      data: {
+        password: hashedNewPassword,
+        tokenVersion: { increment: 1 },
+      },
     });
 
-    return NextResponse.json({ success: true, message: "Contraseña actualizada exitosamente" });
+    await logSecurityEvent("PASSWORD_CHANGED", userPayload.id, request, {});
+
+    return NextResponse.json({
+      success: true,
+      message: "Contraseña actualizada. Todas las demás sesiones han sido cerradas.",
+    });
   } catch (error) {
     console.error("Error al cambiar contraseña:", error);
     return NextResponse.json({ success: false, message: "Error interno" }, { status: 500 });

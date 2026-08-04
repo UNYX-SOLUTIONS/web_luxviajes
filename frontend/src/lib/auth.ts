@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET || "default-secret-change-me";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
@@ -12,6 +13,7 @@ export interface JWTPayload {
   email: string;
   nombre: string;
   rol: string;
+  tv: number;
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -45,14 +47,15 @@ export async function setAuthCookie(token: string): Promise<void> {
   cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 días
+    sameSite: "strict",
+    maxAge: 60 * 60 * 24 * 7,
     path: "/",
   });
 }
 
 export async function removeAuthCookie(): Promise<void> {
   const cookieStore = await cookies();
+  cookieStore.set(COOKIE_NAME, "", { maxAge: 0, path: "/" });
   cookieStore.delete(COOKIE_NAME);
 }
 
@@ -65,5 +68,18 @@ export async function getTokenFromCookies(): Promise<string | null> {
 export async function getUserFromCookies(): Promise<JWTPayload | null> {
   const token = await getTokenFromCookies();
   if (!token) return null;
-  return verifyToken(token);
+
+  const payload = verifyToken(token);
+  if (!payload) return null;
+
+  const user = await prisma.user.findUnique({
+    where: { id: payload.id },
+    select: { tokenVersion: true },
+  });
+
+  if (!user || user.tokenVersion !== payload.tv) {
+    return null;
+  }
+
+  return payload;
 }

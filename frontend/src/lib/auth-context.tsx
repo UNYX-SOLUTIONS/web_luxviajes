@@ -13,6 +13,7 @@ interface User {
   nombre: string;
   email: string;
   rol: string;
+  fotoPerfil: string | null;
 }
 
 interface AuthState {
@@ -115,6 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         nombre: data.user.nombre,
         email: data.user.email,
         rol: data.user.rol,
+        fotoPerfil: data.user.fotoPerfil ?? null,
       };
 
       setCachedUser(user);
@@ -168,6 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           nombre: data.user.nombre,
           email: data.user.email,
           rol: data.user.rol,
+          fotoPerfil: data.user.fotoPerfil ?? null,
         };
 
         setCachedUser(user);
