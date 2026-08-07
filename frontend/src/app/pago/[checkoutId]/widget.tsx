@@ -333,7 +333,6 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
           {/* El form siempre se renderiza pero se oculta con CSS si hay error */}
           <form
             id="datafast-payment-form"
-            action="/pago/resultado"
             className="paymentWidgets"
             noValidate
             style={{ display: phase === "loading" || phase === "ready" ? undefined : "none" }}
