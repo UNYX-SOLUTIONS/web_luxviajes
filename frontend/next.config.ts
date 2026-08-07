@@ -58,7 +58,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "frame-ancestors 'self'",
+            value: "frame-ancestors 'self' *.oppwa.com *.datafast.com.ec",
           },
         ],
       },

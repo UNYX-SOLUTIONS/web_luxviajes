@@ -38,16 +38,29 @@ export interface CustomerFormData {
   identificationDocId: string;
 }
 
+export interface PaymentOptions {
+  creditType: string;
+  installments?: number;
+}
+
 interface PurchaseSummaryDialogProps {
   isOpen: boolean;
   onClose: () => void;
   service: ServiceItem;
-  onPay: (customerData: CustomerFormData) => void;
+  onPay: (customerData: CustomerFormData, paymentOptions?: PaymentOptions) => void;
   isLoading?: boolean;
   currency?: string;
   taxRate?: number;
   error?: string | null;
 }
+
+const CREDIT_TYPE_OPTIONS = [
+  { value: "00", label: "Corriente" },
+  { value: "02", label: "Diferido con interés" },
+  { value: "03", label: "Diferido sin interés" },
+] as const;
+
+const INSTALLMENT_OPTIONS = [3, 6, 9, 12, 18, 24] as const;
 
 export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
   isOpen,
@@ -94,6 +107,9 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
     Partial<Record<keyof CustomerFormData, string>>
   >({});
 
+  const [creditType, setCreditType] = useState<string>("00");
+  const [installments, setInstallments] = useState<number>(0);
+
   const formatPrice = (price: number) => {
     return `${currency} ${price.toFixed(2)}`;
   };
@@ -123,7 +139,10 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
 
   const handlePayClick = () => {
     if (!validateForm()) return;
-    onPay(formData);
+    onPay(formData, {
+      creditType,
+      ...(creditType !== "00" && installments > 0 ? { installments } : {}),
+    });
   };
 
   const handleClose = () => {
@@ -502,6 +521,64 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                 </p>
                               )}
                             </div>
+                          </div>
+
+                          <div className="space-y-4 mt-6 pt-6 border-t border-neutral-200">
+                            <p className="text-sm font-semibold text-neutral-700">
+                              Opciones de pago
+                            </p>
+
+                            <div>
+                              <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
+                                <CreditCardIcon className="h-3.5 w-3.5" /> Tipo de crédito
+                              </label>
+                              <select
+                                value={creditType}
+                                onChange={(e) => {
+                                  setCreditType(e.target.value);
+                                  if (e.target.value === "00") {
+                                    setInstallments(0);
+                                  }
+                                }}
+                                className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50 bg-white"
+                                disabled={isLoading}
+                              >
+                                {CREDIT_TYPE_OPTIONS.map((opt) => (
+                                  <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            {creditType !== "00" && (
+                              <div>
+                                <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
+                                  <CalendarIcon className="h-3.5 w-3.5" /> Cuotas
+                                </label>
+                                <select
+                                  value={installments}
+                                  onChange={(e) =>
+                                    setInstallments(Number(e.target.value))
+                                  }
+                                  className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50 bg-white"
+                                  disabled={isLoading}
+                                >
+                                  <option value={0}>Selecciona cuotas</option>
+                                  {INSTALLMENT_OPTIONS.map((n) => (
+                                    <option key={n} value={n}>
+                                      {n} cuotas
+                                    </option>
+                                  ))}
+                                </select>
+                                {installments > 0 && (
+                                  <p className="text-xs text-neutral-500 mt-1.5">
+                                    Monto estimado por cuota: {currency}{" "}
+                                    {(service.price / installments).toFixed(2)}
+                                  </p>
+                                )}
+                              </div>
+                            )}
                           </div>
 
                           {error && (

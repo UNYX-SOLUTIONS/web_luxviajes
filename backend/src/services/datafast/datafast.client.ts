@@ -31,7 +31,7 @@ export class DatafastClient {
       (error: AxiosError) => {
         if (error.response?.data) {
           logger.warn(`Datafast Error: ${error.response.status} - ${JSON.stringify(error.response.data)}`);
-          return error.response;
+          return Promise.reject(error);
         }
         logger.error({ err: error.message }, 'Datafast Network Error');
         return Promise.reject(error);

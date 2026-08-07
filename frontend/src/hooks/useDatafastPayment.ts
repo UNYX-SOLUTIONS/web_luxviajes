@@ -23,7 +23,7 @@ interface CreateCheckoutRequest {
     street1: string;
     country: string;
   };
-  creditType?: number;
+  creditType?: string;
   installments?: number;
 }
 

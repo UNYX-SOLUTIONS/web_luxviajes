@@ -53,7 +53,7 @@ export const usePurchaseDialog = () => {
   }, [isLoading, datafastLoading]);
 
   const handlePay = useCallback(
-    async (customerData: CustomerFormData, paymentOptions?: { creditType?: number; installments?: number }) => {
+    async (customerData: CustomerFormData, paymentOptions?: { creditType?: string; installments?: number }) => {
       if (!currentService) {
         setError("No hay servicio seleccionado");
         return;
