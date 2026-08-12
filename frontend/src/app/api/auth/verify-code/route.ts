@@ -70,7 +70,7 @@ export async function POST(request: Request) {
         emailVerificado: true,
         emailVerifiedAt: new Date(),
       },
-      select: { id: true, primerNombre: true, apellido: true, email: true, rol: true, tokenVersion: true },
+      select: { id: true, primerNombre: true, apellido: true, email: true, rol: true, telefono: true, cedula: true, tokenVersion: true },
     });
 
     await prisma.pendingRegistration.update({
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       message: "Email verificado exitosamente.",
-      user: { id: user.id, primerNombre: user.primerNombre, apellido: user.apellido, email: user.email, rol: user.rol },
+      user: { id: user.id, primerNombre: user.primerNombre, apellido: user.apellido, email: user.email, rol: user.rol, telefono: user.telefono, cedula: user.cedula },
     });
   } catch (error) {
     console.error("Error en verificación:", error);

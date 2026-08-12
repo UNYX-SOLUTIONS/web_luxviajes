@@ -15,6 +15,8 @@ interface User {
   email: string;
   rol: string;
   fotoPerfil: string | null;
+  telefono?: string | null;
+  cedula?: string | null;
 }
 
 interface AuthState {
@@ -122,6 +124,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: data.user.email,
         rol: data.user.rol,
         fotoPerfil: data.user.fotoPerfil ?? null,
+        telefono: data.user.telefono ?? null,
+        cedula: data.user.cedula ?? null,
       };
 
       setCachedUser(user);
@@ -133,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : "Error de conexión";
+        error instanceof Error ? error.message : "Error al iniciar sesión";
       setState((prev) => ({
         ...prev,
         isLoading: false,
@@ -219,6 +223,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: data.user.email,
           rol: data.user.rol,
           fotoPerfil: data.user.fotoPerfil ?? null,
+          telefono: data.user.telefono ?? null,
+          cedula: data.user.cedula ?? null,
         };
 
         setCachedUser(user);

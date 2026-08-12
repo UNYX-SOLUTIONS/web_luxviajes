@@ -32,6 +32,7 @@ export class DatafastService {
     params.append('amount', data.amount.toFixed(2));
     params.append('currency', 'USD');
     params.append('paymentType', 'DB');
+    params.append('shopperResultUrl', datafastConfig.shopperResultUrl);
     
     // Datos del cliente (Fase 2 - Obligatorios)
     params.append('customer.givenName', data.customer.givenName);
@@ -110,6 +111,11 @@ export class DatafastService {
     }
     
     try {
+      // ===== LOG SCRIPT DE PRUEBAS: PAYLOAD =====
+      console.log('\n📦 ===== PAYLOAD ENVIADO A DATAFAST (CHECKOUT) =====');
+      console.log(params.toString());
+      console.log('=================================================\n');
+
       const response = await this.client.post<ICreateCheckoutResponse>(
         url,
         params.toString()
@@ -159,6 +165,11 @@ export class DatafastService {
     }
     
     try {
+      // ===== LOG SCRIPT DE PRUEBAS: PAYLOAD ANULACIÓN =====
+      console.log('\n📦 ===== PAYLOAD ENVIADO A DATAFAST (ANULACIÓN) =====');
+      console.log(params.toString());
+      console.log('===================================================\n');
+
       const response = await this.client.post<IRefundResponse>(
         url,
         params.toString()

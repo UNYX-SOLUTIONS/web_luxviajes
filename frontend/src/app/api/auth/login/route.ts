@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const { email, password } = parsed.data;
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { id: true, primerNombre: true, apellido: true, email: true, password: true, rol: true, tokenVersion: true, loginAttempts: true, lockedUntil: true, emailVerificado: true },
+      select: { id: true, primerNombre: true, apellido: true, email: true, password: true, rol: true, telefono: true, cedula: true, tokenVersion: true, loginAttempts: true, lockedUntil: true, emailVerificado: true },
     });
 
     if (!user) {
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      user: { id: user.id, primerNombre: user.primerNombre, apellido: user.apellido, email: user.email, rol: user.rol },
+      user: { id: user.id, primerNombre: user.primerNombre, apellido: user.apellido, email: user.email, rol: user.rol, telefono: user.telefono, cedula: user.cedula },
       message: "Inicio de sesión exitoso",
     });
   } catch (error) {

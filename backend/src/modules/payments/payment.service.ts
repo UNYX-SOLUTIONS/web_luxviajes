@@ -47,25 +47,7 @@ export class PaymentService {
   async createCheckout(data: CreateCheckoutInput) {
     const merchantTransactionId = `TRX_${Date.now()}_${uuidv4().slice(0, 8)}`;
 
-    const customer = await prisma.customer.upsert({
-      where: { email: data.customer.email },
-      create: {
-        merchantCustomerId: data.customer.merchantCustomerId || `CUST_${uuidv4().slice(0, 8)}`,
-        givenName: data.customer.givenName,
-        surname: data.customer.surname,
-        email: data.customer.email,
-        phone: data.customer.phone,
-        identificationDocId: data.customer.identificationDocId,
-        identificationDocType: data.customer.identificationDocType || 'IDCARD',
-        address: data.billing.street1,
-      },
-      update: {
-        givenName: data.customer.givenName,
-        surname: data.customer.surname,
-        phone: data.customer.phone,
-        identificationDocId: data.customer.identificationDocId,
-      },
-    });
+    const customer = await this.findOrCreateCustomer(data);
 
     const transaction = await prisma.transaction.create({
       data: {
@@ -111,6 +93,8 @@ export class PaymentService {
       console.log(`📌 IVA: ${data.taxes.iva.toFixed(2)}`);
       console.log(`📌 Servicio: ${data.amount.toFixed(2)}`);
       console.log(`📌 Interés: 0`);
+      console.log(`📌 Monto Fijo: 0.00`);
+      console.log(`📌 Propina: 0.00`);
       console.log(`📌 Gran Total: ${data.amount.toFixed(2)}`);
       console.log(`📌 Tipo de Crédito: ${data.creditType || '00'}`);
       console.log('============================================\n');
@@ -306,6 +290,71 @@ export class PaymentService {
     });
 
     return { success: true };
+  }
+
+  private async findOrCreateCustomer(data: CreateCheckoutInput) {
+    const { customer, billing } = data;
+
+    const identityData = {
+      givenName: customer.givenName,
+      surname: customer.surname,
+      phone: customer.phone,
+      address: billing.street1,
+    };
+
+    // 1. El documento de identidad es la identidad estable del cliente
+    const byDocId = await prisma.customer.findUnique({
+      where: { identificationDocId: customer.identificationDocId },
+    });
+
+    if (byDocId) {
+      return prisma.customer.update({
+        where: { id: byDocId.id },
+        data: identityData,
+      });
+    }
+
+    // 2. Buscar por email
+    const byEmail = await prisma.customer.findUnique({
+      where: { email: customer.email },
+    });
+
+    if (byEmail) {
+      return prisma.customer.update({
+        where: { id: byEmail.id },
+        data: {
+          ...identityData,
+          identificationDocId: customer.identificationDocId,
+        },
+      });
+    }
+
+    // 3. Crear nuevo cliente
+    try {
+      return await prisma.customer.create({
+        data: {
+          ...identityData,
+          merchantCustomerId: customer.merchantCustomerId || `CUST_${uuidv4().slice(0, 8)}`,
+          email: customer.email,
+          identificationDocId: customer.identificationDocId,
+          identificationDocType: customer.identificationDocType || 'IDCARD',
+        },
+      });
+    } catch (error) {
+      // 4. Condición de carrera o cédula ya existente (P2002): actualizar el cliente de esa cédula
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const existing = await prisma.customer.findUnique({
+          where: { identificationDocId: customer.identificationDocId },
+        });
+        if (existing) {
+          return prisma.customer.update({
+            where: { id: existing.id },
+            data: identityData,
+          });
+        }
+      }
+      throw error;
+    }
   }
 
   private async updateTransactionStatus(params: UpdateTransactionParams) {

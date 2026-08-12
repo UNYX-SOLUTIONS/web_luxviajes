@@ -88,8 +88,8 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
         givenName: user.primerNombre || "",
         surname: user.apellido || "",
         email: user.email || "",
-        phone: "",
-        identificationDocId: "",
+        phone: user.telefono || "",
+        identificationDocId: user.cedula || "",
       });
     }
     setShowForm(true);
