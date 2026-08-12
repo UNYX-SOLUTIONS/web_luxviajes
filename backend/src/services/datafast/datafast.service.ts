@@ -144,6 +144,22 @@ export class DatafastService {
       logger.info({ result: response.result, resultDetails: response.resultDetails }, `Estado de transacción: ${response.result?.code}`);
       return response;
     } catch (error) {
+      // Datafast puede devolver el resultado del pago con un estado HTTP 4xx.
+      // En ese caso el body contiene los códigos de resultado que la página
+      // de resultado necesita mostrar. Se extrae y se devuelve como data.
+      const axiosError = error as {
+        response?: { status?: number; data?: IPaymentStatusResponse };
+      };
+      const errorBody = axiosError.response?.data;
+
+      if (errorBody && typeof errorBody === 'object' && (errorBody as IPaymentStatusResponse).result) {
+        logger.info(
+          { result: (errorBody as IPaymentStatusResponse).result },
+          `Estado de transacción (HTTP ${axiosError.response?.status}): ${(errorBody as IPaymentStatusResponse).result?.code}`
+        );
+        return errorBody;
+      }
+
       logger.error({ err: error }, 'Error obteniendo estado');
       throw error;
     }
@@ -259,6 +275,15 @@ export class DatafastService {
       
       return response;
     } catch (error) {
+      const axiosError = error as {
+        response?: { status?: number; data?: IPaymentStatusResponse };
+      };
+      const errorBody = axiosError.response?.data;
+
+      if (errorBody && typeof errorBody === 'object' && (errorBody as IPaymentStatusResponse).result) {
+        return errorBody;
+      }
+
       logger.error({ err: error }, 'Error verificando transacción');
       throw error;
     }
@@ -281,6 +306,15 @@ export class DatafastService {
       
       return response;
     } catch (error) {
+      const axiosError = error as {
+        response?: { status?: number; data?: IPaymentStatusResponse };
+      };
+      const errorBody = axiosError.response?.data;
+
+      if (errorBody && typeof errorBody === 'object' && (errorBody as IPaymentStatusResponse).result) {
+        return errorBody;
+      }
+
       logger.error({ err: error }, 'Error verificando transacción');
       throw error;
     }
