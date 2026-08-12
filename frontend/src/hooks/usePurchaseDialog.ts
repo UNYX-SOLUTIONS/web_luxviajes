@@ -64,6 +64,22 @@ export const usePurchaseDialog = () => {
         return;
       }
 
+      const creditType = paymentOptions?.creditType || "00";
+      if (!["00", "02", "03"].includes(creditType)) {
+        setError("Tipo de crédito no habilitado");
+        return;
+      }
+      if (creditType !== "00") {
+        if (currentService.price < 5) {
+          setError("El monto mínimo para pagar en cuotas es $5.00");
+          return;
+        }
+        if (!paymentOptions?.installments || paymentOptions.installments < 1) {
+          setError("Selecciona el número de cuotas");
+          return;
+        }
+      }
+
       setError(null);
       setIsLoading(true);
 

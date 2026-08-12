@@ -1,6 +1,7 @@
 import { DatafastService } from '../../services/datafast/datafast.service';
 import { prisma } from '../../config/database';
 import { logger } from '../../config/logger';
+import { CREDIT_TYPE_RULES } from '../../config/datafast';
 import { PaymentStatus, Prisma } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { ICreateCheckoutRequest, ITokenPaymentRequest, IPaymentStatusResponse } from '../../services/datafast/types/datafast.types';
@@ -45,6 +46,8 @@ export class PaymentService {
   }
 
   async createCheckout(data: CreateCheckoutInput) {
+    this.validateCreditType(data);
+
     const merchantTransactionId = `TRX_${Date.now()}_${uuidv4().slice(0, 8)}`;
 
     const customer = await this.findOrCreateCustomer(data);
@@ -354,6 +357,31 @@ export class PaymentService {
         }
       }
       throw error;
+    }
+  }
+
+  private validateCreditType(data: CreateCheckoutInput): void {
+    const creditType = data.creditType || '00';
+    const rule = CREDIT_TYPE_RULES[creditType];
+
+    if (!rule) {
+      throw new Error('Tipo de crédito no habilitado');
+    }
+
+    if (data.amount < rule.minAmount) {
+      if (creditType === '00') {
+        throw new Error('Monto inválido');
+      }
+      throw new Error('Monto mínimo para diferir es $5.00');
+    }
+
+    if (creditType !== '00') {
+      if (!data.installments || data.installments < 1) {
+        throw new Error('Debes seleccionar el número de cuotas');
+      }
+      if (data.installments > rule.maxInstallments) {
+        throw new Error(`Máximo ${rule.maxInstallments} cuotas para este tipo de crédito`);
+      }
     }
   }
 

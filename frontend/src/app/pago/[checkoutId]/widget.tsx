@@ -169,12 +169,23 @@ function ErrorDisplay({ isExpired }: { isExpired: boolean }) {
 
 interface Props {
   checkoutId: string;
+  creditType?: string;
+  installments?: number;
 }
 
-export function DatafastPaymentWidget({ checkoutId }: Props) {
+export function DatafastPaymentWidget({
+  checkoutId,
+  creditType,
+  installments,
+}: Props) {
   const [phase, setPhase] = useState<"loading" | "ready" | "expired" | "error">(
     "loading",
   );
+
+  const planLabel =
+    creditType && creditType !== "00"
+      ? `Diferido ${creditType === "02" ? "con interés" : "sin interés"}`
+      : null;
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -330,6 +341,19 @@ export function DatafastPaymentWidget({ checkoutId }: Props) {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm ring-1 ring-neutral-200 p-6">
+          {planLabel && (
+            <div className="mb-4 rounded-lg bg-primary-50 px-4 py-3 text-sm text-primary-800 ring-1 ring-primary-200">
+              <p className="font-semibold">
+                Plan seleccionado: {planLabel}
+                {installments ? ` - ${installments} cuotas` : ""}
+              </p>
+              <p className="text-xs mt-1 text-primary-600">
+                Los pagos en cuotas solo aplican a tarjetas de crédito. Si pagas
+                con débito, la transacción será rechazada.
+              </p>
+            </div>
+          )}
+
           {/* El form siempre se renderiza pero se oculta con CSS si hay error */}
           <form
             id="datafast-payment-form"

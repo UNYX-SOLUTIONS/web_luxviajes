@@ -103,7 +103,11 @@ export function useDatafastPayment() {
       }
 
       if (result.success && result.data?.checkoutId) {
-        router.push(`/pago/${result.data.checkoutId}`);
+        const query = new URLSearchParams();
+        if (data.creditType) query.set("creditType", data.creditType);
+        if (data.installments) query.set("installments", String(data.installments));
+        const qs = query.toString();
+        router.push(`/pago/${result.data.checkoutId}${qs ? `?${qs}` : ""}`);
       }
 
       return result;

@@ -30,3 +30,19 @@ export const DATAFAST_CONSTANTS = {
   PSERV: '17913101',
   VERSION: '2',
 };
+
+// Reglas de tipos de crédito habilitados para el comercio
+export interface CreditTypeRule {
+  minAmount: number;
+  maxInstallments: number;
+  creditOnly: boolean;
+}
+
+export const CREDIT_TYPE_RULES: Record<string, CreditTypeRule> = {
+  '00': { minAmount: 0.01, maxInstallments: 1, creditOnly: false },
+  '02': { minAmount: 5.0, maxInstallments: 36, creditOnly: true },
+  '03': { minAmount: 5.0, maxInstallments: 12, creditOnly: true },
+};
+
+export const ENABLED_CREDIT_TYPES = Object.keys(CREDIT_TYPE_RULES);
+export const MIN_AMOUNT_DEFERRED = 5.0;

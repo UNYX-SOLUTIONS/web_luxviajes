@@ -111,6 +111,7 @@ export class CreateCheckoutDto {
 
   @IsOptional()
   @IsString()
+  @IsIn(['00', '02', '03'], { message: 'Tipo de crédito no habilitado' })
   creditType?: string;
 
   @IsOptional()
