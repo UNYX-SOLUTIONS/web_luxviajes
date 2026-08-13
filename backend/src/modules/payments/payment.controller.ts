@@ -27,7 +27,7 @@ export class PaymentController {
         });
       }
 
-      const clientIp = req.ip || req.socket.remoteAddress || '';
+      const clientIp = dto.customer.ip || req.ip || req.socket.remoteAddress || '';
 
       const result = await this.paymentService.createCheckout({
         ...dto,

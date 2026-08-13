@@ -1,8 +1,9 @@
 import { useState, useCallback } from "react";
 import { useDatafastPayment } from "./useDatafastPayment";
+import { useAuth } from "@/lib/auth-context";
 
 interface ServiceData {
-  id: number;
+  id: string | number;
   documentId: string;
   name: string;
   type: string;
@@ -27,7 +28,15 @@ export const usePurchaseDialog = () => {
   const [currentService, setCurrentService] = useState<ServiceData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const { user } = useAuth();
   const { createCheckout, isLoading: datafastLoading } = useDatafastPayment();
+
+  const generateMerchantCustomerId = useCallback((): string => {
+    if (user?.id) {
+      return `USER_${user.id}_${Date.now()}`;
+    }
+    return `GUEST_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+  }, [user]);
 
   const openDialog = useCallback((service: ServiceData) => {
     setCurrentService(service);
@@ -44,7 +53,7 @@ export const usePurchaseDialog = () => {
   }, [isLoading, datafastLoading]);
 
   const handlePay = useCallback(
-    async (customerData: CustomerFormData) => {
+    async (customerData: CustomerFormData, paymentOptions?: { creditType?: string; installments?: number }) => {
       if (!currentService) {
         setError("No hay servicio seleccionado");
         return;
@@ -53,6 +62,22 @@ export const usePurchaseDialog = () => {
       if (customerData.identificationDocId.length !== 10) {
         setError("La cédula debe tener 10 dígitos");
         return;
+      }
+
+      const creditType = paymentOptions?.creditType || "00";
+      if (!["00", "02", "03"].includes(creditType)) {
+        setError("Tipo de crédito no habilitado");
+        return;
+      }
+      if (creditType !== "00") {
+        if (currentService.price < 5) {
+          setError("El monto mínimo para pagar en cuotas es $5.00");
+          return;
+        }
+        if (!paymentOptions?.installments || paymentOptions.installments < 1) {
+          setError("Selecciona el número de cuotas");
+          return;
+        }
       }
 
       setError(null);
@@ -74,7 +99,7 @@ export const usePurchaseDialog = () => {
             givenName: customerData.givenName,
             surname: customerData.surname,
             email: customerData.email,
-            merchantCustomerId: `CUST_${Date.now()}`,
+            merchantCustomerId: generateMerchantCustomerId(),
             identificationDocId: customerData.identificationDocId,
             phone: customerData.phone,
             ...(customerData.middleName ? { middleName: customerData.middleName } : {}),
@@ -83,6 +108,8 @@ export const usePurchaseDialog = () => {
             street1: "Av. Principal",
             country: "EC",
           },
+          creditType: paymentOptions?.creditType,
+          installments: paymentOptions?.installments,
         });
 
         if (!result.success) {

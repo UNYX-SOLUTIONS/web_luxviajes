@@ -23,6 +23,8 @@ interface CreateCheckoutRequest {
     street1: string;
     country: string;
   };
+  creditType?: string;
+  installments?: number;
 }
 
 interface CreateCheckoutResponse {
@@ -45,13 +47,13 @@ export function useDatafastPayment() {
     setError(null);
 
     try {
-      let clientIp = "127.0.0.1";
+      let clientIp = "";
       try {
         const ipResponse = await fetch("https://api.ipify.org?format=json");
         const ipData = await ipResponse.json();
-        clientIp = ipData.ip || "127.0.0.1";
+        clientIp = ipData.ip || "";
       } catch {
-        // usar localhost si falla
+        // si falla, el backend usa req.ip como respaldo
       }
 
       const taxRate = 0.15;
@@ -60,7 +62,7 @@ export function useDatafastPayment() {
       const baseImp = ROUND(data.amount / (1 + taxRate));
       const iva = ROUND(data.amount - baseImp);
 
-      const payload = {
+      const payload: Record<string, unknown> = {
         amount: ROUND(data.amount),
         customer: {
           ...data.customer,
@@ -83,6 +85,9 @@ export function useDatafastPayment() {
         ],
       };
 
+      if (data.creditType !== undefined) payload.creditType = data.creditType;
+      if (data.installments !== undefined) payload.installments = data.installments;
+
       const response = await fetch("/api/payments/create-checkout", {
         method: "POST",
         headers: {
@@ -98,7 +103,11 @@ export function useDatafastPayment() {
       }
 
       if (result.success && result.data?.checkoutId) {
-        router.push(`/pago/${result.data.checkoutId}`);
+        const query = new URLSearchParams();
+        if (data.creditType) query.set("creditType", data.creditType);
+        if (data.installments) query.set("installments", String(data.installments));
+        const qs = query.toString();
+        router.push(`/pago/${result.data.checkoutId}${qs ? `?${qs}` : ""}`);
       }
 
       return result;

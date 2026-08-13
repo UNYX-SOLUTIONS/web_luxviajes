@@ -1,10 +1,13 @@
 import { DatafastService } from '../../services/datafast/datafast.service';
 import { prisma } from '../../config/database';
 import { logger } from '../../config/logger';
+import { CREDIT_TYPE_RULES } from '../../config/datafast';
 import { PaymentStatus, Prisma } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { ICreateCheckoutRequest, ITokenPaymentRequest, IPaymentStatusResponse } from '../../services/datafast/types/datafast.types';
 import { StatusMapper } from '../../services/datafast/types/datafast.types';
+
+const SCRIPT_TEST_LOGS_ENABLED = process.env.NODE_ENV !== 'production';
 
 interface CreateCheckoutInput {
   amount: number;
@@ -45,27 +48,11 @@ export class PaymentService {
   }
 
   async createCheckout(data: CreateCheckoutInput) {
+    this.validateCreditType(data);
+
     const merchantTransactionId = `TRX_${Date.now()}_${uuidv4().slice(0, 8)}`;
 
-    const customer = await prisma.customer.upsert({
-      where: { email: data.customer.email },
-      create: {
-        merchantCustomerId: data.customer.merchantCustomerId || `CUST_${uuidv4().slice(0, 8)}`,
-        givenName: data.customer.givenName,
-        surname: data.customer.surname,
-        email: data.customer.email,
-        phone: data.customer.phone,
-        identificationDocId: data.customer.identificationDocId,
-        identificationDocType: data.customer.identificationDocType || 'IDCARD',
-        address: data.billing.street1,
-      },
-      update: {
-        givenName: data.customer.givenName,
-        surname: data.customer.surname,
-        phone: data.customer.phone,
-        identificationDocId: data.customer.identificationDocId,
-      },
-    });
+    const customer = await this.findOrCreateCustomer(data);
 
     const transaction = await prisma.transaction.create({
       data: {
@@ -96,6 +83,28 @@ export class PaymentService {
         where: { id: transaction.id },
         data: { checkoutId: checkoutResponse.id },
       });
+
+      // ===== LOG SCRIPT DE PRUEBAS: CHECKOUT =====
+      if (SCRIPT_TEST_LOGS_ENABLED) {
+        console.log('\n📊 ===== DATOS PARA SCRIPT DE PRUEBAS (CHECKOUT) =====');
+        console.log(`📌 CustomerId: ${data.customer.merchantCustomerId}`);
+        console.log(`📌 ID (checkoutId): ${checkoutResponse.id}`);
+        console.log(`📌 Meses Plazo: ${data.installments || 0}`);
+        console.log(`📌 Tipo Transacción: En Línea`);
+        console.log(`📌 Tarjeta: **** (usar la de prueba de Datafast)`);
+        console.log(`📌 Referencia: ${merchantTransactionId}`);
+        console.log(`📌 Valor: ${data.amount.toFixed(2)}`);
+        console.log(`📌 Base 0: ${data.taxes.base0.toFixed(2)}`);
+        console.log(`📌 Base 12: ${data.taxes.baseImp.toFixed(2)}`);
+        console.log(`📌 IVA: ${data.taxes.iva.toFixed(2)}`);
+        console.log(`📌 Servicio: ${data.amount.toFixed(2)}`);
+        console.log(`📌 Interés: 0`);
+        console.log(`📌 Monto Fijo: 0.00`);
+        console.log(`📌 Propina: 0.00`);
+        console.log(`📌 Gran Total: ${data.amount.toFixed(2)}`);
+        console.log(`📌 Tipo de Crédito: ${data.creditType || '00'}`);
+        console.log('============================================\n');
+      }
 
       return {
         checkoutId: checkoutResponse.id,
@@ -152,6 +161,17 @@ export class PaymentService {
       }
     }
 
+    // ===== LOG SCRIPT DE PRUEBAS: STATUS =====
+    if (SCRIPT_TEST_LOGS_ENABLED) {
+      console.log('\n📊 ===== RESULTADO TRANSACCIÓN (STATUS) =====');
+      console.log(`📌 ID (paymentId): ${paymentData.id}`);
+      console.log(`📌 Lote: ${(paymentData.resultDetails as any)?.ReferenceNbr || 'N/A'}`);
+      console.log(`📌 Autorización: ${(paymentData.resultDetails as any)?.AuthCode || 'N/A'}`);
+      console.log(`📌 Código: ${paymentData.result?.code}`);
+      console.log(`📌 Descripción: ${paymentData.result?.description}`);
+      console.log('============================================\n');
+    }
+
     return paymentData;
   }
 
@@ -189,6 +209,16 @@ export class PaymentService {
         where: { id: transaction.id },
         data: { status: 'REFUNDED' },
       });
+    }
+
+    // ===== LOG SCRIPT DE PRUEBAS: ANULACIÓN =====
+    if (SCRIPT_TEST_LOGS_ENABLED) {
+      console.log('\n📊 ===== DATOS PARA SCRIPT DE PRUEBAS (ANULACIÓN) =====');
+      console.log(`📌 ID (refund): ${refundResponse.id}`);
+      console.log(`📌 Referencia Anulación: ${refundData.merchantTransactionId}`);
+      console.log(`📌 Referencia Original: ${transaction.merchantTransactionId}`);
+      console.log(`📌 Gran Total (anulación): ${data.amount.toFixed(2)}`);
+      console.log('==================================================\n');
     }
 
     return refundResponse;
@@ -271,6 +301,96 @@ export class PaymentService {
     });
 
     return { success: true };
+  }
+
+  private async findOrCreateCustomer(data: CreateCheckoutInput) {
+    const { customer, billing } = data;
+
+    const identityData = {
+      givenName: customer.givenName,
+      surname: customer.surname,
+      phone: customer.phone,
+      address: billing.street1,
+    };
+
+    // 1. El documento de identidad es la identidad estable del cliente
+    const byDocId = await prisma.customer.findUnique({
+      where: { identificationDocId: customer.identificationDocId },
+    });
+
+    if (byDocId) {
+      return prisma.customer.update({
+        where: { id: byDocId.id },
+        data: identityData,
+      });
+    }
+
+    // 2. Buscar por email
+    const byEmail = await prisma.customer.findUnique({
+      where: { email: customer.email },
+    });
+
+    if (byEmail) {
+      return prisma.customer.update({
+        where: { id: byEmail.id },
+        data: {
+          ...identityData,
+          identificationDocId: customer.identificationDocId,
+        },
+      });
+    }
+
+    // 3. Crear nuevo cliente
+    try {
+      return await prisma.customer.create({
+        data: {
+          ...identityData,
+          merchantCustomerId: customer.merchantCustomerId || `CUST_${uuidv4().slice(0, 8)}`,
+          email: customer.email,
+          identificationDocId: customer.identificationDocId,
+          identificationDocType: customer.identificationDocType || 'IDCARD',
+        },
+      });
+    } catch (error) {
+      // 4. Condición de carrera o cédula ya existente (P2002): actualizar el cliente de esa cédula
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const existing = await prisma.customer.findUnique({
+          where: { identificationDocId: customer.identificationDocId },
+        });
+        if (existing) {
+          return prisma.customer.update({
+            where: { id: existing.id },
+            data: identityData,
+          });
+        }
+      }
+      throw error;
+    }
+  }
+
+  private validateCreditType(data: CreateCheckoutInput): void {
+    const creditType = data.creditType || '00';
+    const rule = CREDIT_TYPE_RULES[creditType];
+
+    if (!rule) {
+      throw new Error('Tipo de crédito no habilitado');
+    }
+
+    if (data.amount < rule.minAmount) {
+      if (creditType === '00') {
+        throw new Error('Monto inválido');
+      }
+      throw new Error('Monto mínimo para diferir es $5.00');
+    }
+
+    if (creditType !== '00') {
+      if (!data.installments || data.installments < 1) {
+        throw new Error('Debes seleccionar el número de cuotas');
+      }
+      if (data.installments > rule.maxInstallments) {
+        throw new Error(`Máximo ${rule.maxInstallments} cuotas para este tipo de crédito`);
+      }
+    }
   }
 
   private async updateTransactionStatus(params: UpdateTransactionParams) {

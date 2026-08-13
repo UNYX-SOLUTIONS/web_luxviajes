@@ -1,5 +1,5 @@
 import { DatafastClient } from './datafast.client';
-import { datafastConfig, DATAFAST_CONSTANTS } from '../../config/datafast';
+import { datafastConfig, DATAFAST_CONSTANTS, DATAFAST_TEST_MODE_ENABLED } from '../../config/datafast';
 import { logger } from '../../config/logger';
 import { 
   ICreateCheckoutRequest, 
@@ -10,6 +10,8 @@ import {
   ITokenPaymentRequest,
   ITokenPaymentResponse
 } from './types/datafast.types';
+
+const SCRIPT_TEST_LOGS_ENABLED = process.env.NODE_ENV !== 'production';
 
 export class DatafastService {
   private client: DatafastClient;
@@ -32,6 +34,7 @@ export class DatafastService {
     params.append('amount', data.amount.toFixed(2));
     params.append('currency', 'USD');
     params.append('paymentType', 'DB');
+    params.append('shopperResultUrl', datafastConfig.shopperResultUrl);
     
     // Datos del cliente (Fase 2 - Obligatorios)
     params.append('customer.givenName', data.customer.givenName);
@@ -92,8 +95,8 @@ export class DatafastService {
     // Merchant Transaction ID (único por transacción)
     params.append('merchantTransactionId', data.merchantTransactionId);
     
-    // Test mode (solo en desarrollo)
-    if (process.env.NODE_ENV !== 'production') {
+    // Test mode (SOLO si DATAFAST_TEST_MODE=true en el .env; nunca en producción)
+    if (DATAFAST_TEST_MODE_ENABLED) {
       params.append('testMode', 'EXTERNAL');
     }
     
@@ -110,6 +113,13 @@ export class DatafastService {
     }
     
     try {
+      // ===== LOG SCRIPT DE PRUEBAS: PAYLOAD =====
+      if (SCRIPT_TEST_LOGS_ENABLED) {
+        console.log('\n📦 ===== PAYLOAD ENVIADO A DATAFAST (CHECKOUT) =====');
+        console.log(params.toString());
+        console.log('=================================================\n');
+      }
+
       const response = await this.client.post<ICreateCheckoutResponse>(
         url,
         params.toString()
@@ -138,6 +148,22 @@ export class DatafastService {
       logger.info({ result: response.result, resultDetails: response.resultDetails }, `Estado de transacción: ${response.result?.code}`);
       return response;
     } catch (error) {
+      // Datafast puede devolver el resultado del pago con un estado HTTP 4xx.
+      // En ese caso el body contiene los códigos de resultado que la página
+      // de resultado necesita mostrar. Se extrae y se devuelve como data.
+      const axiosError = error as {
+        response?: { status?: number; data?: IPaymentStatusResponse };
+      };
+      const errorBody = axiosError.response?.data;
+
+      if (errorBody && typeof errorBody === 'object' && (errorBody as IPaymentStatusResponse).result) {
+        logger.info(
+          { result: (errorBody as IPaymentStatusResponse).result },
+          `Estado de transacción (HTTP ${axiosError.response?.status}): ${(errorBody as IPaymentStatusResponse).result?.code}`
+        );
+        return errorBody;
+      }
+
       logger.error({ err: error }, 'Error obteniendo estado');
       throw error;
     }
@@ -159,6 +185,13 @@ export class DatafastService {
     }
     
     try {
+      // ===== LOG SCRIPT DE PRUEBAS: PAYLOAD ANULACIÓN =====
+      if (SCRIPT_TEST_LOGS_ENABLED) {
+        console.log('\n📦 ===== PAYLOAD ENVIADO A DATAFAST (ANULACIÓN) =====');
+        console.log(params.toString());
+        console.log('===================================================\n');
+      }
+
       const response = await this.client.post<IRefundResponse>(
         url,
         params.toString()
@@ -200,8 +233,8 @@ export class DatafastService {
     params.append('customParameters[SHOPPER_PSERV]', DATAFAST_CONSTANTS.PSERV);
     params.append('customParameters[SHOPPER_VERSIONDF]', DATAFAST_CONSTANTS.VERSION);
     
-    // Test mode
-    if (process.env.NODE_ENV !== 'production') {
+    // Test mode (SOLO si DATAFAST_TEST_MODE=true en el .env; nunca en producción)
+    if (DATAFAST_TEST_MODE_ENABLED) {
       params.append('testMode', 'EXTERNAL');
     }
     
@@ -248,6 +281,15 @@ export class DatafastService {
       
       return response;
     } catch (error) {
+      const axiosError = error as {
+        response?: { status?: number; data?: IPaymentStatusResponse };
+      };
+      const errorBody = axiosError.response?.data;
+
+      if (errorBody && typeof errorBody === 'object' && (errorBody as IPaymentStatusResponse).result) {
+        return errorBody;
+      }
+
       logger.error({ err: error }, 'Error verificando transacción');
       throw error;
     }
@@ -270,6 +312,15 @@ export class DatafastService {
       
       return response;
     } catch (error) {
+      const axiosError = error as {
+        response?: { status?: number; data?: IPaymentStatusResponse };
+      };
+      const errorBody = axiosError.response?.data;
+
+      if (errorBody && typeof errorBody === 'object' && (errorBody as IPaymentStatusResponse).result) {
+        return errorBody;
+      }
+
       logger.error({ err: error }, 'Error verificando transacción');
       throw error;
     }

@@ -41,6 +41,10 @@ class CustomerDto {
   @MinLength(7)
   @MaxLength(25)
   phone: string;
+
+  @IsOptional()
+  @IsString()
+  ip?: string;
 }
 
 class BillingDto {
@@ -111,6 +115,7 @@ export class CreateCheckoutDto {
 
   @IsOptional()
   @IsString()
+  @IsIn(['00', '02', '03'], { message: 'Tipo de crédito no habilitado' })
   creditType?: string;
 
   @IsOptional()

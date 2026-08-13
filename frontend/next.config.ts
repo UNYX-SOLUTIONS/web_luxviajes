@@ -58,7 +58,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: "Content-Security-Policy",
-            value: "frame-ancestors 'self'",
+            value: "frame-ancestors 'self' *.oppwa.com *.datafast.com.ec",
           },
         ],
       },
@@ -93,7 +93,23 @@ const nextConfig: NextConfig = {
   /* Rewrites */
   async rewrites() {
     return {
-      beforeFiles: [],
+      beforeFiles: [
+        // Auth API routes — handle locally, do NOT proxy to CMS
+        {
+          source: "/api/auth/:path*",
+          destination: "/api/auth/:path*",
+        },
+        // User/profile API routes — handle locally
+        {
+          source: "/api/user/:path*",
+          destination: "/api/user/:path*",
+        },
+        // Payments API — proxy to Express backend
+        {
+          source: "/api/payments/:path*",
+          destination: `${process.env.NEXT_PUBLIC_PAYMENTS_BACKEND_URL || "http://localhost:3001"}/api/payments/:path*`,
+        },
+      ],
       afterFiles: [],
       fallback: [
         {

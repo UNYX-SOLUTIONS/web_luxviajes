@@ -19,6 +19,7 @@ jest.mock('../../src/config/datafast', () => ({
     PSERV: '17913101',
     VERSION: '2',
   },
+  DATAFAST_TEST_MODE_ENABLED: true,
   CreditTypes: {
     CORRIENTE: '00',
   },
