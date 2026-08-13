@@ -1,0 +1,27 @@
+# Entornos y secretos
+.env
+.env.production
+.env.local
+.env.*.local
+!.env.example
+!.env.docker.example
+!backend/.env.example
+!backend/.env.docker.example
+!frontend/.env.example
+
+# Node
+node_modules/
+dist/
+coverage/
+
+# Logs
+*.log
+logs/
+backend/logs/
+
+# Docker
+postgres_data/
+
+# IDE
+.vscode/
+.idea/
