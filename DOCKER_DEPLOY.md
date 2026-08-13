@@ -167,12 +167,20 @@ docker exec traefik-xdid-traefik-1 cat /etc/traefik/traefik.yml | grep -A3 certi
 docker exec traefik-xdid-traefik-1 cat /etc/traefik/traefik.yml | grep -A2 entryPoints
 ```
 
-Ajustar en `frontend/.env.production`:
+Ajustar en `frontend/.env` del VPS (crearlo copiando la plantilla):
+
+```bash
+cd /root/luxviajes/frontend
+cp .env.production.example .env   # docker compose lee .env automáticamente
+nano .env
+```
 
 ```env
 DOMAIN=agencialuxviajes.com
 TRAEFIK_NETWORK=<nombre real de la red>
 CERT_RESOLVER=<nombre real del certresolver>
+PAYMENTS_BACKEND_URL=http://backend:3001
+JWT_SECRET=<clave larga aleatoria>
 ```
 
 ### 6.2 Despliegue del frontend
