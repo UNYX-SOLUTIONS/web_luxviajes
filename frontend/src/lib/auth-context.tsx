@@ -89,12 +89,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const cached = getCachedUser();
     if (cached) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hidratación segura: leer localStorage después del montaje
       setState((prev) => ({
         ...prev,
         user: cached,
         isAuthenticated: true,
       }));
     }
+  }, []);
+
+  useEffect(() => {
+    function handleStorage(event: StorageEvent) {
+      if (event.key !== CACHE_KEY) return;
+
+      if (event.newValue === null) {
+        setState((prev) => ({
+          ...prev,
+          user: null,
+          isAuthenticated: false,
+        }));
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(event.newValue);
+        const now = Date.now();
+        if (parsed.expiresAt && now > parsed.expiresAt) {
+          setState((prev) => ({
+            ...prev,
+            user: null,
+            isAuthenticated: false,
+          }));
+          return;
+        }
+        setState((prev) => ({
+          ...prev,
+          user: parsed.user ?? null,
+          isAuthenticated: Boolean(parsed.user),
+        }));
+      } catch {
+        setState((prev) => ({
+          ...prev,
+          user: null,
+          isAuthenticated: false,
+        }));
+      }
+    }
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
   const clearError = useCallback(() => {
@@ -268,6 +311,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState((prev) => ({
       ...prev,
       user: updatedUser,
+      isAuthenticated: true,
     }));
   }, []);
 

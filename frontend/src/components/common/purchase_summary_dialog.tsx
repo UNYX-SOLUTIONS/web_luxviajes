@@ -369,7 +369,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                               onChange={(e) =>
                                 setTermsAccepted(e.target.checked)
                               }
-                              className="h-4 w-4 rounded border-neutral-300 text-primary-700 focus:ring-primary-500 accent-primary-700"
+                              className="h-4 w-4 rounded border-neutral-300 text-primary-700! focus:ring-primary-500! accent-primary-700!"
                             />
                             <label
                               htmlFor="terms"
@@ -384,7 +384,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                   onClick={(e) => {
                                     e.stopPropagation();
                                   }}
-                                  className="text-primary-700 hover:underline"
+                                  className="text-primary-700! hover:underline"
                                 >
                                   políticas de visas
                                 </a>
@@ -396,7 +396,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                   onClick={(e) => {
                                     e.stopPropagation();
                                   }}
-                                  className="text-primary-700 hover:underline"
+                                  className="text-primary-700! hover:underline"
                                 >
                                   políticas de privacidad{" "}
                                 </a>
@@ -408,9 +408,10 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                   onClick={(e) => {
                                     e.stopPropagation();
                                   }}
-                                  className="text-primary-700 hover:underline"
+                                  className="text-primary-700! hover:underline"
                                 >
-                                  terminos y condiciones del uso de la plataforma
+                                  terminos y condiciones del uso de la
+                                  plataforma
                                 </a>
                                 .
                               </p>
@@ -424,21 +425,13 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                           )}
 
                           <div className="mt-6">
-                            {/* <button
+                            <button
                               onClick={handleContinueToForm}
                               disabled={isLoading || !termsAccepted}
                               className="flex w-full items-center justify-center gap-3 rounded-full bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                             >
                               <CreditCardIcon className="h-5 w-5" />
                               Pagar {formatPrice(service.price)}
-                            </button> */}
-                            <button
-                              onClick={handleContinueToForm}
-                              disabled={true}
-                              className="flex w-full items-center justify-center gap-3 rounded-full bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
-                            >
-                              <CreditCardIcon className="h-5 w-5" />
-                              Próximamente
                             </button>
                           </div>
                         </>
@@ -451,7 +444,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
 
                           {isAuthenticated && user && (
                             <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary-50 px-3 py-2 text-xs text-primary-700">
-                              <CheckCircleIcon className="h-4 w-4 flex-shrink-0" />
+                              <CheckCircleIcon className="h-4 w-4 shrink-0" />
                               <span>
                                 Datos precargados de tu perfil. Puedes editarlos
                                 si es necesario.
