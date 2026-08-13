@@ -27,8 +27,6 @@ export default function ProfilePage() {
     success,
     loadProfile,
     saveProfile,
-    savePhoto,
-    removePhoto,
     savePassword,
   } = useUserProfile();
 
@@ -79,7 +77,7 @@ export default function ProfilePage() {
             <ArrowLeftIcon className="h-4 w-4" />
             <span className="text-sm font-medium">Volver al inicio</span>
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-neutral-900 mt-4">
+          <h1 className="text-xl! md:text-2xl! lg:text-3xl! font-bold text-neutral-900 mt-4">
             Mi Perfil
           </h1>
           <p className="text-neutral-500 mt-1">
@@ -106,12 +104,8 @@ export default function ProfilePage() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-sm ring-1 ring-neutral-200 p-6">
               <ProfilePhoto
-                fotoUrl={profile.fotoPerfil}
                 primerNombre={profile.primerNombre ?? ""}
                 apellido={profile.apellido ?? ""}
-                onUpload={savePhoto}
-                onDelete={removePhoto}
-                isSaving={isSaving}
               />
 
               <div className="mt-6 pt-4 border-t border-neutral-200 space-y-2">

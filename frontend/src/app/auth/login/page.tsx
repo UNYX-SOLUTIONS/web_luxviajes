@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   EnvelopeIcon,
@@ -14,7 +14,6 @@ import { useAuth } from "@/lib/auth-context";
 import { getSafeRedirect, preserveRedirectParam } from "@/utils/redirect";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = getSafeRedirect(searchParams.get("redirect"), "/");
   const { login, isLoading, error, clearError } = useAuth();
@@ -75,7 +74,7 @@ function LoginForm() {
 
     try {
       await login(formData.email, formData.password);
-      router.push(redirectTo);
+      window.location.href = redirectTo;
     } catch (err) {
       // Login error
     }

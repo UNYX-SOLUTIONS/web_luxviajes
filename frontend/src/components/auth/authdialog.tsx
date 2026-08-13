@@ -159,6 +159,7 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
       try {
         await login(formData.email, formData.password);
         onClose();
+        window.location.reload();
       } catch (err) {
         // Error manejado por el contexto
       }
@@ -572,6 +573,7 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
             updateUser(user);
             setShowVerification(false);
             onClose();
+            window.location.reload();
           }}
           onCancel={() => { setShowVerification(false); }}
         />
