@@ -435,7 +435,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                               className="flex w-full items-center justify-center gap-3 rounded-full bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                             >
                               <CreditCardIcon className="h-5 w-5" />
-                              Proximamente
+                              Próximamente
                             </button>
                           </div>
                         </>
