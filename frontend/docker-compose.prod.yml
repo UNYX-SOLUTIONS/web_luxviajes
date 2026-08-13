@@ -1,144 +1,156 @@
-version: "3.9"
+# ============================================
+# Luxviajes Frontend - Producción
+# Next.js + Traefik
+# ============================================
+
+name: lux-viajes-frontend
 
 services:
-  # Aplicación Next.js (Producción) — expuesta vía Traefik
+
   luxviajes-web:
     build:
       context: .
       dockerfile: Dockerfile
+
       args:
-        - NODE_ENV=production
-        - NEXT_PUBLIC_NODE_ENV=production
-        - NEXT_PUBLIC_DATAFAST_BASE_URL=${NEXT_PUBLIC_DATAFAST_BASE_URL_PROD:-https://eu-prod.oppwa.com}
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://cms.agencialuxviajes.com/api}
-        - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-https://agencialuxviajes.com}
-        - PAYMENTS_BACKEND_URL=${PAYMENTS_BACKEND_URL:-http://backend:3001}
+        NODE_ENV: production
+        NEXT_PUBLIC_NODE_ENV: production
+
+        NEXT_PUBLIC_DATAFAST_BASE_URL: ${NEXT_PUBLIC_DATAFAST_BASE_URL_PROD:-https://eu-prod.oppwa.com}
+
+        # API pública de Strapi
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://cms.agencialuxviajes.com/api}
+
+        # Dominio público del frontend
+        NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL:-https://agencialuxviajes.com}
+
+        # Backend Express PRIVADO
+        PAYMENTS_BACKEND_URL: ${PAYMENTS_BACKEND_URL:-http://backend:3001}
+
     container_name: luxviajes-app
     restart: unless-stopped
+
+    # ========================================
+    # Puerto accesible únicamente en el VPS
+    # Traefik también accede por Docker
+    # ========================================
     ports:
-      # Solo localhost del host (mismo patrón que cms-luxviajes y n8n)
       - "127.0.0.1:3000:3000"
+
     environment:
-      - NODE_ENV=production
-      - PORT=3000
-      - DATABASE_URL=postgresql://${DB_USER:-luxviajes}:${DB_PASSWORD:?DB_PASSWORD es requerida en .env}@postgres:5432/${DB_NAME:-luxviajes_db}?schema=public
-      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET es requerido en .env}
-      - WEBHOOK_URL=${WEBHOOK_URL}
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
+      NODE_ENV: production
+      PORT: 3000
+
+      # ======================================
+      # PostgreSQL / Prisma
+      # ======================================
+      # Mantener únicamente si Next.js
+      # todavía utiliza Prisma directamente.
+      DATABASE_URL: postgresql://${DB_USER:-luxviajes}:${DB_PASSWORD:?DB_PASSWORD es requerida en .env}@postgres:5432/${DB_NAME:-luxviajes_db}?schema=public
+
+      # ======================================
+      # Aplicación
+      # ======================================
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET es requerido en .env}
+
+      WEBHOOK_URL: ${WEBHOOK_URL:-}
+
+      # ======================================
+      # Backend Express interno
+      # ======================================
+      PAYMENTS_BACKEND_URL: ${PAYMENTS_BACKEND_URL:-http://backend:3001}
+
+      # ======================================
+      # Variables públicas Next.js
+      # ======================================
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://cms.agencialuxviajes.com/api}
+
+      NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL:-https://agencialuxviajes.com}
+
+      NEXT_PUBLIC_DATAFAST_BASE_URL: ${NEXT_PUBLIC_DATAFAST_BASE_URL_PROD:-https://eu-prod.oppwa.com}
+
+    # ========================================
+    # Traefik
+    # ========================================
     labels:
       - "traefik.enable=true"
 
-      # Router HTTPS (dominio principal + www)
+      # Importante:
+      # Traefik debe utilizar su propia red
+      - "traefik.docker.network=${TRAEFIK_NETWORK:-traefik-proxy}"
+
+      # HTTPS
       - "traefik.http.routers.luxviajes.rule=Host(`${DOMAIN:-agencialuxviajes.com}`) || Host(`www.${DOMAIN:-agencialuxviajes.com}`)"
       - "traefik.http.routers.luxviajes.entrypoints=websecure"
       - "traefik.http.routers.luxviajes.tls=true"
       - "traefik.http.routers.luxviajes.tls.certresolver=${CERT_RESOLVER:-le}"
+
+      # Next.js escucha internamente en 3000
       - "traefik.http.services.luxviajes.loadbalancer.server.port=3000"
 
-      # Redirección HTTP -> HTTPS
+      # HTTP
       - "traefik.http.routers.luxviajes-http.rule=Host(`${DOMAIN:-agencialuxviajes.com}`) || Host(`www.${DOMAIN:-agencialuxviajes.com}`)"
       - "traefik.http.routers.luxviajes-http.entrypoints=web"
-      - "traefik.http.routers.luxviajes-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+      # HTTP -> HTTPS
+      - "traefik.http.routers.luxviajes-http.middlewares=luxviajes-redirect-https"
+      - "traefik.http.middlewares.luxviajes-redirect-https.redirectscheme.scheme=https"
+
+    # ========================================
+    # Healthcheck
+    # ========================================
     healthcheck:
       test:
         [
           "CMD",
           "node",
           "-e",
-          "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})",
+          "require('http').get('http://localhost:3000', (r) => { if (r.statusCode !== 200) throw new Error(r.statusCode) })"
         ]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 45s
+
+    # ========================================
+    # Logs
+    # ========================================
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
         max-size: "10m"
         max-file: "5"
+
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 1G
         reservations:
-          cpus: '1'
+          cpus: "1"
           memory: 512M
+
+    # ========================================
+    # Redes
+    # ========================================
     networks:
       - luxviajes-network
       - traefik-proxy
 
-  # Monitoreo con Prometheus (Opcional)
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: luxviajes-prometheus
-    restart: unless-stopped
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-    networks:
-      - luxviajes-network
-    profiles:
-      - monitoring
 
-  # Logs con Loki (Opcional)
-  loki:
-    image: grafana/loki:latest
-    container_name: luxviajes-loki
-    restart: unless-stopped
-    ports:
-      - "3100:3100"
-    volumes:
-      - ./monitoring/loki-config.yml:/etc/loki/local-config.yaml:ro
-      - loki-data:/loki
-    command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - luxviajes-network
-    profiles:
-      - monitoring
-
-  # Visualización con Grafana (Opcional)
-  grafana:
-    image: grafana/grafana:latest
-    container_name: luxviajes-grafana
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:3200:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_USERS_ALLOW_SIGN_UP=false
-    volumes:
-      - grafana-storage:/var/lib/grafana
-    depends_on:
-      - prometheus
-      - loki
-    networks:
-      - luxviajes-network
-    profiles:
-      - monitoring
+# ============================================
+# Redes
+# ============================================
 
 networks:
-  # Red interna compartida con el backend (backend/docker-compose.yml)
-  luxviajes-network:
-    name: luxviajes-network
-    driver: bridge
 
-  # Red externa de Traefik (ya existente en tu VPS)
+  # Compartida con:
+  # backend
+  # postgres
+  luxviajes-network:
+    external: true
+
+  # Red existente de Traefik
   traefik-proxy:
     name: ${TRAEFIK_NETWORK:-traefik-proxy}
     external: true
-
-volumes:
-  prometheus-data:
-    driver: local
-  loki-data:
-    driver: local
-  grafana-storage:
-    driver: local

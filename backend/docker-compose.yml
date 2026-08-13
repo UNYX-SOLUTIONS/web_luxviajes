@@ -1,99 +1,166 @@
 # ============================================
-# Backend Lux Viajes - Producción
-# Servicios: backend (Node/Express) + PostgreSQL
-# ============================================
-# Uso (desde la carpeta backend/):
-#   1. cp .env.docker.example .env  y llenar los valores reales
-#   2. docker compose up -d --build
+# Luxviajes Backend - Producción
+# Node/Express + PostgreSQL
 # ============================================
 
 name: lux-viajes-backend
 
 services:
+
+  # ==========================================
+  # PostgreSQL
+  # ==========================================
   postgres:
     image: postgres:15-alpine
     container_name: luxviajes-postgres
     restart: unless-stopped
+
     environment:
       POSTGRES_USER: ${DB_USER:-luxviajes}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD es requerida en .env}
       POSTGRES_DB: ${DB_NAME:-luxviajes_db}
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+    # Accesible únicamente desde el propio VPS.
+    # NO queda expuesto públicamente.
     ports:
-      # Solo accesible desde el host (pgAdmin/backups). No expuesto públicamente.
       - "127.0.0.1:5432:5432"
+
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-luxviajes} -d ${DB_NAME:-luxviajes_db}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER:-luxviajes} -d ${DB_NAME:-luxviajes_db}"
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 15s
+
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
+
     deploy:
       resources:
         limits:
           memory: 1G
+
     networks:
       - luxviajes-network
 
+
+  # ==========================================
+  # Backend Node / Express
+  # ==========================================
   backend:
     build:
       context: .
       dockerfile: Dockerfile
+
     container_name: luxviajes-backend
     restart: unless-stopped
+
     environment:
+      # --------------------------------------
+      # Aplicación
+      # --------------------------------------
       NODE_ENV: production
       PORT: 3001
+
+      # --------------------------------------
+      # PostgreSQL / Prisma
+      # --------------------------------------
       DATABASE_URL: postgresql://${DB_USER:-luxviajes}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-luxviajes_db}?schema=public
+
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+
+      # --------------------------------------
+      # CORS
+      # --------------------------------------
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS_PROD:?ALLOWED_ORIGINS_PROD es requerida en .env}
-      # Datafast PRODUCCIÓN (interruptor + bloque PROD)
+
+      # --------------------------------------
+      # Datafast Producción
+      # --------------------------------------
       DATAFAST_ENV: production
+
       DATAFAST_PROD_ENTITY_ID: ${DATAFAST_PROD_ENTITY_ID:?DATAFAST_PROD_ENTITY_ID es requerida en .env}
+
       DATAFAST_PROD_BEARER_TOKEN: ${DATAFAST_PROD_BEARER_TOKEN:?DATAFAST_PROD_BEARER_TOKEN es requerido en .env}
+
       DATAFAST_PROD_MERCHANT_ID: ${DATAFAST_PROD_MERCHANT_ID:-4100010042}
+
       DATAFAST_PROD_TERMINAL_ID: ${DATAFAST_PROD_TERMINAL_ID:-BP467901}
+
       DATAFAST_PROD_BASE_URL: ${DATAFAST_PROD_BASE_URL:-https://eu-prod.oppwa.com}
+
       DATAFAST_PROD_SHOPPER_RESULT_URL: ${DATAFAST_PROD_SHOPPER_RESULT_URL:?DATAFAST_PROD_SHOPPER_RESULT_URL es requerida en .env}
+
       DATAFAST_TIMEOUT: ${DATAFAST_TIMEOUT:-30000}
+
       DATAFAST_RETRY_ATTEMPTS: ${DATAFAST_RETRY_ATTEMPTS:-3}
-      # No definir DATAFAST_TEST_MODE en producción
+
+      # --------------------------------------
+      # Logs
+      # --------------------------------------
       LOG_LEVEL: ${LOG_LEVEL:-info}
-    ports:
-      # Solo accesible desde el host. El frontend llega por la red Docker.
-      - "127.0.0.1:3001:3001"
+
+    # NO publicamos 3001.
+    # El frontend accede mediante:
+    #
+    # http://backend:3001
+    #
+    # usando luxviajes-network.
+
     depends_on:
       postgres:
         condition: service_healthy
+
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => { if (r.statusCode !== 200) throw new Error(r.statusCode) })"]
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3001/health', (r) => { if (r.statusCode !== 200) throw new Error(r.statusCode) })"
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
+
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "5"
+
     deploy:
       resources:
         limits:
           memory: 1G
+
     networks:
       - luxviajes-network
 
+
+# ============================================
+# Red compartida
+# ============================================
+
 networks:
-  # Red compartida con el compose del frontend (ver DOCKER_DEPLOY.md)
   luxviajes-network:
-    name: luxviajes-network
-    driver: bridge
+    external: true
+
+
+# ============================================
+# Persistencia PostgreSQL
+# ============================================
 
 volumes:
   postgres_data:
