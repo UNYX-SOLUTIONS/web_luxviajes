@@ -59,7 +59,10 @@ interface PurchaseSummaryDialogProps {
   isOpen: boolean;
   onClose: () => void;
   service: ServiceItem;
-  onPay: (customerData: CustomerFormData, paymentOptions?: PaymentOptions) => void;
+  onPay: (
+    customerData: CustomerFormData,
+    paymentOptions?: PaymentOptions,
+  ) => void;
   isLoading?: boolean;
   currency?: string;
   taxRate?: number;
@@ -373,9 +376,9 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                               className="text-xs text-neutral-600"
                             >
                               <p className="mt-3 text-justify">
-                                Confirmo que he leído los{" "}
+                                Confirmo que he leído las{" "}
                                 <a
-                                  href={helpData?.pdfPoliticasViaje || "#"}
+                                  href={helpData?.pdfPoliticasVisas || "#"}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => {
@@ -383,7 +386,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                   }}
                                   className="text-primary-700 hover:underline"
                                 >
-                                  términos y condiciones
+                                  políticas de visas
                                 </a>
                                 ,{" "}
                                 <a
@@ -397,9 +400,9 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                 >
                                   políticas de privacidad{" "}
                                 </a>
-                                y{" "}
+                                y los{" "}
                                 <a
-                                  href={helpData?.pdfPoliticasVisas || "#"}
+                                  href={helpData?.pdfPoliticasUsoWeb || "#"}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => {
@@ -407,7 +410,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                   }}
                                   className="text-primary-700 hover:underline"
                                 >
-                                  políticas de visas
+                                  terminos y condiciones del uso de la plataforma
                                 </a>
                                 .
                               </p>
@@ -421,13 +424,21 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                           )}
 
                           <div className="mt-6">
-                            <button
+                            {/* <button
                               onClick={handleContinueToForm}
                               disabled={isLoading || !termsAccepted}
                               className="flex w-full items-center justify-center gap-3 rounded-full bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
                             >
                               <CreditCardIcon className="h-5 w-5" />
                               Pagar {formatPrice(service.price)}
+                            </button> */}
+                            <button
+                              onClick={handleContinueToForm}
+                              disabled={true}
+                              className="flex w-full items-center justify-center gap-3 rounded-full bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-primary-700/25 transition-all hover:bg-primary-800 hover:shadow-primary-700/35 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+                            >
+                              <CreditCardIcon className="h-5 w-5" />
+                              Próximamente
                             </button>
                           </div>
                         </>
@@ -441,7 +452,10 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                           {isAuthenticated && user && (
                             <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary-50 px-3 py-2 text-xs text-primary-700">
                               <CheckCircleIcon className="h-4 w-4 flex-shrink-0" />
-                              <span>Datos precargados de tu perfil. Puedes editarlos si es necesario.</span>
+                              <span>
+                                Datos precargados de tu perfil. Puedes editarlos
+                                si es necesario.
+                              </span>
                             </div>
                           )}
 
@@ -576,7 +590,9 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                   <button
                                     key={opt.value}
                                     type="button"
-                                    onClick={() => handleCardClassChange(opt.value)}
+                                    onClick={() =>
+                                      handleCardClassChange(opt.value)
+                                    }
                                     disabled={isLoading}
                                     className={`flex-1 rounded-lg border px-3 py-2.5 text-sm font-medium transition disabled:opacity-50 ${
                                       cardClass === opt.value
@@ -590,20 +606,23 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                               </div>
                               {cardClass === "DEBIT" && (
                                 <p className="text-xs text-amber-600 mt-1.5">
-                                  Las tarjetas de débito no permiten pagos en cuotas.
+                                  Las tarjetas de débito no permiten pagos en
+                                  cuotas.
                                 </p>
                               )}
                             </div>
 
                             {showMinAmountNotice && (
                               <div className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
-                                El monto mínimo para pagar en cuotas es ${MIN_AMOUNT_DEFERRED.toFixed(2)}.
+                                El monto mínimo para pagar en cuotas es $
+                                {MIN_AMOUNT_DEFERRED.toFixed(2)}.
                               </div>
                             )}
 
                             <div>
                               <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                                <CreditCardIcon className="h-3.5 w-3.5" /> Tipo de crédito
+                                <CreditCardIcon className="h-3.5 w-3.5" /> Tipo
+                                de crédito
                               </label>
                               <select
                                 value={creditType}
@@ -612,7 +631,9 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                   setInstallments(0);
                                 }}
                                 className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50 bg-white"
-                                disabled={isLoading || enabledCreditTypes.length <= 1}
+                                disabled={
+                                  isLoading || enabledCreditTypes.length <= 1
+                                }
                               >
                                 {enabledCreditTypes.map((opt) => (
                                   <option key={opt.code} value={opt.code}>
@@ -625,7 +646,8 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                             {isDeferred && (
                               <div>
                                 <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                                  <CalendarIcon className="h-3.5 w-3.5" /> Cuotas
+                                  <CalendarIcon className="h-3.5 w-3.5" />{" "}
+                                  Cuotas
                                 </label>
                                 <select
                                   value={installments}
