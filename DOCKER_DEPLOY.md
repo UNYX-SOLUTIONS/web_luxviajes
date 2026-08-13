@@ -2,6 +2,8 @@
 
 > Stack: Node.js 20 + Express + TypeScript + Prisma + PostgreSQL 15
 > Todo vive dentro de `backend/` (igual que el frontend vive en `frontend/` con su propio Docker). Strapi y n8n están fuera de este despliegue.
+>
+> **Despliegue completo (backend + frontend) con un solo comando:** `./scripts/deploy-all.sh` desde la raíz del repo. Orquesta los dos composes — no hay un tercer compose en la raíz (evitar duplicación).
 
 ---
 
@@ -137,33 +139,68 @@ El contenedor nuevo aplica migraciones al iniciar (si `RUN_MIGRATIONS=true`). Co
 
 ---
 
-## 6. Conexión con el frontend dockerizado
+## 6. Conexión con Traefik y el frontend dockerizado
 
-Los contenedores del frontend y backend deben estar en la misma red `luxviajes-network`. El proxy del frontend (`next.config.ts`) apunta a `http://localhost:3001` por defecto, que **no resuelve** dentro del contenedor del frontend.
+**Infraestructura real del VPS:** Traefik (puertos 80/443) es el proxy central — Strapi (`cms-luxviajes`, `127.0.0.1:1337`) y n8n (`127.0.0.1:5678`) ya viven detrás de él. El frontend de Lux Viajes se suma igual: contenedor en `127.0.0.1:3000` + red externa de Traefik.
 
-**Solución aplicada:** el rewrite ahora usa la variable `NEXT_PUBLIC_PAYMENTS_BACKEND_URL` (con fallback a `localhost:3001` para desarrollo local):
-
-```typescript
-// frontend/next.config.ts
-destination: `${process.env.NEXT_PUBLIC_PAYMENTS_BACKEND_URL || "http://localhost:3001"}/api/payments/:path*`,
+```
+Internet → Traefik (80/443)
+   ├── agencialuxviajes.com      → luxviajes-app:3000
+   ├── cms.agencialuxviajes.com  → cms-luxviajes:1337
+   └── flow.agencialuxviajes.com → n8n:5678
+                     │
+   luxviajes-app ────┴── red luxviajes-network → backend:3001 → postgres:5432
 ```
 
-En el `.env.production` del frontend (VPS) agregar:
+### 6.1 Antes de desplegar: verificar la config real de Traefik
+
+```bash
+# 1. Nombre de la red de Traefik
+docker network ls | grep -i traefik
+#   ej: xdid_proxy, traefik-proxy, traefik_default → ponerlo en TRAEFIK_NETWORK
+
+# 2. Nombre del certresolver (en traefik.yml del VPS)
+docker exec traefik-xdid-traefik-1 cat /etc/traefik/traefik.yml | grep -A3 certificatesResolvers
+#   ej: "le", "letsencrypt", "cloudflare" → ponerlo en CERT_RESOLVER
+
+# 3. Entrypoints definidos (ej: web, websecure)
+docker exec traefik-xdid-traefik-1 cat /etc/traefik/traefik.yml | grep -A2 entryPoints
+```
+
+Ajustar en `frontend/.env.production`:
 
 ```env
-NEXT_PUBLIC_PAYMENTS_BACKEND_URL=http://backend:3001
+DOMAIN=agencialuxviajes.com
+TRAEFIK_NETWORK=<nombre real de la red>
+CERT_RESOLVER=<nombre real del certresolver>
 ```
 
-Y en el `docker-compose` del frontend, asegurarse de que el servicio esté en la red:
+### 6.2 Despliegue del frontend
 
-```yaml
-networks:
-  luxviajes-network:
-    name: luxviajes-network
-    driver: bridge
+```bash
+cd /root/luxviajes/frontend
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-Después: `docker compose build && docker compose up -d` en el directorio del frontend. En local no se necesita ninguna variable (usa `localhost:3001`).
+Traefik detecta el contenedor por los labels y genera el certificado automáticamente. Verificar:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}' https://agencialuxviajes.com   # → 200
+```
+
+### 6.3 Conexión frontend → backend
+
+El proxy del frontend (`next.config.ts`) usa la variable **solo servidor** `PAYMENTS_BACKEND_URL` (no va al navegador):
+
+```typescript
+destination: `${process.env.PAYMENTS_BACKEND_URL || "http://localhost:3001"}/api/payments/:path*`,
+```
+
+En producción el compose la pasa como build arg con default `http://backend:3001` (resolución por red Docker). En local no se necesita (usa `localhost:3001`).
+
+### 6.4 El backend NO se expone
+
+El backend publica solo `127.0.0.1:3001` (localhost del host) y PostgreSQL `127.0.0.1:5432` — ninguno es alcanzable desde internet. Traefik solo enruta al frontend. No existe dominio `api.*` para el backend.
 
 ---
 

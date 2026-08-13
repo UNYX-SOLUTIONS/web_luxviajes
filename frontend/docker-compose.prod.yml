@@ -1,22 +1,39 @@
 version: "3.9"
 
 services:
-  # Aplicación Next.js (Producción)
+  # Aplicación Next.js (Producción) — expuesta vía Traefik
   luxviajes-web:
     build:
       context: .
       dockerfile: Dockerfile
       args:
         - NODE_ENV=production
+        - NEXT_PUBLIC_NODE_ENV=${NEXT_PUBLIC_NODE_ENV:-production}
+        - NEXT_PUBLIC_DATAFAST_BASE_URL=${NEXT_PUBLIC_DATAFAST_BASE_URL:-https://eu-prod.oppwa.com}
+        - PAYMENTS_BACKEND_URL=${PAYMENTS_BACKEND_URL:-http://backend:3001}
     container_name: luxviajes-app
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      # Solo localhost del host (mismo patrón que cms-luxviajes y n8n)
+      - "127.0.0.1:3000:3000"
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api.luxviajes.com}
-      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-https://luxviajes.com}
+    labels:
+      - "traefik.enable=true"
+
+      # Router HTTPS (dominio principal + www)
+      - "traefik.http.routers.luxviajes.rule=Host(`${DOMAIN:-agencialuxviajes.com}`) || Host(`www.${DOMAIN:-agencialuxviajes.com}`)"
+      - "traefik.http.routers.luxviajes.entrypoints=websecure"
+      - "traefik.http.routers.luxviajes.tls=true"
+      - "traefik.http.routers.luxviajes.tls.certresolver=${CERT_RESOLVER:-le}"
+      - "traefik.http.services.luxviajes.loadbalancer.server.port=3000"
+
+      # Redirección HTTP -> HTTPS
+      - "traefik.http.routers.luxviajes-http.rule=Host(`${DOMAIN:-agencialuxviajes.com}`) || Host(`www.${DOMAIN:-agencialuxviajes.com}`)"
+      - "traefik.http.routers.luxviajes-http.entrypoints=web"
+      - "traefik.http.routers.luxviajes-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     healthcheck:
       test:
         [
@@ -44,31 +61,7 @@ services:
           memory: 512M
     networks:
       - luxviajes-network
-
-  # Proxy inverso Nginx (Opcional - Si no usas Nginx en el host)
-  nginx:
-    image: nginx:alpine
-    container_name: luxviajes-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-      - /var/www/certbot:/var/www/certbot:ro
-    depends_on:
-      - luxviajes-web
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    networks:
-      - luxviajes-network
-    # Descomenta para habilitar - requiere ssl y certificados
-    # profiles:
-    #   - nginx
+      - traefik-proxy
 
   # Monitoreo con Prometheus (Opcional)
   prometheus:
@@ -110,7 +103,7 @@ services:
     container_name: luxviajes-grafana
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "127.0.0.1:3200:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
@@ -125,8 +118,15 @@ services:
       - monitoring
 
 networks:
+  # Red interna compartida con el backend (backend/docker-compose.yml)
   luxviajes-network:
+    name: luxviajes-network
     driver: bridge
+
+  # Red externa de Traefik (ya existente en tu VPS)
+  traefik-proxy:
+    name: ${TRAEFIK_NETWORK:-traefik-proxy}
+    external: true
 
 volumes:
   prometheus-data:

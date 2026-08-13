@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# openssl requerido por Prisma para generar el cliente
+RUN apk add --no-cache openssl libc6-compat
+
 # Instalar pnpm
 RUN npm install -g pnpm
 
@@ -12,8 +15,20 @@ COPY package.json pnpm-lock.yaml ./
 # Instalar dependencias (incluyendo dev)
 RUN pnpm install --frozen-lockfile
 
-# Copiar todo el código fuente
+# Copiar todo el código fuente (incluye prisma/schema.prisma)
 COPY . .
+
+# Variables build-time: NEXT_PUBLIC_* se incrustan en el cliente;
+# PAYMENTS_BACKEND_URL es solo servidor (no llega al navegador)
+ARG NEXT_PUBLIC_NODE_ENV
+ARG NEXT_PUBLIC_DATAFAST_BASE_URL
+ARG PAYMENTS_BACKEND_URL
+ENV NEXT_PUBLIC_NODE_ENV=$NEXT_PUBLIC_NODE_ENV \
+    NEXT_PUBLIC_DATAFAST_BASE_URL=$NEXT_PUBLIC_DATAFAST_BASE_URL \
+    PAYMENTS_BACKEND_URL=$PAYMENTS_BACKEND_URL
+
+# Generar Prisma Client (requerido para typecheck y runtime)
+RUN pnpm exec prisma generate
 
 # Build de Next.js
 RUN pnpm build
@@ -25,17 +40,27 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# openssl requerido por el query engine de Prisma en runtime
+RUN apk add --no-cache openssl libc6-compat
+
 # Instalar pnpm
 RUN npm install -g pnpm
 
 # Crear usuario no-root (seguridad)
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
-# Copiar archivos de dependencias
-COPY --chown=nextjs:nodejs package.json pnpm-lock.yaml ./
+# Copiar archivos de dependencias y schema ANTES de instalar
+COPY package.json pnpm-lock.yaml ./
+COPY prisma ./prisma
 
-# Instalar solo dependencias de producción
-RUN pnpm install --frozen-lockfile --production
+# Instalar todas las dependencias (necesario para prisma generate)
+RUN pnpm install --frozen-lockfile
+
+# Generar Prisma Client en el runtime
+RUN pnpm exec prisma generate
+
+# Quitar dependencias de desarrollo (imagen más liviana)
+RUN pnpm prune --prod
 
 # Limpiar caché
 RUN pnpm store prune
