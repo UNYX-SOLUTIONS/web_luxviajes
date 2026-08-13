@@ -52,7 +52,7 @@ services:
       PORT: 3001
       DATABASE_URL: postgresql://${DB_USER:-luxviajes}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-luxviajes_db}?schema=public
       RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?ALLOWED_ORIGINS es requerida en .env}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS_PROD:?ALLOWED_ORIGINS_PROD es requerida en .env}
       # Datafast PRODUCCIÓN (interruptor + bloque PROD)
       DATAFAST_ENV: production
       DATAFAST_PROD_ENTITY_ID: ${DATAFAST_PROD_ENTITY_ID:?DATAFAST_PROD_ENTITY_ID es requerida en .env}
