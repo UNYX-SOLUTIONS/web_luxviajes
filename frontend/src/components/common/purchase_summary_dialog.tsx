@@ -359,7 +359,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                               IVA incluido
                             </p>
                           </div>
-                          <div className="mt-6 flex flex-row items-center justify-center gap-2 px-2">
+                          <div className="mt-6 flex flex-row items-center justify-center gap-2 px-2 mx-0">
                             {/* Un checkbox obligatoio si no no puede avanzar */}
                             <input
                               type="checkbox"
