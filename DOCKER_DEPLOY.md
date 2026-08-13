@@ -13,7 +13,7 @@
 |---------|-----------|
 | `backend/Dockerfile` | Multi-stage: builder (tsc + prisma generate) → runtime alpine sin root |
 | `backend/docker-compose.yml` | Backend + PostgreSQL (producción) |
-| `backend/.env.docker.example` | Plantilla de variables de Docker — copiar a `.env` (nunca al repo) |
+| `backend/.env` | Archivo ÚNICO de entorno (local + VPS). Lo entrega el desarrollador — nunca al repo |
 | `backend/entrypoint.sh` | Espera a PostgreSQL, aplica migraciones (`RUN_MIGRATIONS=true`) y arranca |
 | `backend/.dockerignore` | Excluye node_modules, dist, .env, tests del contexto de build |
 | `backend/scripts/deploy.sh` | Despliegue con un comando |
@@ -53,16 +53,12 @@ sudo systemctl enable --now docker
 cd /root
 git clone <URL_DEL_REPO> luxviajes
 cd luxviajes/backend
-
-# Variables de entorno REALES de Docker
-cp .env.docker.example .env
-nano .env   # ← llenar todos los valores (Datafast prod, DB_PASSWORD, URLs)
 ```
 
-Verifica que en `.env` estén:
+**El `.env` ya está listo** (archivo único por servicio, lo entrega el desarrollador). Verifica que contenga los valores de producción:
 
 ```env
-DATAFAST_ENV=production
+DATAFAST_ENV=test           # ← el compose lo fuerza a production en el VPS
 DATAFAST_PROD_ENTITY_ID=<entity id de producción>
 DATAFAST_PROD_BEARER_TOKEN=<access token de producción>
 DATAFAST_PROD_MERCHANT_ID=4100010042
@@ -167,13 +163,7 @@ docker exec traefik-xdid-traefik-1 cat /etc/traefik/traefik.yml | grep -A3 certi
 docker exec traefik-xdid-traefik-1 cat /etc/traefik/traefik.yml | grep -A2 entryPoints
 ```
 
-Ajustar en `frontend/.env` del VPS (crearlo copiando la plantilla):
-
-```bash
-cd /root/luxviajes/frontend
-cp .env.production.example .env   # docker compose lee .env automáticamente
-nano .env
-```
+Ajustar en `frontend/.env` del VPS (archivo único que entrega el desarrollador):
 
 ```env
 DOMAIN=agencialuxviajes.com
@@ -226,7 +216,7 @@ El backend publica solo `127.0.0.1:3001` (localhost del host) y PostgreSQL `127.
 
 | Síntoma | Solución |
 |---------|----------|
-| `DB_PASSWORD es requerida` | Falta la variable en `backend/.env` — copiar de `.env.docker.example` |
+| `DB_PASSWORD es requerida` | Falta la variable en `backend/.env` — pedir el archivo al desarrollador |
 | El backend reinicia en loop | `docker compose logs backend` — casi siempre es DATABASE_URL o migración pendiente |
 | `prisma migrate deploy` falla | Verificar `postgres` healthy: `docker compose ps`; revisar credenciales DB en `.env` |
 | Frontend no llega al backend | Revisar sección 6 (rewrite a `http://backend:3001` + red compartida) |

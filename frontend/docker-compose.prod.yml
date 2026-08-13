@@ -8,8 +8,10 @@ services:
       dockerfile: Dockerfile
       args:
         - NODE_ENV=production
-        - NEXT_PUBLIC_NODE_ENV=${NEXT_PUBLIC_NODE_ENV:-production}
-        - NEXT_PUBLIC_DATAFAST_BASE_URL=${NEXT_PUBLIC_DATAFAST_BASE_URL:-https://eu-prod.oppwa.com}
+        - NEXT_PUBLIC_NODE_ENV=production
+        - NEXT_PUBLIC_DATAFAST_BASE_URL=${NEXT_PUBLIC_DATAFAST_BASE_URL_PROD:-https://eu-prod.oppwa.com}
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://cms.agencialuxviajes.com/api}
+        - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-https://agencialuxviajes.com}
         - PAYMENTS_BACKEND_URL=${PAYMENTS_BACKEND_URL:-http://backend:3001}
     container_name: luxviajes-app
     restart: unless-stopped
@@ -19,6 +21,11 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - DATABASE_URL=postgresql://${DB_USER:-luxviajes}:${DB_PASSWORD:?DB_PASSWORD es requerida en .env}@postgres:5432/${DB_NAME:-luxviajes_db}?schema=public
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET es requerido en .env}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
     labels:
       - "traefik.enable=true"
 
