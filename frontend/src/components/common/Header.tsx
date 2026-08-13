@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 import {
-  UserIcon,
   ArrowRightOnRectangleIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
@@ -14,7 +13,7 @@ import { NAVIGATION_LINKS } from "@/constants";
 import { cn } from "@/utils/cn";
 import { useAuth } from "@/lib/auth-context";
 import { AuthDialog } from "@/components/auth/authdialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/auth/avatar";
+import { Avatar, AvatarFallback } from "@/components/auth/avatar";
 
 interface HeaderProps {
   activeLink?: string;
@@ -116,13 +115,9 @@ export function Header({ activeLink }: HeaderProps) {
                   className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-white/10"
                 >
                   <Avatar size="sm" variant="solid" shape="circle">
-                    {user?.fotoPerfil ? (
-                      <AvatarImage src={user.fotoPerfil} alt={user.primerNombre} />
-                    ) : (
-                      <AvatarFallback>
-                        {getUserInitials(user?.primerNombre, user?.apellido)}
-                      </AvatarFallback>
-                    )}
+                    <AvatarFallback>
+                      {getUserInitials(user?.primerNombre, user?.apellido)}
+                    </AvatarFallback>
                   </Avatar>
                   <span className="hidden text-[11px] font-medium text-[#CCC6D0] lg:inline lg:text-xs xl:text-sm">
                     {user?.primerNombre?.split(" ")[0]}
@@ -158,7 +153,7 @@ export function Header({ activeLink }: HeaderProps) {
                     <div className="py-1">
                       <Link
                         href="/profile"
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-50"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm! text-neutral-700 transition-colors hover:bg-neutral-50"
                         onClick={() => setShowUserMenu(false)}
                       >
                         <UserCircleIcon className="h-4 w-4" />
@@ -272,13 +267,9 @@ export function Header({ activeLink }: HeaderProps) {
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-3 px-4 py-2">
                       <Avatar size="sm" variant="solid" shape="circle">
-                        {user?.fotoPerfil ? (
-                          <AvatarImage src={user.fotoPerfil} alt={user?.primerNombre || ""} />
-                        ) : (
-                          <AvatarFallback>
-                            {getUserInitials(user?.primerNombre, user?.apellido)}
-                          </AvatarFallback>
-                        )}
+                        <AvatarFallback>
+                          {getUserInitials(user?.primerNombre, user?.apellido)}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-white">
@@ -291,7 +282,7 @@ export function Header({ activeLink }: HeaderProps) {
                     </div>
                     <Link
                       href="/profile"
-                      className="rounded-lg px-4 py-2 text-left font-medium text-[#CCC6D0] hover:bg-white/10 hover:text-white transition-colors"
+                      className="rounded-lg px-4 py-2 text-left font-medium! text-[#CCC6D0] hover:bg-white/10 hover:text-white transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Mi perfil

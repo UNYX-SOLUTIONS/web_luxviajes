@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   EnvelopeIcon,
@@ -26,7 +26,6 @@ interface PasswordStrength {
 }
 
 function RegisterForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = getSafeRedirect(searchParams.get("redirect"), "/");
   const { register, updateUser, isLoading, error, clearError } = useAuth();
@@ -187,7 +186,7 @@ function RegisterForm() {
     };
     updateUser(user);
     setShowVerification(false);
-    router.push(redirectTo);
+    window.location.href = redirectTo;
   };
 
   return (
