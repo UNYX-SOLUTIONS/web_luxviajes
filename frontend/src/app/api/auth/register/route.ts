@@ -33,6 +33,11 @@ export async function POST(request: Request) {
 
     const { primerNombre, apellido, email, password, telefono, cedula, direccion, pais } = parsed.data;
 
+    // Limpiar registros pendientes expirados para no bloquear el re-registro
+    await prisma.pendingRegistration.deleteMany({
+      where: { email, codeExpiresAt: { lt: new Date() } },
+    });
+
     const [existingUser, existingPending] = await Promise.all([
       prisma.user.findUnique({ where: { email }, select: { id: true } }),
       prisma.pendingRegistration.findUnique({ where: { email }, select: { id: true } }),
@@ -70,7 +75,7 @@ export async function POST(request: Request) {
       });
     }
 
-    await logSecurityEvent("REGISTER", pending.id, request, { email });
+    await logSecurityEvent("REGISTER", null, request, { email, pending: true, webhookSent: webhookOk });
 
     if (process.env.NODE_ENV === "development") {
       console.log(`[DEV] Verification code for ${email}: ${rawCode}`);
@@ -78,7 +83,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Usuario registrado. Revisa tu correo para el código de verificación.",
+      message: webhookOk
+        ? "Usuario registrado. Revisa tu correo para el código de verificación."
+        : "No pudimos enviar el correo de verificación. Usa la opción de reenviar código o intenta más tarde.",
       data: {
         email,
         code: process.env.NODE_ENV === "development" ? rawCode : undefined,

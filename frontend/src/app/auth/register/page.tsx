@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   EnvelopeIcon,
@@ -12,7 +12,9 @@ import {
   CheckCircleIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, type User } from "@/lib/auth-context";
+import { VerificationDialog } from "@/components/auth/VerificationDialog";
+import { getSafeRedirect, preserveRedirectParam } from "@/utils/redirect";
 
 interface PasswordStrength {
   length: boolean;
@@ -22,9 +24,14 @@ interface PasswordStrength {
   special: boolean;
 }
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
-  const { register, isLoading, error, clearError } = useAuth();
+  const searchParams = useSearchParams();
+  const redirectTo = getSafeRedirect(searchParams.get("redirect"), "/");
+  const { register, updateUser, isLoading, error, clearError } = useAuth();
+
+  const [showVerification, setShowVerification] = useState(false);
+  const [verifyEmail, setVerifyEmail] = useState("");
 
   const [formData, setFormData] = useState({
     primerNombre: "",
@@ -149,17 +156,36 @@ export default function RegisterPage() {
     }
 
     try {
-      await register(
+      const result = await register(
         formData.email,
         formData.primerNombre,
         formData.apellido,
         formData.password,
         formData.confirmPassword,
       );
-      router.push("/");
+      setVerifyEmail(result.email);
+      setShowVerification(true);
     } catch (err) {
       // Register error
     }
+  };
+
+  const handleVerified = (verifiedUser: {
+    id: string;
+    nombre?: string;
+    email: string;
+  }) => {
+    const user: User = {
+      id: verifiedUser.id,
+      primerNombre: formData.primerNombre.trim(),
+      apellido: formData.apellido.trim(),
+      email: verifiedUser.email,
+      rol: "USER",
+      fotoPerfil: null,
+    };
+    updateUser(user);
+    setShowVerification(false);
+    router.push(redirectTo);
   };
 
   return (
@@ -488,7 +514,7 @@ export default function RegisterPage() {
             <p className="text-sm text-neutral-600">
               ¿Ya tienes cuenta?{" "}
               <Link
-                href="/auth/login"
+                href={preserveRedirectParam(searchParams, "/auth/login")}
                 className="font-semibold text-primary-700 hover:text-primary-800 transition-colors"
               >
                 Inicia sesión
@@ -546,6 +572,21 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
+      {showVerification && verifyEmail && (
+        <VerificationDialog
+          email={verifyEmail}
+          onVerified={handleVerified}
+          onCancel={() => setShowVerification(false)}
+        />
+      )}
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
   );
 }

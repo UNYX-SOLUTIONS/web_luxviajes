@@ -27,7 +27,9 @@ export async function sendVerificationWebhook(
       code,
     };
 
-    console.log(`[Webhook] Sending:`, JSON.stringify(payload));
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[Webhook] Sending:`, JSON.stringify(payload));
+    }
 
     const response = await fetch(WEBHOOK_URL, {
       method: "POST",
@@ -39,7 +41,9 @@ export async function sendVerificationWebhook(
     clearTimeout(timeout);
 
     const responseBody = await response.text();
-    console.log(`[Webhook] Response ${response.status}: ${responseBody}`);
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`[Webhook] Response ${response.status}: ${responseBody}`);
+    }
 
     if (!response.ok) {
       return false;

@@ -15,7 +15,7 @@
     "moduleResolution": "node16",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "types": ["node"],
+    "types": ["node", "jest"],
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,

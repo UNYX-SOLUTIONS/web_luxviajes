@@ -19,6 +19,8 @@ export const registerSchema = z.object({
     ),
   email: z
     .string()
+    .trim()
+    .toLowerCase()
     .email("Ingresa un correo electrónico válido")
     .max(100, "El correo no puede exceder 100 caracteres"),
   password: z
@@ -55,7 +57,7 @@ export const registerSchema = z.object({
 export type RegisterInput = z.infer<typeof registerSchema>;
 
 export const loginSchema = z.object({
-  email: z.string().email("Ingresa un correo electrónico válido"),
+  email: z.string().trim().toLowerCase().email("Ingresa un correo electrónico válido"),
   password: z.string().min(1, "La contraseña es requerida"),
 });
 

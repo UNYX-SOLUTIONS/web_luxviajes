@@ -14,15 +14,20 @@ export interface DatafastConfig {
 export const datafastConfig: DatafastConfig = {
   entityId: process.env.DATAFAST_ENTITY_ID!,
   bearerToken: process.env.DATAFAST_BEARER_TOKEN!,
-  baseUrl: process.env.NODE_ENV === 'production'
-    ? 'https://eu-prod.oppwa.com'
-    : 'https://eu-test.oppwa.com',
+  baseUrl: process.env.DATAFAST_BASE_URL
+    || (process.env.NODE_ENV === 'production'
+      ? 'https://eu-prod.oppwa.com'
+      : 'https://eu-test.oppwa.com'),
   merchantId: process.env.DATAFAST_MERCHANT_ID!,
   terminalId: process.env.DATAFAST_TERMINAL_ID!,
   shopperResultUrl: process.env.DATAFAST_SHOPPER_RESULT_URL!,
   timeout: parseInt(process.env.DATAFAST_TIMEOUT || '30000'),
   retryAttempts: parseInt(process.env.DATAFAST_RETRY_ATTEMPTS || '3'),
 };
+
+// Modo de pruebas: SOLO se activa si la env var DATAFAST_TEST_MODE=true
+// En producción debe estar ausente o en false (instrucción #2 de Datafast)
+export const DATAFAST_TEST_MODE_ENABLED = process.env.DATAFAST_TEST_MODE === 'true';
 
 // Códigos de Datafast (fijos)
 export const DATAFAST_CONSTANTS = {

@@ -2,6 +2,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   XMarkIcon,
@@ -19,6 +20,11 @@ import {
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { useHelpData } from "@/hooks";
 import { useAuth } from "@/lib/auth-context";
+import {
+  savePendingPurchase,
+  clearPendingPurchase,
+} from "@/utils/purchase-intent";
+import { buildAuthHref } from "@/utils/redirect";
 import {
   getEnabledCreditTypes,
   getInstallmentOptions,
@@ -72,12 +78,23 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
 }) => {
   const { data: helpData } = useHelpData();
   const { isAuthenticated, user } = useAuth();
+  const pathname = usePathname();
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
 
   const handleContinueToForm = () => {
     if (!isAuthenticated) {
+      savePendingPurchase({
+        id: service.id,
+        documentId: String(service.id),
+        name: service.name,
+        type: service.type,
+        price: service.price,
+        validity: service.validity,
+        processing: service.processing,
+        includes: service.includes,
+      });
       setShowAuthGate(true);
       return;
     }
@@ -229,20 +246,23 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                       </p>
                       <div className="mt-6 space-y-3">
                         <a
-                          href="/auth/register"
+                          href={buildAuthHref("/auth/register", pathname)}
                           className="block w-full bg-primary-700 hover:bg-primary-800 text-white font-semibold py-3 rounded-xl transition text-center"
                         >
                           Registrarse
                         </a>
                         <a
-                          href="/auth/login"
+                          href={buildAuthHref("/auth/login", pathname)}
                           className="block w-full border border-primary-300 text-primary-700 font-semibold py-3 rounded-xl hover:bg-primary-50 transition text-center"
                         >
                           Iniciar sesión
                         </a>
                       </div>
                       <button
-                        onClick={() => setShowAuthGate(false)}
+                        onClick={() => {
+                          clearPendingPurchase();
+                          setShowAuthGate(false);
+                        }}
                         className="mt-5! text-sm text-neutral-500 hover:text-neutral-700"
                       >
                         Cancelar

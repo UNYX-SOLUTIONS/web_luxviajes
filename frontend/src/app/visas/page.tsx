@@ -19,6 +19,11 @@ import {
 } from "@/components/common/AppointmentBase";
 import { usePurchaseDialog } from "@/hooks/usePurchaseDialog";
 import { PurchaseSummaryDialog } from "@/components/common/purchase_summary_dialog";
+import { useAuth } from "@/lib/auth-context";
+import {
+  loadPendingPurchase,
+  clearPendingPurchase,
+} from "@/utils/purchase-intent";
 
 const steps = [
   {
@@ -46,6 +51,7 @@ export default function VisasPage() {
   const [showRequirementsDialog, setShowRequirementsDialog] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const { data: visasPageData, loading, error: visasError } = useVisasData();
+  const { isAuthenticated } = useAuth();
 
   const {
     isOpen: isPurchaseDialogOpen,
@@ -56,6 +62,15 @@ export default function VisasPage() {
     closeDialog: closePurchaseDialog,
     handlePay: handlePurchasePay,
   } = usePurchaseDialog();
+
+  // Reanudar compra pendiente tras iniciar sesión/registrarse
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const pending = loadPendingPurchase();
+    if (!pending) return;
+    clearPendingPurchase();
+    openPurchaseDialog(pending);
+  }, [isAuthenticated, openPurchaseDialog]);
 
   // Estado para el newsletter
   const [newsletterEmail, setNewsletterEmail] = useState("");

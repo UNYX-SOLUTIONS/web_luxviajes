@@ -5,6 +5,12 @@ import { prisma } from '../../src/config/database';
 jest.mock('../../src/services/datafast/datafast.service');
 jest.mock('../../src/config/database', () => ({
   prisma: {
+    customer: {
+      findUnique: jest.fn().mockResolvedValue(null),
+      create: jest.fn().mockResolvedValue({ id: 'CUST_001' }),
+      update: jest.fn().mockResolvedValue({ id: 'CUST_001' }),
+      upsert: jest.fn().mockResolvedValue({ id: 'CUST_001' }),
+    },
     transaction: {
       create: jest.fn(),
       update: jest.fn(),

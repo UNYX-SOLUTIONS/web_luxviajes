@@ -3,8 +3,26 @@ import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
-const JWT_SECRET = process.env.JWT_SECRET || "default-secret-change-me";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
+
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret || secret === "default-secret-change-me") {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("JWT_SECRET no está configurado en producción");
+    }
+    return "lux-viajes-dev-secret-not-for-production";
+  }
+  return secret;
+}
+
+function expiresInToSeconds(expiresIn: string): number {
+  const match = /^(\d+)(s|m|h|d)$/.exec(expiresIn);
+  if (!match) return 60 * 60 * 24 * 7;
+  const n = parseInt(match[1], 10);
+  const multipliers: Record<string, number> = { s: 1, m: 60, h: 3600, d: 86400 };
+  return n * multipliers[match[2]];
+}
 
 const COOKIE_NAME = "lux_viajes_token";
 
@@ -30,14 +48,14 @@ export async function comparePassword(
 }
 
 export function generateToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, {
+  return jwt.sign(payload, getJwtSecret(), {
     expiresIn: JWT_EXPIRES_IN,
   } as jwt.SignOptions);
 }
 
 export function verifyToken(token: string): JWTPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload;
+    return jwt.verify(token, getJwtSecret()) as JWTPayload;
   } catch {
     return null;
   }
@@ -49,7 +67,7 @@ export async function setAuthCookie(token: string): Promise<void> {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 60 * 60 * 24 * 7,
+    maxAge: expiresInToSeconds(JWT_EXPIRES_IN),
     path: "/",
   });
 }

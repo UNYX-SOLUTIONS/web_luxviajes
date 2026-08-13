@@ -6,7 +6,7 @@ import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
 import { sendVerificationWebhook } from "@/lib/webhook";
 import bcrypt from "bcryptjs";
 
-const resendCodeSchema = z.object({ email: z.string().email() });
+const resendCodeSchema = z.object({ email: z.string().trim().toLowerCase().email() });
 
 function generateCode(): string {
   const arr = new Uint8Array(3);

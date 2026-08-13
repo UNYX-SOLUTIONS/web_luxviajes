@@ -34,7 +34,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push("/auth/login");
+      router.push("/auth/login?redirect=/profile");
       return;
     }
     loadProfile();

@@ -42,7 +42,19 @@ export function rateLimit(
 export function getRateLimitKey(request: Request, prefix: string): string {
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "127.0.0.1";
-  return `${prefix}:${ip}`;
+    request.headers.get("x-real-ip")?.trim();
+
+  if (ip) {
+    return `${prefix}:${ip}`;
+  }
+
+  // Sin cabeceras de IP: evitar un bucket compartido "127.0.0.1"
+  // derivando una clave del User-Agent.
+  const ua = request.headers.get("user-agent") || "unknown";
+  let hash = 0;
+  for (let i = 0; i < ua.length; i++) {
+    hash = (hash << 5) - hash + ua.charCodeAt(i);
+    hash |= 0;
+  }
+  return `${prefix}:ua-${hash}`;
 }

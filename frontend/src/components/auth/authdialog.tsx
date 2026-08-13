@@ -11,7 +11,7 @@ import {
   XCircleIcon,
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, type User } from "@/lib/auth-context";
 import { VerificationDialog } from "@/components/auth/VerificationDialog";
 
 interface AuthDialogProps {
@@ -20,7 +20,7 @@ interface AuthDialogProps {
 
 export function AuthDialog({ onClose }: AuthDialogProps) {
   const [mode, setMode] = useState<"login" | "register">("login");
-  const { login, register, verifyCode, isLoading, error, clearError } = useAuth();
+  const { login, register, updateUser, isLoading, error, clearError } = useAuth();
   const [showVerification, setShowVerification] = useState(false);
   const [verifyEmail, setVerifyEmail] = useState("");
 
@@ -96,8 +96,6 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
 
     if (!formData.password) {
       errors.password = "Contraseña es requerida";
-    } else if (formData.password.length < 8) {
-      errors.password = "La contraseña debe tener al menos 8 caracteres";
     }
 
     setValidationErrors(errors);
@@ -159,9 +157,6 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
       try {
         await login(formData.email, formData.password);
         onClose();
-        setTimeout(() => {
-          window.location.reload();
-        }, 500);
       } catch (err) {
         // Error manejado por el contexto
       }
@@ -552,7 +547,19 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
       {showVerification && verifyEmail && (
         <VerificationDialog
           email={verifyEmail}
-          onVerified={() => { setShowVerification(false); onClose(); setTimeout(() => window.location.reload(), 500); }}
+          onVerified={(verifiedUser) => {
+            const user: User = {
+              id: verifiedUser.id,
+              primerNombre: formData.primerNombre.trim(),
+              apellido: formData.apellido.trim(),
+              email: verifiedUser.email,
+              rol: "USER",
+              fotoPerfil: null,
+            };
+            updateUser(user);
+            setShowVerification(false);
+            onClose();
+          }}
           onCancel={() => { setShowVerification(false); }}
         />
       )}

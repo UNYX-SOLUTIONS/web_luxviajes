@@ -1,5 +1,5 @@
 import { DatafastClient } from './datafast.client';
-import { datafastConfig, DATAFAST_CONSTANTS } from '../../config/datafast';
+import { datafastConfig, DATAFAST_CONSTANTS, DATAFAST_TEST_MODE_ENABLED } from '../../config/datafast';
 import { logger } from '../../config/logger';
 import { 
   ICreateCheckoutRequest, 
@@ -95,8 +95,8 @@ export class DatafastService {
     // Merchant Transaction ID (único por transacción)
     params.append('merchantTransactionId', data.merchantTransactionId);
     
-    // Test mode (solo en desarrollo)
-    if (process.env.NODE_ENV !== 'production') {
+    // Test mode (SOLO si DATAFAST_TEST_MODE=true en el .env; nunca en producción)
+    if (DATAFAST_TEST_MODE_ENABLED) {
       params.append('testMode', 'EXTERNAL');
     }
     
@@ -233,8 +233,8 @@ export class DatafastService {
     params.append('customParameters[SHOPPER_PSERV]', DATAFAST_CONSTANTS.PSERV);
     params.append('customParameters[SHOPPER_VERSIONDF]', DATAFAST_CONSTANTS.VERSION);
     
-    // Test mode
-    if (process.env.NODE_ENV !== 'production') {
+    // Test mode (SOLO si DATAFAST_TEST_MODE=true en el .env; nunca en producción)
+    if (DATAFAST_TEST_MODE_ENABLED) {
       params.append('testMode', 'EXTERNAL');
     }
     

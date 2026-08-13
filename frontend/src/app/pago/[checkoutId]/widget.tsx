@@ -19,7 +19,10 @@ interface WpwlOptions {
 }
 
 const DATAFAST_BASE_URL =
-  process.env.NEXT_PUBLIC_DATAFAST_BASE_URL || "https://eu-test.oppwa.com";
+  process.env.NEXT_PUBLIC_DATAFAST_BASE_URL ||
+  (process.env.NEXT_PUBLIC_NODE_ENV === "production"
+    ? "https://eu-prod.oppwa.com"
+    : "https://eu-test.oppwa.com");
 const SUPPORTED_BRANDS = "VISA MASTERCARD AMEX DINERS DISCOVER";
 const WIDGET_TIMEOUT_MS = 20000;
 const WIDGET_POLL_MS = 300;
@@ -35,12 +38,24 @@ function injectCustomFields(): void {
 
   if (!formCard) return;
 
+  if (formCard.querySelector('[data-verified-logo]')) return;
+
   const logoDiv = document.createElement("div");
+  logoDiv.setAttribute("data-verified-logo", "true");
   logoDiv.style.textAlign = "center";
   logoDiv.style.marginTop = "16px";
   logoDiv.innerHTML =
     '<img src="https://www.datafast.com.ec/images/verified.png" style="max-width:300px;width:100%;display:block;margin:0 auto" alt="Powered by Datafast" loading="lazy" />';
-  formCard.appendChild(logoDiv);
+
+  // Insertar antes del botón de pago (requisito de certificación Datafast)
+  const payButton =
+    formCard.querySelector(".wpwl-button") ||
+    formCard.querySelector("button[type=submit]");
+  if (payButton && payButton.parentNode) {
+    payButton.parentNode.insertBefore(logoDiv, payButton);
+  } else {
+    formCard.appendChild(logoDiv);
+  }
 }
 
 /** Detecta si Datafast inyectó su propio error HTML dentro del form */

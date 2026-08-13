@@ -8,7 +8,7 @@ import React, {
   useEffect,
 } from "react";
 
-interface User {
+export interface User {
   id: string;
   primerNombre: string;
   apellido: string;

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   EnvelopeIcon,
@@ -11,9 +11,12 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "@/lib/auth-context";
+import { getSafeRedirect, preserveRedirectParam } from "@/utils/redirect";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = getSafeRedirect(searchParams.get("redirect"), "/");
   const { login, isLoading, error, clearError } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -56,8 +59,6 @@ export default function LoginPage() {
 
     if (!formData.password) {
       errors.password = "Contraseña es requerida";
-    } else if (formData.password.length < 8) {
-      errors.password = "La contraseña debe tener al menos 8 caracteres";
     }
 
     setValidationErrors(errors);
@@ -74,7 +75,7 @@ export default function LoginPage() {
 
     try {
       await login(formData.email, formData.password);
-      router.push("/");
+      router.push(redirectTo);
     } catch (err) {
       // Login error
     }
@@ -146,7 +147,10 @@ export default function LoginPage() {
                   Contraseña
                 </label>
                 <Link
-                  href="/auth/forgot-password"
+                  href={preserveRedirectParam(
+                    searchParams,
+                    "/auth/forgot-password",
+                  )}
                   className="text-xs text-primary-600 hover:text-primary-700 font-medium transition-colors"
                 >
                   ¿Olvidaste tu contraseña?
@@ -244,7 +248,7 @@ export default function LoginPage() {
             <p className="text-sm text-neutral-600">
               ¿No tienes cuenta?{" "}
               <Link
-                href="/auth/register"
+                href={preserveRedirectParam(searchParams, "/auth/register")}
                 className="font-semibold text-primary-700 hover:text-primary-800 transition-colors"
               >
                 Regístrate aquí
@@ -297,5 +301,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

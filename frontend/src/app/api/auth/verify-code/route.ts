@@ -5,10 +5,11 @@ import { z } from "zod";
 import { treeifyError } from "zod/v4/core";
 import { rateLimit, getRateLimitKey } from "@/lib/rate-limit";
 import { logSecurityEvent } from "@/lib/security-logger";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import bcrypt from "bcryptjs";
 
 const verifyCodeSchema = z.object({
-  email: z.string().email(),
+  email: z.string().trim().toLowerCase().email(),
   code: z.string().length(6).regex(/^\d{6}$/, "El código debe ser 6 dígitos"),
 });
 
@@ -57,28 +58,38 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    const user = await prisma.user.create({
-      data: {
-        primerNombre: pending.primerNombre,
-        apellido: pending.apellido,
-        email: pending.email,
-        password: pending.password,
-        telefono: pending.telefono,
-        cedula: pending.cedula,
-        direccion: pending.direccion,
-        pais: pending.pais || "EC",
-        emailVerificado: true,
-        emailVerifiedAt: new Date(),
-      },
-      select: { id: true, primerNombre: true, apellido: true, email: true, rol: true, telefono: true, cedula: true, tokenVersion: true },
-    });
+    let user;
+    try {
+      user = await prisma.user.create({
+        data: {
+          primerNombre: pending.primerNombre,
+          apellido: pending.apellido,
+          email: pending.email,
+          password: pending.password,
+          telefono: pending.telefono,
+          cedula: pending.cedula,
+          direccion: pending.direccion,
+          pais: pending.pais || "EC",
+          emailVerificado: true,
+          emailVerifiedAt: new Date(),
+        },
+        select: { id: true, primerNombre: true, apellido: true, email: true, rol: true, telefono: true, cedula: true, fotoPerfil: true, tokenVersion: true },
+      });
+    } catch (error) {
+      // Condición de carrera: otra petición verificó el mismo código
+      // y ya creó el usuario. Recuperar el usuario existente.
+      if (error instanceof PrismaClientKnownRequestError && error.code === "P2002") {
+        user = await prisma.user.findUnique({
+          where: { email: pending.email },
+          select: { id: true, primerNombre: true, apellido: true, email: true, rol: true, telefono: true, cedula: true, fotoPerfil: true, tokenVersion: true },
+        });
+        if (!user) throw error;
+      } else {
+        throw error;
+      }
+    }
 
-    await prisma.pendingRegistration.update({
-      where: { id: pending.id },
-      data: { verifiedAt: new Date() },
-    });
-
-    await prisma.pendingRegistration.delete({ where: { id: pending.id } });
+    await prisma.pendingRegistration.deleteMany({ where: { id: pending.id } });
 
     await logSecurityEvent("REGISTER", user.id, request, { email, verified: true });
 
@@ -95,7 +106,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       message: "Email verificado exitosamente.",
-      user: { id: user.id, primerNombre: user.primerNombre, apellido: user.apellido, email: user.email, rol: user.rol, telefono: user.telefono, cedula: user.cedula },
+      user: { id: user.id, primerNombre: user.primerNombre, apellido: user.apellido, email: user.email, rol: user.rol, telefono: user.telefono, cedula: user.cedula, fotoPerfil: user.fotoPerfil },
     });
   } catch (error) {
     console.error("Error en verificación:", error);

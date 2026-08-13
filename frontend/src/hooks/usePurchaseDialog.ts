@@ -3,7 +3,7 @@ import { useDatafastPayment } from "./useDatafastPayment";
 import { useAuth } from "@/lib/auth-context";
 
 interface ServiceData {
-  id: number;
+  id: string | number;
   documentId: string;
   name: string;
   type: string;
