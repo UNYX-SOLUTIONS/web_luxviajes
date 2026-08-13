@@ -7,6 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { ICreateCheckoutRequest, ITokenPaymentRequest, IPaymentStatusResponse } from '../../services/datafast/types/datafast.types';
 import { StatusMapper } from '../../services/datafast/types/datafast.types';
 
+const SCRIPT_TEST_LOGS_ENABLED = process.env.NODE_ENV !== 'production';
+
 interface CreateCheckoutInput {
   amount: number;
   customer: ICreateCheckoutRequest['customer'];
@@ -83,24 +85,26 @@ export class PaymentService {
       });
 
       // ===== LOG SCRIPT DE PRUEBAS: CHECKOUT =====
-      console.log('\n📊 ===== DATOS PARA SCRIPT DE PRUEBAS (CHECKOUT) =====');
-      console.log(`📌 CustomerId: ${data.customer.merchantCustomerId}`);
-      console.log(`📌 ID (checkoutId): ${checkoutResponse.id}`);
-      console.log(`📌 Meses Plazo: ${data.installments || 0}`);
-      console.log(`📌 Tipo Transacción: En Línea`);
-      console.log(`📌 Tarjeta: **** (usar la de prueba de Datafast)`);
-      console.log(`📌 Referencia: ${merchantTransactionId}`);
-      console.log(`📌 Valor: ${data.amount.toFixed(2)}`);
-      console.log(`📌 Base 0: ${data.taxes.base0.toFixed(2)}`);
-      console.log(`📌 Base 12: ${data.taxes.baseImp.toFixed(2)}`);
-      console.log(`📌 IVA: ${data.taxes.iva.toFixed(2)}`);
-      console.log(`📌 Servicio: ${data.amount.toFixed(2)}`);
-      console.log(`📌 Interés: 0`);
-      console.log(`📌 Monto Fijo: 0.00`);
-      console.log(`📌 Propina: 0.00`);
-      console.log(`📌 Gran Total: ${data.amount.toFixed(2)}`);
-      console.log(`📌 Tipo de Crédito: ${data.creditType || '00'}`);
-      console.log('============================================\n');
+      if (SCRIPT_TEST_LOGS_ENABLED) {
+        console.log('\n📊 ===== DATOS PARA SCRIPT DE PRUEBAS (CHECKOUT) =====');
+        console.log(`📌 CustomerId: ${data.customer.merchantCustomerId}`);
+        console.log(`📌 ID (checkoutId): ${checkoutResponse.id}`);
+        console.log(`📌 Meses Plazo: ${data.installments || 0}`);
+        console.log(`📌 Tipo Transacción: En Línea`);
+        console.log(`📌 Tarjeta: **** (usar la de prueba de Datafast)`);
+        console.log(`📌 Referencia: ${merchantTransactionId}`);
+        console.log(`📌 Valor: ${data.amount.toFixed(2)}`);
+        console.log(`📌 Base 0: ${data.taxes.base0.toFixed(2)}`);
+        console.log(`📌 Base 12: ${data.taxes.baseImp.toFixed(2)}`);
+        console.log(`📌 IVA: ${data.taxes.iva.toFixed(2)}`);
+        console.log(`📌 Servicio: ${data.amount.toFixed(2)}`);
+        console.log(`📌 Interés: 0`);
+        console.log(`📌 Monto Fijo: 0.00`);
+        console.log(`📌 Propina: 0.00`);
+        console.log(`📌 Gran Total: ${data.amount.toFixed(2)}`);
+        console.log(`📌 Tipo de Crédito: ${data.creditType || '00'}`);
+        console.log('============================================\n');
+      }
 
       return {
         checkoutId: checkoutResponse.id,
@@ -158,13 +162,15 @@ export class PaymentService {
     }
 
     // ===== LOG SCRIPT DE PRUEBAS: STATUS =====
-    console.log('\n📊 ===== RESULTADO TRANSACCIÓN (STATUS) =====');
-    console.log(`📌 ID (paymentId): ${paymentData.id}`);
-    console.log(`📌 Lote: ${(paymentData.resultDetails as any)?.ReferenceNbr || 'N/A'}`);
-    console.log(`📌 Autorización: ${(paymentData.resultDetails as any)?.AuthCode || 'N/A'}`);
-    console.log(`📌 Código: ${paymentData.result?.code}`);
-    console.log(`📌 Descripción: ${paymentData.result?.description}`);
-    console.log('============================================\n');
+    if (SCRIPT_TEST_LOGS_ENABLED) {
+      console.log('\n📊 ===== RESULTADO TRANSACCIÓN (STATUS) =====');
+      console.log(`📌 ID (paymentId): ${paymentData.id}`);
+      console.log(`📌 Lote: ${(paymentData.resultDetails as any)?.ReferenceNbr || 'N/A'}`);
+      console.log(`📌 Autorización: ${(paymentData.resultDetails as any)?.AuthCode || 'N/A'}`);
+      console.log(`📌 Código: ${paymentData.result?.code}`);
+      console.log(`📌 Descripción: ${paymentData.result?.description}`);
+      console.log('============================================\n');
+    }
 
     return paymentData;
   }
@@ -206,12 +212,14 @@ export class PaymentService {
     }
 
     // ===== LOG SCRIPT DE PRUEBAS: ANULACIÓN =====
-    console.log('\n📊 ===== DATOS PARA SCRIPT DE PRUEBAS (ANULACIÓN) =====');
-    console.log(`📌 ID (refund): ${refundResponse.id}`);
-    console.log(`📌 Referencia Anulación: ${refundData.merchantTransactionId}`);
-    console.log(`📌 Referencia Original: ${transaction.merchantTransactionId}`);
-    console.log(`📌 Gran Total (anulación): ${data.amount.toFixed(2)}`);
-    console.log('==================================================\n');
+    if (SCRIPT_TEST_LOGS_ENABLED) {
+      console.log('\n📊 ===== DATOS PARA SCRIPT DE PRUEBAS (ANULACIÓN) =====');
+      console.log(`📌 ID (refund): ${refundResponse.id}`);
+      console.log(`📌 Referencia Anulación: ${refundData.merchantTransactionId}`);
+      console.log(`📌 Referencia Original: ${transaction.merchantTransactionId}`);
+      console.log(`📌 Gran Total (anulación): ${data.amount.toFixed(2)}`);
+      console.log('==================================================\n');
+    }
 
     return refundResponse;
   }

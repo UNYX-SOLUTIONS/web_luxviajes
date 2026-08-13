@@ -11,6 +11,8 @@ import {
   ITokenPaymentResponse
 } from './types/datafast.types';
 
+const SCRIPT_TEST_LOGS_ENABLED = process.env.NODE_ENV !== 'production';
+
 export class DatafastService {
   private client: DatafastClient;
 
@@ -112,9 +114,11 @@ export class DatafastService {
     
     try {
       // ===== LOG SCRIPT DE PRUEBAS: PAYLOAD =====
-      console.log('\n📦 ===== PAYLOAD ENVIADO A DATAFAST (CHECKOUT) =====');
-      console.log(params.toString());
-      console.log('=================================================\n');
+      if (SCRIPT_TEST_LOGS_ENABLED) {
+        console.log('\n📦 ===== PAYLOAD ENVIADO A DATAFAST (CHECKOUT) =====');
+        console.log(params.toString());
+        console.log('=================================================\n');
+      }
 
       const response = await this.client.post<ICreateCheckoutResponse>(
         url,
@@ -182,9 +186,11 @@ export class DatafastService {
     
     try {
       // ===== LOG SCRIPT DE PRUEBAS: PAYLOAD ANULACIÓN =====
-      console.log('\n📦 ===== PAYLOAD ENVIADO A DATAFAST (ANULACIÓN) =====');
-      console.log(params.toString());
-      console.log('===================================================\n');
+      if (SCRIPT_TEST_LOGS_ENABLED) {
+        console.log('\n📦 ===== PAYLOAD ENVIADO A DATAFAST (ANULACIÓN) =====');
+        console.log(params.toString());
+        console.log('===================================================\n');
+      }
 
       const response = await this.client.post<IRefundResponse>(
         url,
