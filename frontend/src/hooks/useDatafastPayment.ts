@@ -47,13 +47,13 @@ export function useDatafastPayment() {
     setError(null);
 
     try {
-      let clientIp = "127.0.0.1";
+      let clientIp = "";
       try {
         const ipResponse = await fetch("https://api.ipify.org?format=json");
         const ipData = await ipResponse.json();
-        clientIp = ipData.ip || "127.0.0.1";
+        clientIp = ipData.ip || "";
       } catch {
-        // usar localhost si falla
+        // si falla, el backend usa req.ip como respaldo
       }
 
       const taxRate = 0.15;

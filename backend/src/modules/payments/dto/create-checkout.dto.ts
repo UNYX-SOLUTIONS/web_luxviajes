@@ -41,6 +41,10 @@ class CustomerDto {
   @MinLength(7)
   @MaxLength(25)
   phone: string;
+
+  @IsOptional()
+  @IsString()
+  ip?: string;
 }
 
 class BillingDto {
