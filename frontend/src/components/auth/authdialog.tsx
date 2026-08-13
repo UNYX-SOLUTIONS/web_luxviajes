@@ -12,6 +12,7 @@ import {
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth, type User } from "@/lib/auth-context";
+import { useHelpData } from "@/hooks";
 import { VerificationDialog } from "@/components/auth/VerificationDialog";
 
 interface AuthDialogProps {
@@ -21,6 +22,7 @@ interface AuthDialogProps {
 export function AuthDialog({ onClose }: AuthDialogProps) {
   const [mode, setMode] = useState<"login" | "register">("login");
   const { login, register, updateUser, isLoading, error, clearError } = useAuth();
+  const { data: helpData } = useHelpData();
   const [showVerification, setShowVerification] = useState(false);
   const [verifyEmail, setVerifyEmail] = useState("");
 
@@ -448,17 +450,28 @@ export function AuthDialog({ onClose }: AuthDialogProps) {
                     checked={formData.acceptTerms}
                     onChange={handleChange}
                     disabled={isLoading}
-                    className="mt-1 h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+                    className="mt-1 h-4 w-4 rounded border-neutral-300 text-primary-700 focus:ring-primary-500 accent-primary-700"
                   />
                   <label htmlFor="acceptTerms" className="text-xs text-neutral-600">
-                    Acepto los{" "}
-                    <a href="/terminos" className="text-primary-600 hover:text-primary-700 font-medium">
-                      Términos y Condiciones
-                    </a>{" "}
-                    y la{" "}
-                    <a href="/privacidad" className="text-primary-600 hover:text-primary-700 font-medium">
-                      Política de Privacidad
+                    Confirmo que he leído las{" "}
+                    <a
+                      href={helpData?.pdfPoliticasPrivacidad || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary-700 hover:underline"
+                    >
+                      políticas de privacidad{" "}
                     </a>
+                    y los{" "}
+                    <a
+                      href={helpData?.pdfPoliticasUsoWeb || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary-700 hover:underline"
+                    >
+                      terminos y condiciones del uso de la plataforma
+                    </a>
+                    .
                   </label>
                 </div>
               )}

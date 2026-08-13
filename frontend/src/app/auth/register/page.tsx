@@ -13,6 +13,7 @@ import {
   XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth, type User } from "@/lib/auth-context";
+import { useHelpData } from "@/hooks";
 import { VerificationDialog } from "@/components/auth/VerificationDialog";
 import { getSafeRedirect, preserveRedirectParam } from "@/utils/redirect";
 
@@ -29,6 +30,7 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const redirectTo = getSafeRedirect(searchParams.get("redirect"), "/");
   const { register, updateUser, isLoading, error, clearError } = useAuth();
+  const { data: helpData } = useHelpData();
 
   const [showVerification, setShowVerification] = useState(false);
   const [verifyEmail, setVerifyEmail] = useState("");
@@ -447,23 +449,28 @@ function RegisterForm() {
                 checked={formData.acceptTerms}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="mt-1 h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+                className="mt-1 h-4 w-4 rounded border-neutral-300 text-primary-700 focus:ring-primary-500 accent-primary-700"
               />
               <label htmlFor="acceptTerms" className="text-xs text-neutral-600">
-                Acepto los{" "}
-                <Link
-                  href="/terminos"
-                  className="text-primary-600 hover:text-primary-700 font-medium"
+                Confirmo que he leído las{" "}
+                <a
+                  href={helpData?.pdfPoliticasPrivacidad || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-700 hover:underline"
                 >
-                  Términos y Condiciones
-                </Link>{" "}
-                y la{" "}
-                <Link
-                  href="/privacidad"
-                  className="text-primary-600 hover:text-primary-700 font-medium"
+                  políticas de privacidad{" "}
+                </a>
+                y los{" "}
+                <a
+                  href={helpData?.pdfPoliticasUsoWeb || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-700 hover:underline"
                 >
-                  Política de Privacidad
-                </Link>
+                  terminos y condiciones del uso de la plataforma
+                </a>
+                .
               </label>
             </div>
             {validationErrors.acceptTerms && (
