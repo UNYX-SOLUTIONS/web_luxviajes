@@ -60,15 +60,17 @@ nano .env   # ← llenar todos los valores (Datafast prod, DB_PASSWORD, URLs)
 Verifica que en `.env` estén:
 
 ```env
-DATAFAST_ENTITY_ID=<entity id de producción>
-DATAFAST_BEARER_TOKEN=<access token de producción>
-DATAFAST_MERCHANT_ID=4100010042
-DATAFAST_TERMINAL_ID=BP467901
-DATAFAST_BASE_URL=<URL de producción indicada por Datafast>
-DATAFAST_SHOPPER_RESULT_URL=https://luxviajes.com/pago/resultado
+DATAFAST_ENV=production
+DATAFAST_PROD_ENTITY_ID=<entity id de producción>
+DATAFAST_PROD_BEARER_TOKEN=<access token de producción>
+DATAFAST_PROD_MERCHANT_ID=4100010042
+DATAFAST_PROD_TERMINAL_ID=BP467901
+DATAFAST_PROD_BASE_URL=https://eu-prod.oppwa.com
+DATAFAST_PROD_SHOPPER_RESULT_URL=https://luxviajes.com/pago/resultado
 ALLOWED_ORIGINS=https://luxviajes.com
-# SIN DATAFAST_TEST_MODE
 ```
+
+> Con `DATAFAST_ENV=production`, el `testMode` nunca se envía y se leen únicamente las variables `DATAFAST_PROD_*`. En desarrollo local basta cambiar `DATAFAST_ENV=test` y el bloque `DATAFAST_TEST_*`.
 
 ### 3.3 Primer despliegue
 
@@ -137,13 +139,19 @@ El contenedor nuevo aplica migraciones al iniciar (si `RUN_MIGRATIONS=true`). Co
 
 ## 6. Conexión con el frontend dockerizado
 
-Los contenedores del frontend y backend deben estar en la misma red `luxviajes-network`. El proxy del frontend (`next.config.ts`) apunta a `http://localhost:3001`, que **no resuelve** dentro del contenedor del frontend.
+Los contenedores del frontend y backend deben estar en la misma red `luxviajes-network`. El proxy del frontend (`next.config.ts`) apunta a `http://localhost:3001` por defecto, que **no resuelve** dentro del contenedor del frontend.
 
-**Cambio requerido (1 línea) en `frontend/next.config.ts`:**
+**Solución aplicada:** el rewrite ahora usa la variable `NEXT_PUBLIC_PAYMENTS_BACKEND_URL` (con fallback a `localhost:3001` para desarrollo local):
 
-```diff
-- destination: "http://localhost:3001/api/payments/:path*",
-+ destination: "http://backend:3001/api/payments/:path*",
+```typescript
+// frontend/next.config.ts
+destination: `${process.env.NEXT_PUBLIC_PAYMENTS_BACKEND_URL || "http://localhost:3001"}/api/payments/:path*`,
+```
+
+En el `.env.production` del frontend (VPS) agregar:
+
+```env
+NEXT_PUBLIC_PAYMENTS_BACKEND_URL=http://backend:3001
 ```
 
 Y en el `docker-compose` del frontend, asegurarse de que el servicio esté en la red:
@@ -155,9 +163,7 @@ networks:
     driver: bridge
 ```
 
-Después: `docker compose build && docker compose up -d` en el directorio del frontend.
-
-Si NO quieres tocar el frontend aún, alternativa temporal: publicar el backend en el host (`0.0.0.0:3001:3001`) y usar la IP del VPS en el rewrite — no recomendado (expone el backend a internet).
+Después: `docker compose build && docker compose up -d` en el directorio del frontend. En local no se necesita ninguna variable (usa `localhost:3001`).
 
 ---
 

@@ -107,7 +107,7 @@ const nextConfig: NextConfig = {
         // Payments API — proxy to Express backend
         {
           source: "/api/payments/:path*",
-          destination: "http://localhost:3001/api/payments/:path*",
+          destination: `${process.env.NEXT_PUBLIC_PAYMENTS_BACKEND_URL || "http://localhost:3001"}/api/payments/:path*`,
         },
       ],
       afterFiles: [],

@@ -11,23 +11,52 @@ export interface DatafastConfig {
   retryAttempts: number;
 }
 
+// ============================================
+// INTERRUPTOR DE AMBIENTE
+// En el .env: DATAFAST_ENV=test | production
+// Cambia UNA palabra y todo lo demás se resuelve solo.
+// ============================================
+const DATAFAST_ENV = process.env.DATAFAST_ENV
+  || (process.env.NODE_ENV === 'production' ? 'production' : 'test');
+const IS_PRODUCTION = DATAFAST_ENV === 'production';
+
+function readEnv(testKey: string, prodKey: string, required = false): string {
+  const value = IS_PRODUCTION ? process.env[prodKey] : process.env[testKey];
+  if (required && !value) {
+    throw new Error(
+      `Variable ${IS_PRODUCTION ? prodKey : testKey} requerida para DATAFAST_ENV=${DATAFAST_ENV}`
+    );
+  }
+  return value || '';
+}
+
+function normalizeBaseUrl(url: string): string {
+  const trimmed = url.trim().replace(/\/+$/, '');
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
 export const datafastConfig: DatafastConfig = {
-  entityId: process.env.DATAFAST_ENTITY_ID!,
-  bearerToken: process.env.DATAFAST_BEARER_TOKEN!,
-  baseUrl: process.env.DATAFAST_BASE_URL
-    || (process.env.NODE_ENV === 'production'
-      ? 'https://eu-prod.oppwa.com'
-      : 'https://eu-test.oppwa.com'),
-  merchantId: process.env.DATAFAST_MERCHANT_ID!,
-  terminalId: process.env.DATAFAST_TERMINAL_ID!,
-  shopperResultUrl: process.env.DATAFAST_SHOPPER_RESULT_URL!,
+  entityId: readEnv('DATAFAST_TEST_ENTITY_ID', 'DATAFAST_PROD_ENTITY_ID', true),
+  bearerToken: readEnv('DATAFAST_TEST_BEARER_TOKEN', 'DATAFAST_PROD_BEARER_TOKEN', true),
+  baseUrl: normalizeBaseUrl(
+    readEnv('DATAFAST_TEST_BASE_URL', 'DATAFAST_PROD_BASE_URL', true)
+  ),
+  merchantId: readEnv('DATAFAST_TEST_MERCHANT_ID', 'DATAFAST_PROD_MERCHANT_ID', true),
+  terminalId: readEnv('DATAFAST_TEST_TERMINAL_ID', 'DATAFAST_PROD_TERMINAL_ID', true),
+  shopperResultUrl: readEnv(
+    'DATAFAST_TEST_SHOPPER_RESULT_URL',
+    'DATAFAST_PROD_SHOPPER_RESULT_URL',
+    true
+  ),
   timeout: parseInt(process.env.DATAFAST_TIMEOUT || '30000'),
   retryAttempts: parseInt(process.env.DATAFAST_RETRY_ATTEMPTS || '3'),
 };
 
-// Modo de pruebas: SOLO se activa si la env var DATAFAST_TEST_MODE=true
-// En producción debe estar ausente o en false (instrucción #2 de Datafast)
-export const DATAFAST_TEST_MODE_ENABLED = process.env.DATAFAST_TEST_MODE === 'true';
+// testMode=EXTERNAL se envía SOLO en test (instrucción #2 de Datafast).
+// En test se puede desactivar con DATAFAST_TEST_MODE=false.
+export const DATAFAST_TEST_MODE_ENABLED =
+  !IS_PRODUCTION && process.env.DATAFAST_TEST_MODE !== 'false';
 
 // Códigos de Datafast (fijos)
 export const DATAFAST_CONSTANTS = {
