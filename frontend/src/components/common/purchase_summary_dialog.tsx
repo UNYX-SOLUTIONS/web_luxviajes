@@ -31,6 +31,7 @@ import {
   MIN_AMOUNT_DEFERRED,
   type CardClass,
 } from "@/config/creditTypes";
+import { getLocalISOStringFromDate } from "@/components/common/AppointmentBase";
 
 interface ServiceItem {
   id: string | number;
@@ -53,7 +54,21 @@ export interface CustomerFormData {
 export interface PaymentOptions {
   creditType: string;
   installments?: number;
+  visaType: string;
+  appointmentDate?: string;
+  receivePromotion: boolean;
 }
+
+const APPOINTMENT_TIME_SLOTS = [
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+];
 
 interface PurchaseSummaryDialogProps {
   isOpen: boolean;
@@ -128,6 +143,11 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
   const [creditType, setCreditType] = useState<string>("00");
   const [installments, setInstallments] = useState<number>(0);
   const [cardClass, setCardClass] = useState<CardClass>("CREDIT");
+  const [appointmentDay, setAppointmentDay] = useState<string>("");
+  const [appointmentTime, setAppointmentTime] = useState<string>("");
+  const [receivePromotion, setReceivePromotion] = useState<boolean>(false);
+
+  const todayStr = new Date().toISOString().split("T")[0];
 
   const enabledCreditTypes = getEnabledCreditTypes(service.price, cardClass);
   const installmentOptions = getInstallmentOptions(creditType);
@@ -165,9 +185,21 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
   const handlePayClick = () => {
     if (!validateForm()) return;
     if (!paymentOptionsValid) return;
+
+    let appointmentIso: string | undefined;
+    if (appointmentDay && appointmentTime) {
+      appointmentIso = getLocalISOStringFromDate(
+        new Date(`${appointmentDay}T00:00:00`),
+        appointmentTime,
+      );
+    }
+
     onPay(formData, {
       creditType,
       ...(creditType !== "00" && installments > 0 ? { installments } : {}),
+      visaType: service.name,
+      appointmentDate: appointmentIso,
+      receivePromotion,
     });
   };
 
@@ -670,6 +702,65 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                 )}
                               </div>
                             )}
+                          </div>
+
+                          <div className="space-y-4 mt-6 pt-6 border-t border-neutral-200">
+                            <p className="text-sm font-semibold text-neutral-700">
+                              Agenda tu cita (opcional)
+                            </p>
+
+                            <div>
+                              <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
+                                <CalendarIcon className="h-3.5 w-3.5" /> Fecha
+                              </label>
+                              <input
+                                type="date"
+                                min={todayStr}
+                                value={appointmentDay}
+                                onChange={(e) => {
+                                  setAppointmentDay(e.target.value);
+                                  setAppointmentTime("");
+                                }}
+                                className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50 bg-white"
+                                disabled={isLoading}
+                              />
+                            </div>
+
+                            {appointmentDay && (
+                              <div>
+                                <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
+                                  <CalendarIcon className="h-3.5 w-3.5" /> Hora
+                                </label>
+                                <select
+                                  value={appointmentTime}
+                                  onChange={(e) =>
+                                    setAppointmentTime(e.target.value)
+                                  }
+                                  className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50 bg-white"
+                                  disabled={isLoading}
+                                >
+                                  <option value="">Selecciona hora</option>
+                                  {APPOINTMENT_TIME_SLOTS.map((t) => (
+                                    <option key={t} value={t}>
+                                      {t}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            )}
+
+                            <label className="flex items-center gap-2 text-sm text-neutral-700">
+                              <input
+                                type="checkbox"
+                                checked={receivePromotion}
+                                onChange={(e) =>
+                                  setReceivePromotion(e.target.checked)
+                                }
+                                disabled={isLoading}
+                                className="h-4 w-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+                              />
+                              Quiero recibir promociones y novedades
+                            </label>
                           </div>
 
                           {error && (

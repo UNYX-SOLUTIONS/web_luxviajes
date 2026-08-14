@@ -25,6 +25,9 @@ interface CreateCheckoutRequest {
   };
   creditType?: string;
   installments?: number;
+  visaType?: string;
+  appointmentDate?: string;
+  receivePromotion?: boolean;
 }
 
 interface CreateCheckoutResponse {
@@ -87,6 +90,9 @@ export function useDatafastPayment() {
 
       if (data.creditType !== undefined) payload.creditType = data.creditType;
       if (data.installments !== undefined) payload.installments = data.installments;
+      if (data.visaType !== undefined) payload.visaType = data.visaType;
+      if (data.appointmentDate !== undefined) payload.appointmentDate = data.appointmentDate;
+      if (data.receivePromotion !== undefined) payload.receivePromotion = data.receivePromotion;
 
       const response = await fetch("/api/payments/create-checkout", {
         method: "POST",

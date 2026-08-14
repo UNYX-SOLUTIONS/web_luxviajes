@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, Min, Max, IsEmail, IsOptional, IsArray, ValidateNested, IsIn, MinLength, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, Min, Max, IsEmail, IsOptional, IsArray, ValidateNested, IsIn, MinLength, MaxLength, IsBoolean, IsISO8601 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class CustomerDto {
@@ -129,4 +129,19 @@ export class CreateCheckoutDto {
 
   @IsOptional()
   createRegistration?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  visaType?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsISO8601()
+  @MaxLength(100)
+  appointmentDate?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  receivePromotion?: boolean;
 }
