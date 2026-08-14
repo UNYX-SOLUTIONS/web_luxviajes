@@ -2,7 +2,7 @@ import { DatafastService } from '../../services/datafast/datafast.service';
 import { prisma } from '../../config/database';
 import { logger } from '../../config/logger';
 import { CREDIT_TYPE_RULES } from '../../config/datafast';
-import { PaymentStatus, Prisma } from '@prisma/client';
+import { PaymentStatus, Prisma, ReservationLocation } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { createHmac } from 'node:crypto';
 import { ICreateCheckoutRequest, ITokenPaymentRequest, IPaymentStatusResponse } from '../../services/datafast/types/datafast.types';
@@ -26,6 +26,7 @@ interface CreateCheckoutInput {
   appointmentDate?: string;
   preferredLocation?: string;
   receivePromotion?: boolean;
+  userId?: string;
 }
 
 interface RecurringPaymentInput {
@@ -80,6 +81,7 @@ export class PaymentService {
           appointmentDate: data.appointmentDate ?? null,
           preferredLocation: data.preferredLocation ?? null,
           receivePromotion: data.receivePromotion ?? false,
+          userId: data.userId ?? null,
           source: 'bought',
         },
       },
@@ -190,6 +192,7 @@ export class PaymentService {
       if (status === 'SUCCESS' && !wasAlreadySuccess) {
         void this.sendLeadWebhook(transaction);
         void this.sendVisaAppointmentWebhook(transaction);
+        void this.createReservation(transaction);
       }
     }
 
@@ -725,6 +728,56 @@ export class PaymentService {
       } catch {
         // ignorar: el flag quedará en SENDING si el reset falla
       }
+    }
+  }
+
+  /**
+   * Persiste la reservación del flujo de compra de visa cuando el pago pasa
+   * a SUCCESS. Solo se crea si el cliente eligió fecha y hora de cita.
+   * El upsert por transactionId evita duplicados en reintentos.
+   */
+  private async createReservation(transaction: TransactionWithCustomer): Promise<void> {
+    const metadata = (transaction.metadata as Record<string, unknown> ?? {});
+    const appointmentIso = typeof metadata.appointmentDate === 'string' && metadata.appointmentDate
+      ? metadata.appointmentDate
+      : null;
+
+    if (!appointmentIso) {
+      return;
+    }
+
+    try {
+      await prisma.reservation.upsert({
+        where: { transactionId: transaction.id },
+        create: {
+          transactionId: transaction.id,
+          userId: typeof metadata.userId === 'string' ? metadata.userId : null,
+          name: transaction.customer.givenName,
+          lastName: transaction.customer.surname,
+          email: transaction.customer.email,
+          phone: transaction.customer.phone,
+          appointmentDate: new Date(appointmentIso),
+          location: this.mapPreferredLocation(metadata.preferredLocation),
+          source: 'bought',
+          receivePromotion: (metadata.receivePromotion as boolean) ?? false,
+          status: 'CONFIRMED',
+        },
+        update: {},
+      });
+
+      logger.info(`Reserva creada: ${transaction.merchantTransactionId}`);
+    } catch (error) {
+      logger.error({ err: error }, 'Error creando reserva');
+    }
+  }
+
+  private mapPreferredLocation(value: unknown): ReservationLocation {
+    switch (value) {
+      case 'Matriz': return ReservationLocation.MATRIZ;
+      case 'Guayaquil': return ReservationLocation.GUAYAQUIL;
+      case 'Quito': return ReservationLocation.QUITO;
+      case 'Cuenca': return ReservationLocation.CUENCA;
+      default: return ReservationLocation.SIN_PREFERENCIA;
     }
   }
 
