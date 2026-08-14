@@ -1,32 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useRef } from "react";
 import {
   AppointmentBase,
   AppointmentSource,
   AppointmentBaseRef,
 } from "../common/AppointmentBase";
-
-interface FormData {
-  nombre: string;
-  apellido: string;
-  telefono: string;
-  correo: string;
-  promociones: boolean;
-}
-
-interface AppointmentWebhookPayload {
-  name: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  appointment_date: string;
-  receivePromotion: boolean;
-  source: AppointmentSource;
-}
-
-const APPOINTMENT_WEBHOOK_URL =
-  "https://flow.agencialuxviajes.com/webhook/de1e3a16-857f-48ec-a863-3eaf2aed41cc";
 
 interface AppointmentSectionProps {
   citaTitulo?: string;
