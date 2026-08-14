@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { getTransactionStatus } from "@/services/payments";
 
 declare global {
   interface Window {
@@ -193,6 +195,7 @@ export function DatafastPaymentWidget({
   creditType,
   installments,
 }: Props) {
+  const router = useRouter();
   const [phase, setPhase] = useState<"loading" | "ready" | "expired" | "error">(
     "loading",
   );
@@ -332,10 +335,38 @@ export function DatafastPaymentWidget({
 
   useEffect(() => {
     mountedRef.current = true;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    initWidget();
+
+    // Si la transacción ya terminó (pago completado, rechazado o revertido),
+    // no mostrar el widget de pago: redirigir a la página de resultado.
+    // Evita el error de Datafast cuando el usuario navega hacia atrás.
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const statusResult = await getTransactionStatus(checkoutId);
+        if (cancelled || !mountedRef.current) return;
+
+        const status = statusResult.data?.status;
+        if (
+          status === "SUCCESS" ||
+          status === "FAILED" ||
+          status === "REFUNDED" ||
+          status === "CANCELLED" ||
+          status === "REVERSED"
+        ) {
+          const resourcePath = `/v1/checkouts/${encodeURIComponent(checkoutId)}/payment`;
+          router.replace(`/pago/resultado?resourcePath=${encodeURIComponent(resourcePath)}`);
+          return;
+        }
+      } catch {
+        // Si no se puede consultar el estado local, se muestra el widget normal
+      }
+
+      if (mountedRef.current) initWidget();
+    })();
 
     return () => {
+      cancelled = true;
       mountedRef.current = false;
       clearTimers();
       if (scriptRef.current?.parentNode) {
@@ -343,7 +374,7 @@ export function DatafastPaymentWidget({
         scriptRef.current = null;
       }
     };
-  }, [initWidget, clearTimers]);
+  }, [initWidget, clearTimers, checkoutId, router]);
 
   return (
     <main className="min-h-screen bg-neutral-50 flex items-start! justify-center! pt-32! md:pt-40! pb-16! px-4!">

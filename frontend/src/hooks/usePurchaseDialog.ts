@@ -114,6 +114,7 @@ export const usePurchaseDialog = () => {
           appointmentDate: paymentOptions?.appointmentDate,
           preferredLocation: paymentOptions?.preferredLocation,
           receivePromotion: paymentOptions?.receivePromotion ?? false,
+          userId: user?.id,
         });
 
         if (!result.success) {
@@ -126,7 +127,7 @@ export const usePurchaseDialog = () => {
         setIsLoading(false);
       }
     },
-    [currentService, createCheckout]
+    [currentService, createCheckout, generateMerchantCustomerId, user]
   );
 
   return {

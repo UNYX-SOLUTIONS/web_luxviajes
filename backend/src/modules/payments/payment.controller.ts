@@ -61,6 +61,33 @@ export class PaymentController {
     }
   }
 
+  async getTransactionStatus(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { checkoutId } = req.query;
+
+      if (!checkoutId) {
+        return res.status(400).json({
+          success: false,
+          error: 'checkoutId es requerido',
+        });
+      }
+
+      const result = await this.paymentService.getTransactionStatusByCheckout(checkoutId as string);
+
+      if (!result) {
+        return res.status(404).json({
+          success: false,
+          error: 'Transacción no encontrada',
+        });
+      }
+
+      return res.json({ success: true, data: result });
+    } catch (error) {
+      logger.error({ err: error }, 'Error en getTransactionStatus');
+      next(error);
+    }
+  }
+
   async refundTransaction(req: Request, res: Response, next: NextFunction) {
     try {
       const { transactionId, amount, reason } = req.body;

@@ -29,6 +29,7 @@ interface CreateCheckoutRequest {
   appointmentDate?: string;
   preferredLocation?: string;
   receivePromotion?: boolean;
+  userId?: string;
 }
 
 interface CreateCheckoutResponse {
@@ -95,6 +96,7 @@ export function useDatafastPayment() {
       if (data.appointmentDate !== undefined) payload.appointmentDate = data.appointmentDate;
       if (data.preferredLocation !== undefined) payload.preferredLocation = data.preferredLocation;
       if (data.receivePromotion !== undefined) payload.receivePromotion = data.receivePromotion;
+      if (data.userId !== undefined) payload.userId = data.userId;
 
       const response = await fetch("/api/payments/create-checkout", {
         method: "POST",

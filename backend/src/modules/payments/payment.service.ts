@@ -133,14 +133,29 @@ export class PaymentService {
   }
 
   async getPaymentStatus(resourcePath: string) {
+    // El checkoutId viene en el resourcePath: /v1/checkouts/{checkoutId}/payment
+    const checkoutId = resourcePath.split('/checkouts/')[1]?.split('/')[0] ?? undefined;
+
+    // Si la transacción ya alcanzó un estado terminal (confirmado por Datafast
+    // en una llamada previa), devolver el estado guardado en BD sin volver a
+    // consultar a Datafast. Así las recargas de la página de resultado no
+    // fallan cuando el resourcePath ya no es consultable en Datafast.
+    if (checkoutId) {
+      const existing = await prisma.transaction.findFirst({
+        where: { checkoutId },
+        include: { customer: true },
+      });
+
+      if (existing && this.isTerminalStatus(existing.status)) {
+        return this.buildStoredStatusResponse(existing);
+      }
+    }
+
     const paymentData = await this.datafastService.getPaymentStatus(resourcePath);
 
     if (!paymentData?.result?.code) {
       return paymentData;
     }
-
-    // El checkoutId viene en el resourcePath: /v1/checkouts/{checkoutId}/payment
-    const checkoutId = resourcePath.split('/checkouts/')[1]?.split('/')[0] ?? undefined;
 
     const transaction = await prisma.transaction.findFirst({
       where: {
@@ -190,8 +205,8 @@ export class PaymentService {
       // No bloquea la respuesta: fire-and-forget. El claim atómico dentro
       // de sendLeadWebhook evita envíos duplicados concurrentes.
       if (status === 'SUCCESS' && !wasAlreadySuccess) {
-        void this.sendLeadWebhook(transaction);
-        void this.sendVisaAppointmentWebhook(transaction);
+        void this.sendLeadWebhook(transaction, paymentData.id);
+        void this.sendVisaAppointmentWebhook(transaction, paymentData.id);
         void this.createReservation(transaction);
       }
     }
@@ -208,6 +223,23 @@ export class PaymentService {
     }
 
     return paymentData;
+  }
+
+  async getTransactionStatusByCheckout(checkoutId: string) {
+    const transaction = await prisma.transaction.findFirst({
+      where: { checkoutId },
+    });
+
+    if (!transaction) return null;
+
+    return {
+      checkoutId: transaction.checkoutId,
+      merchantTransactionId: transaction.merchantTransactionId,
+      status: transaction.status,
+      paymentId: transaction.paymentId,
+      resultCode: transaction.resultCode,
+      resultDescription: transaction.resultDescription,
+    };
   }
 
   async refundTransaction(data: { transactionId: string; amount: number; reason?: string }) {
@@ -493,7 +525,7 @@ export class PaymentService {
     }
   }
 
-  private async sendLeadWebhook(transaction: TransactionWithCustomer): Promise<void> {
+  private async sendLeadWebhook(transaction: TransactionWithCustomer, paymentId: string | null): Promise<void> {
     const webhookUrl = process.env.N8N_LEAD_WEBHOOK_URL;
     if (!webhookUrl) {
       logger.warn('N8N_LEAD_WEBHOOK_URL no configurada. Lead no enviado.');
@@ -531,7 +563,7 @@ export class PaymentService {
       amount: transaction.amount,
       currency: transaction.currency,
       merchantTransactionId: transaction.merchantTransactionId,
-      paymentId: transaction.paymentId ?? null,
+      paymentId: paymentId ?? transaction.paymentId ?? null,
     };
 
     const body = JSON.stringify(payload);
@@ -616,7 +648,7 @@ export class PaymentService {
    * exclusivo de visas cuando el pago pasa a SUCCESS. Se dispara una sola
    * vez por transacción gracias al flag visaAppointmentWebhookSent.
    */
-  private async sendVisaAppointmentWebhook(transaction: TransactionWithCustomer): Promise<void> {
+  private async sendVisaAppointmentWebhook(transaction: TransactionWithCustomer, paymentId: string | null): Promise<void> {
     const webhookUrl = process.env.VISA_APPOINTMENT_WEBHOOK_URL
       || 'https://flow.agencialuxviajes.com/webhook/84a52cef-82b0-4db6-9463-9339ec4ba1be';
 
@@ -651,7 +683,7 @@ export class PaymentService {
       amount: transaction.amount.toString(),
       currency: transaction.currency,
       merchant_transaction_id: transaction.merchantTransactionId,
-      payment_id: transaction.paymentId ?? null,
+      payment_id: paymentId ?? transaction.paymentId ?? null,
     };
 
     const body = JSON.stringify(payload);
@@ -769,6 +801,41 @@ export class PaymentService {
     } catch (error) {
       logger.error({ err: error }, 'Error creando reserva');
     }
+  }
+
+  private isTerminalStatus(status: PaymentStatus): boolean {
+    return ['SUCCESS', 'FAILED', 'REFUNDED', 'CANCELLED', 'REVERSED'].includes(status);
+  }
+
+  /**
+   * Construye una respuesta compatible con IPaymentStatusResponse a partir
+   * de la transacción guardada en BD (sin consultar Datafast).
+   */
+  private buildStoredStatusResponse(transaction: TransactionWithCustomer): IPaymentStatusResponse {
+    const metadata = (transaction.metadata as Record<string, unknown> ?? {});
+    const resultDetails = (metadata.resultDetails as Record<string, unknown> ?? {});
+
+    return {
+      id: transaction.paymentId ?? '',
+      paymentType: transaction.paymentType,
+      amount: transaction.amount.toString(),
+      currency: transaction.currency,
+      result: {
+        code: transaction.resultCode ?? '',
+        description: transaction.resultDescription ?? '',
+      },
+      resultDetails: {
+        AuthCode: typeof resultDetails.AuthCode === 'string' ? resultDetails.AuthCode : (transaction.authCode ?? undefined),
+        ResponseCode: typeof resultDetails.ResponseCode === 'string' ? resultDetails.ResponseCode : (transaction.responseCode ?? undefined),
+        clearingInstituteName: typeof resultDetails.clearingInstituteName === 'string' ? resultDetails.clearingInstituteName : (transaction.acquirerName ?? undefined),
+        LastFourDigits: typeof resultDetails.LastFourDigits === 'string' ? resultDetails.LastFourDigits : undefined,
+        CardType: typeof resultDetails.CardType === 'string' ? resultDetails.CardType : undefined,
+      },
+      merchantTransactionId: transaction.merchantTransactionId,
+      timestamp: transaction.updatedAt.toISOString(),
+      ndc: '',
+      buildNumber: '',
+    };
   }
 
   private mapPreferredLocation(value: unknown): ReservationLocation {

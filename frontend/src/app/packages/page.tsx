@@ -31,6 +31,7 @@ interface PackageDetails {
 // Funciones de mapeo...
 function mapDestinoToDestination(destino: TopDestinosMes): DreamDestination {
   return {
+    id: destino.documentId,
     title: destino.titulo,
     image: destino.imagen || "",
     description: destino.descripcion || "",
@@ -56,6 +57,7 @@ function mapPaqueteToPremium(paquete: PaquetePremium): PremiumPackage {
         .map((line) => line.trim())
     : [];
   return {
+    id: paquete.documentId,
     tag: paquete.etiqueta,
     title: paquete.titulo,
     days: paquete.dias,

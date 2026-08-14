@@ -147,6 +147,11 @@ export class CreateCheckoutDto {
   preferredLocation?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  userId?: string;
+
+  @IsOptional()
   @IsBoolean()
   receivePromotion?: boolean;
 }

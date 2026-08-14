@@ -1,4 +1,5 @@
 export interface BasePackage {
+  id: string;
   title: string;
   image: string;
   description: string;
