@@ -106,6 +106,12 @@ services:
       DATAFAST_RETRY_ATTEMPTS: ${DATAFAST_RETRY_ATTEMPTS:-3}
 
       # --------------------------------------
+      # Webhook de leads (n8n → Kommo)
+      # --------------------------------------
+      N8N_LEAD_WEBHOOK_URL: ${N8N_LEAD_WEBHOOK_URL:-}
+      N8N_LEAD_WEBHOOK_SECRET: ${N8N_LEAD_WEBHOOK_SECRET:-}
+
+      # --------------------------------------
       # Logs
       # --------------------------------------
       LOG_LEVEL: ${LOG_LEVEL:-info}

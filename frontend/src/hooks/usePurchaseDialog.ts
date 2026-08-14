@@ -53,7 +53,7 @@ export const usePurchaseDialog = () => {
   }, [isLoading, datafastLoading]);
 
   const handlePay = useCallback(
-    async (customerData: CustomerFormData, paymentOptions?: { creditType?: string; installments?: number }) => {
+    async (customerData: CustomerFormData, paymentOptions?: { creditType?: string; installments?: number; visaType?: string; appointmentDate?: string; receivePromotion?: boolean }) => {
       if (!currentService) {
         setError("No hay servicio seleccionado");
         return;
@@ -110,6 +110,9 @@ export const usePurchaseDialog = () => {
           },
           creditType: paymentOptions?.creditType,
           installments: paymentOptions?.installments,
+          visaType: paymentOptions?.visaType ?? currentService.name,
+          appointmentDate: paymentOptions?.appointmentDate,
+          receivePromotion: paymentOptions?.receivePromotion ?? false,
         });
 
         if (!result.success) {

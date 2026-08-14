@@ -68,7 +68,7 @@ function parseStyledText(text: string): string {
 }
 
 // Función para obtener la fecha local en formato ISO con offset (2026-05-05T09:00:00-05:00)
-function getLocalISOStringFromDate(date: Date, time: string): string {
+export function getLocalISOStringFromDate(date: Date, time: string): string {
   const [hours, minutes] = time.split(":").map(Number);
   const dateWithTime = new Date(date);
   dateWithTime.setHours(hours, minutes, 0, 0);
