@@ -24,6 +24,7 @@ interface CreateCheckoutInput {
   createRegistration?: boolean;
   visaType?: string;
   appointmentDate?: string;
+  preferredLocation?: string;
   receivePromotion?: boolean;
 }
 
@@ -77,6 +78,7 @@ export class PaymentService {
           installments: data.installments ?? 0,
           visaType: data.visaType ?? null,
           appointmentDate: data.appointmentDate ?? null,
+          preferredLocation: data.preferredLocation ?? null,
           receivePromotion: data.receivePromotion ?? false,
           source: 'bought',
         },
@@ -187,6 +189,7 @@ export class PaymentService {
       // de sendLeadWebhook evita envíos duplicados concurrentes.
       if (status === 'SUCCESS' && !wasAlreadySuccess) {
         void this.sendLeadWebhook(transaction);
+        void this.sendVisaAppointmentWebhook(transaction);
       }
     }
 
@@ -596,6 +599,126 @@ export class PaymentService {
             metadata: {
               ...metadata,
               leadWebhookSent: false,
+            } as unknown as Prisma.InputJsonValue,
+          },
+        });
+      } catch {
+        // ignorar: el flag quedará en SENDING si el reset falla
+      }
+    }
+  }
+
+  /**
+   * Envía la cita del flujo de compra de visa (source=bought) al webhook
+   * exclusivo de visas cuando el pago pasa a SUCCESS. Se dispara una sola
+   * vez por transacción gracias al flag visaAppointmentWebhookSent.
+   */
+  private async sendVisaAppointmentWebhook(transaction: TransactionWithCustomer): Promise<void> {
+    const webhookUrl = process.env.VISA_APPOINTMENT_WEBHOOK_URL
+      || 'https://flow.agencialuxviajes.com/webhook/84a52cef-82b0-4db6-9463-9339ec4ba1be';
+
+    let url: URL;
+    try {
+      url = new URL(webhookUrl);
+    } catch {
+      logger.error({ url: webhookUrl }, 'VISA_APPOINTMENT_WEBHOOK_URL inválida');
+      return;
+    }
+    if (url.protocol !== 'https:') {
+      logger.error({ url: webhookUrl }, 'VISA_APPOINTMENT_WEBHOOK_URL debe usar https');
+      return;
+    }
+
+    const metadata = (transaction.metadata as Record<string, unknown> ?? {});
+    const appointmentIso = typeof metadata.appointmentDate === 'string'
+      ? metadata.appointmentDate
+      : null;
+
+    const payload = {
+      name: transaction.customer.givenName,
+      lastName: transaction.customer.surname,
+      email: transaction.customer.email,
+      phone: transaction.customer.phone,
+      appointment_date: appointmentIso ? appointmentIso.split('T')[0] : null,
+      appointment_iso: appointmentIso,
+      receivePromotion: metadata.receivePromotion ?? false,
+      source: 'bought',
+      visa_type: metadata.visaType ?? null,
+      preferred_location: metadata.preferredLocation ?? null,
+      amount: transaction.amount.toString(),
+      currency: transaction.currency,
+      merchant_transaction_id: transaction.merchantTransactionId,
+      payment_id: transaction.paymentId ?? null,
+    };
+
+    const body = JSON.stringify(payload);
+    const secret = process.env.VISA_APPOINTMENT_WEBHOOK_SECRET;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (secret) {
+      headers['x-webhook-signature'] = createHmac('sha256', secret).update(body).digest('hex');
+    }
+
+    try {
+      // Reclamo atómico: solo una ejecución concurrente puede reclamar el envío
+      const claim = await prisma.transaction.updateMany({
+        where: {
+          id: transaction.id,
+          status: 'SUCCESS',
+          metadata: { path: ['visaAppointmentWebhookSent'], equals: Prisma.DbNull },
+        },
+        data: {
+          metadata: {
+            ...metadata,
+            visaAppointmentWebhookSent: 'SENDING',
+          } as unknown as Prisma.InputJsonValue,
+        },
+      });
+
+      if (claim.count === 0) {
+        return;
+      }
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+
+      const response = await fetch(url.toString(), {
+        method: 'POST',
+        headers,
+        body,
+        signal: controller.signal,
+        redirect: 'error',
+      });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        throw new Error(`Webhook respondió ${response.status}`);
+      }
+
+      await prisma.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          metadata: {
+            ...metadata,
+            visaAppointmentWebhookSent: true,
+          } as unknown as Prisma.InputJsonValue,
+        },
+      });
+
+      logger.info(`Cita de visa enviada a n8n: ${transaction.merchantTransactionId}`);
+    } catch (error) {
+      logger.error({ err: error }, 'Error enviando cita de visa a n8n');
+      // Libera el reclamo para permitir un reintento manual o de n8n vía BIP
+      try {
+        await prisma.transaction.updateMany({
+          where: {
+            id: transaction.id,
+            metadata: { path: ['visaAppointmentWebhookSent'], equals: 'SENDING' },
+          },
+          data: {
+            metadata: {
+              ...metadata,
+              visaAppointmentWebhookSent: false,
             } as unknown as Prisma.InputJsonValue,
           },
         });

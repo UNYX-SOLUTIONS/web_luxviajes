@@ -142,6 +142,11 @@ export class CreateCheckoutDto {
   appointmentDate?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  preferredLocation?: string;
+
+  @IsOptional()
   @IsBoolean()
   receivePromotion?: boolean;
 }
