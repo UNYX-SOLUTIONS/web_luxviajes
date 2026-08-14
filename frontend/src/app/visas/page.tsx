@@ -286,7 +286,7 @@ export default function VisasPage() {
                     )}
                   </div>
                   <h5 className="text-lg font-bold text-neutral-900">
-                    {visa.titulo}
+                    Visa {visa.titulo}
                   </h5>
                   <p className="mt-2 mb-6 text-sm text-neutral-600">
                     {visa.subtitulo}

@@ -44,6 +44,7 @@ export default function Home() {
   // Transformar destinos de Strapi a formato DreamDestination
   const dreamDestinations: DreamDestination[] = (homeData?.destinos || []).map(
     (destino) => ({
+      id: destino.documentId,
       title: destino.titulo,
       image: destino.imagen || "",
       description: destino.descripcion || "",

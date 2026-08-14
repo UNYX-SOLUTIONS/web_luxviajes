@@ -164,7 +164,7 @@ export const DreamDestinationsSection: FC<DreamDestinationsSectionProps> = ({
                 >
                   {visibleDestinations.map((item) => (
                     <article
-                      key={item.title}
+                      key={item.id}
                       className="overflow-hidden rounded-lg sm:rounded-2xl bg-white shadow-sm ring-1 ring-primary-100 flex flex-col h-full"
                     >
                       <div className="relative w-full shrink-0 aspect-4/3 sm:aspect-auto sm:h-36 md:h-40">

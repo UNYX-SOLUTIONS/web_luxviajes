@@ -66,6 +66,7 @@ model Transaction {
   
   refunds              Refund[]
   recurringPayments    RecurringPayment?
+  reservation          Reservation?
 
   @@index([checkoutId])
 }
@@ -155,6 +156,7 @@ model User {
   tokenVersion          Int       @default(0)
   lastLogin             DateTime?
   securityLogs          SecurityLog[]
+  reservations          Reservation[]
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 }
@@ -224,4 +226,42 @@ enum RefundStatus {
   PROCESSING
   COMPLETED
   FAILED
+}
+
+enum ReservationLocation {
+  MATRIZ
+  GUAYAQUIL
+  QUITO
+  CUENCA
+  SIN_PREFERENCIA
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Reservation {
+  id               String              @id @default(uuid())
+  userId           String?
+  user             User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  transactionId    String?             @unique
+  transaction      Transaction?        @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+  name             String
+  lastName         String
+  email            String
+  phone            String
+  appointmentDate  DateTime
+  location         ReservationLocation @default(SIN_PREFERENCIA)
+  source           String              @default("calendar")
+  receivePromotion Boolean             @default(false)
+  status           ReservationStatus   @default(CONFIRMED)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([email])
+  @@index([appointmentDate])
 }

@@ -144,7 +144,7 @@ export const PremiumPackagesSection: FC<PremiumPackagesSectionProps> = ({
           ) : (
             visiblePackages.map((item) => (
               <article
-                key={item.title}
+                key={item.id}
                 className="overflow-hidden rounded-lg sm:rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200"
               >
                 <div className="relative w-full aspect-4/3 sm:aspect-auto sm:h-56 md:h-80">

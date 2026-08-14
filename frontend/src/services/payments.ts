@@ -29,6 +29,23 @@ export async function getPaymentStatus(resourcePath: string): Promise<PaymentSta
   return get<PaymentStatusResponse>(`/api/payments/status?resourcePath=${encodeURIComponent(resourcePath)}`);
 }
 
+export interface TransactionStatusResponse {
+  success: boolean;
+  data?: {
+    checkoutId?: string | null;
+    merchantTransactionId: string;
+    status: string;
+    paymentId?: string | null;
+    resultCode?: string | null;
+    resultDescription?: string | null;
+  };
+  error?: string;
+}
+
+export async function getTransactionStatus(checkoutId: string): Promise<TransactionStatusResponse> {
+  return get<TransactionStatusResponse>(`/api/payments/transaction-status?checkoutId=${encodeURIComponent(checkoutId)}`);
+}
+
 export async function verifyPayment(paymentId: string): Promise<PaymentStatusResponse> {
   return get<PaymentStatusResponse>(`/api/payments/verify/${paymentId}`);
 }

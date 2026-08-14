@@ -2,7 +2,7 @@ import { DatafastService } from '../../services/datafast/datafast.service';
 import { prisma } from '../../config/database';
 import { logger } from '../../config/logger';
 import { CREDIT_TYPE_RULES } from '../../config/datafast';
-import { PaymentStatus, Prisma } from '@prisma/client';
+import { PaymentStatus, Prisma, ReservationLocation } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { createHmac } from 'node:crypto';
 import { ICreateCheckoutRequest, ITokenPaymentRequest, IPaymentStatusResponse } from '../../services/datafast/types/datafast.types';
@@ -24,7 +24,9 @@ interface CreateCheckoutInput {
   createRegistration?: boolean;
   visaType?: string;
   appointmentDate?: string;
+  preferredLocation?: string;
   receivePromotion?: boolean;
+  userId?: string;
 }
 
 interface RecurringPaymentInput {
@@ -77,7 +79,9 @@ export class PaymentService {
           installments: data.installments ?? 0,
           visaType: data.visaType ?? null,
           appointmentDate: data.appointmentDate ?? null,
+          preferredLocation: data.preferredLocation ?? null,
           receivePromotion: data.receivePromotion ?? false,
+          userId: data.userId ?? null,
           source: 'bought',
         },
       },
@@ -129,14 +133,29 @@ export class PaymentService {
   }
 
   async getPaymentStatus(resourcePath: string) {
+    // El checkoutId viene en el resourcePath: /v1/checkouts/{checkoutId}/payment
+    const checkoutId = resourcePath.split('/checkouts/')[1]?.split('/')[0] ?? undefined;
+
+    // Si la transacción ya alcanzó un estado terminal (confirmado por Datafast
+    // en una llamada previa), devolver el estado guardado en BD sin volver a
+    // consultar a Datafast. Así las recargas de la página de resultado no
+    // fallan cuando el resourcePath ya no es consultable en Datafast.
+    if (checkoutId) {
+      const existing = await prisma.transaction.findFirst({
+        where: { checkoutId },
+        include: { customer: true },
+      });
+
+      if (existing && this.isTerminalStatus(existing.status)) {
+        return this.buildStoredStatusResponse(existing);
+      }
+    }
+
     const paymentData = await this.datafastService.getPaymentStatus(resourcePath);
 
     if (!paymentData?.result?.code) {
       return paymentData;
     }
-
-    // El checkoutId viene en el resourcePath: /v1/checkouts/{checkoutId}/payment
-    const checkoutId = resourcePath.split('/checkouts/')[1]?.split('/')[0] ?? undefined;
 
     const transaction = await prisma.transaction.findFirst({
       where: {
@@ -186,7 +205,9 @@ export class PaymentService {
       // No bloquea la respuesta: fire-and-forget. El claim atómico dentro
       // de sendLeadWebhook evita envíos duplicados concurrentes.
       if (status === 'SUCCESS' && !wasAlreadySuccess) {
-        void this.sendLeadWebhook(transaction);
+        void this.sendLeadWebhook(transaction, paymentData.id);
+        void this.sendVisaAppointmentWebhook(transaction, paymentData.id);
+        void this.createReservation(transaction);
       }
     }
 
@@ -202,6 +223,23 @@ export class PaymentService {
     }
 
     return paymentData;
+  }
+
+  async getTransactionStatusByCheckout(checkoutId: string) {
+    const transaction = await prisma.transaction.findFirst({
+      where: { checkoutId },
+    });
+
+    if (!transaction) return null;
+
+    return {
+      checkoutId: transaction.checkoutId,
+      merchantTransactionId: transaction.merchantTransactionId,
+      status: transaction.status,
+      paymentId: transaction.paymentId,
+      resultCode: transaction.resultCode,
+      resultDescription: transaction.resultDescription,
+    };
   }
 
   async refundTransaction(data: { transactionId: string; amount: number; reason?: string }) {
@@ -487,7 +525,7 @@ export class PaymentService {
     }
   }
 
-  private async sendLeadWebhook(transaction: TransactionWithCustomer): Promise<void> {
+  private async sendLeadWebhook(transaction: TransactionWithCustomer, paymentId: string | null): Promise<void> {
     const webhookUrl = process.env.N8N_LEAD_WEBHOOK_URL;
     if (!webhookUrl) {
       logger.warn('N8N_LEAD_WEBHOOK_URL no configurada. Lead no enviado.');
@@ -525,7 +563,7 @@ export class PaymentService {
       amount: transaction.amount,
       currency: transaction.currency,
       merchantTransactionId: transaction.merchantTransactionId,
-      paymentId: transaction.paymentId ?? null,
+      paymentId: paymentId ?? transaction.paymentId ?? null,
     };
 
     const body = JSON.stringify(payload);
@@ -602,6 +640,211 @@ export class PaymentService {
       } catch {
         // ignorar: el flag quedará en SENDING si el reset falla
       }
+    }
+  }
+
+  /**
+   * Envía la cita del flujo de compra de visa (source=bought) al webhook
+   * exclusivo de visas cuando el pago pasa a SUCCESS. Se dispara una sola
+   * vez por transacción gracias al flag visaAppointmentWebhookSent.
+   */
+  private async sendVisaAppointmentWebhook(transaction: TransactionWithCustomer, paymentId: string | null): Promise<void> {
+    const webhookUrl = process.env.VISA_APPOINTMENT_WEBHOOK_URL
+      || 'https://flow.agencialuxviajes.com/webhook/84a52cef-82b0-4db6-9463-9339ec4ba1be';
+
+    let url: URL;
+    try {
+      url = new URL(webhookUrl);
+    } catch {
+      logger.error({ url: webhookUrl }, 'VISA_APPOINTMENT_WEBHOOK_URL inválida');
+      return;
+    }
+    if (url.protocol !== 'https:') {
+      logger.error({ url: webhookUrl }, 'VISA_APPOINTMENT_WEBHOOK_URL debe usar https');
+      return;
+    }
+
+    const metadata = (transaction.metadata as Record<string, unknown> ?? {});
+    const appointmentIso = typeof metadata.appointmentDate === 'string'
+      ? metadata.appointmentDate
+      : null;
+
+    const payload = {
+      name: transaction.customer.givenName,
+      lastName: transaction.customer.surname,
+      email: transaction.customer.email,
+      phone: transaction.customer.phone,
+      appointment_date: appointmentIso ? appointmentIso.split('T')[0] : null,
+      appointment_iso: appointmentIso,
+      receivePromotion: metadata.receivePromotion ?? false,
+      source: 'bought',
+      visa_type: metadata.visaType ?? null,
+      preferred_location: metadata.preferredLocation ?? null,
+      amount: transaction.amount.toString(),
+      currency: transaction.currency,
+      merchant_transaction_id: transaction.merchantTransactionId,
+      payment_id: paymentId ?? transaction.paymentId ?? null,
+    };
+
+    const body = JSON.stringify(payload);
+    const secret = process.env.VISA_APPOINTMENT_WEBHOOK_SECRET;
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (secret) {
+      headers['x-webhook-signature'] = createHmac('sha256', secret).update(body).digest('hex');
+    }
+
+    try {
+      // Reclamo atómico: solo una ejecución concurrente puede reclamar el envío
+      const claim = await prisma.transaction.updateMany({
+        where: {
+          id: transaction.id,
+          status: 'SUCCESS',
+          metadata: { path: ['visaAppointmentWebhookSent'], equals: Prisma.DbNull },
+        },
+        data: {
+          metadata: {
+            ...metadata,
+            visaAppointmentWebhookSent: 'SENDING',
+          } as unknown as Prisma.InputJsonValue,
+        },
+      });
+
+      if (claim.count === 0) {
+        return;
+      }
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+
+      const response = await fetch(url.toString(), {
+        method: 'POST',
+        headers,
+        body,
+        signal: controller.signal,
+        redirect: 'error',
+      });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        throw new Error(`Webhook respondió ${response.status}`);
+      }
+
+      await prisma.transaction.update({
+        where: { id: transaction.id },
+        data: {
+          metadata: {
+            ...metadata,
+            visaAppointmentWebhookSent: true,
+          } as unknown as Prisma.InputJsonValue,
+        },
+      });
+
+      logger.info(`Cita de visa enviada a n8n: ${transaction.merchantTransactionId}`);
+    } catch (error) {
+      logger.error({ err: error }, 'Error enviando cita de visa a n8n');
+      // Libera el reclamo para permitir un reintento manual o de n8n vía BIP
+      try {
+        await prisma.transaction.updateMany({
+          where: {
+            id: transaction.id,
+            metadata: { path: ['visaAppointmentWebhookSent'], equals: 'SENDING' },
+          },
+          data: {
+            metadata: {
+              ...metadata,
+              visaAppointmentWebhookSent: false,
+            } as unknown as Prisma.InputJsonValue,
+          },
+        });
+      } catch {
+        // ignorar: el flag quedará en SENDING si el reset falla
+      }
+    }
+  }
+
+  /**
+   * Persiste la reservación del flujo de compra de visa cuando el pago pasa
+   * a SUCCESS. Solo se crea si el cliente eligió fecha y hora de cita.
+   * El upsert por transactionId evita duplicados en reintentos.
+   */
+  private async createReservation(transaction: TransactionWithCustomer): Promise<void> {
+    const metadata = (transaction.metadata as Record<string, unknown> ?? {});
+    const appointmentIso = typeof metadata.appointmentDate === 'string' && metadata.appointmentDate
+      ? metadata.appointmentDate
+      : null;
+
+    if (!appointmentIso) {
+      return;
+    }
+
+    try {
+      await prisma.reservation.upsert({
+        where: { transactionId: transaction.id },
+        create: {
+          transactionId: transaction.id,
+          userId: typeof metadata.userId === 'string' ? metadata.userId : null,
+          name: transaction.customer.givenName,
+          lastName: transaction.customer.surname,
+          email: transaction.customer.email,
+          phone: transaction.customer.phone,
+          appointmentDate: new Date(appointmentIso),
+          location: this.mapPreferredLocation(metadata.preferredLocation),
+          source: 'bought',
+          receivePromotion: (metadata.receivePromotion as boolean) ?? false,
+          status: 'CONFIRMED',
+        },
+        update: {},
+      });
+
+      logger.info(`Reserva creada: ${transaction.merchantTransactionId}`);
+    } catch (error) {
+      logger.error({ err: error }, 'Error creando reserva');
+    }
+  }
+
+  private isTerminalStatus(status: PaymentStatus): boolean {
+    return ['SUCCESS', 'FAILED', 'REFUNDED', 'CANCELLED', 'REVERSED'].includes(status);
+  }
+
+  /**
+   * Construye una respuesta compatible con IPaymentStatusResponse a partir
+   * de la transacción guardada en BD (sin consultar Datafast).
+   */
+  private buildStoredStatusResponse(transaction: TransactionWithCustomer): IPaymentStatusResponse {
+    const metadata = (transaction.metadata as Record<string, unknown> ?? {});
+    const resultDetails = (metadata.resultDetails as Record<string, unknown> ?? {});
+
+    return {
+      id: transaction.paymentId ?? '',
+      paymentType: transaction.paymentType,
+      amount: transaction.amount.toString(),
+      currency: transaction.currency,
+      result: {
+        code: transaction.resultCode ?? '',
+        description: transaction.resultDescription ?? '',
+      },
+      resultDetails: {
+        AuthCode: typeof resultDetails.AuthCode === 'string' ? resultDetails.AuthCode : (transaction.authCode ?? undefined),
+        ResponseCode: typeof resultDetails.ResponseCode === 'string' ? resultDetails.ResponseCode : (transaction.responseCode ?? undefined),
+        clearingInstituteName: typeof resultDetails.clearingInstituteName === 'string' ? resultDetails.clearingInstituteName : (transaction.acquirerName ?? undefined),
+        LastFourDigits: typeof resultDetails.LastFourDigits === 'string' ? resultDetails.LastFourDigits : undefined,
+        CardType: typeof resultDetails.CardType === 'string' ? resultDetails.CardType : undefined,
+      },
+      merchantTransactionId: transaction.merchantTransactionId,
+      timestamp: transaction.updatedAt.toISOString(),
+      ndc: '',
+      buildNumber: '',
+    };
+  }
+
+  private mapPreferredLocation(value: unknown): ReservationLocation {
+    switch (value) {
+      case 'Matriz': return ReservationLocation.MATRIZ;
+      case 'Guayaquil': return ReservationLocation.GUAYAQUIL;
+      case 'Quito': return ReservationLocation.QUITO;
+      case 'Cuenca': return ReservationLocation.CUENCA;
+      default: return ReservationLocation.SIN_PREFERENCIA;
     }
   }
 
