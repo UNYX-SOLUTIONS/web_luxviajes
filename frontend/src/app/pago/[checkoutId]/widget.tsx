@@ -71,6 +71,39 @@ function hasDatafastError(form: HTMLElement): boolean {
   );
 }
 
+/** Muestra una advertencia si el usuario ingresa una tarjeta Mastercard */
+function watchMastercardBrand(): void {
+  const cardNumberInput = document.querySelector(
+    ".wpwl-control-cardNumber",
+  ) as HTMLInputElement | null;
+
+  if (!cardNumberInput || cardNumberInput.dataset.brandWatch === "true") return;
+
+  cardNumberInput.dataset.brandWatch = "true";
+
+  const check = (): void => {
+    const digits = cardNumberInput.value.replace(/\s+/g, "");
+    const isMastercard = /^5[1-5]/.test(digits);
+
+    const existing = document.getElementById("brand-warning");
+    if (isMastercard) {
+      if (!existing) {
+        const warning = document.createElement("p");
+        warning.id = "brand-warning";
+        warning.className = "mt-1 text-xs font-medium text-red-600";
+        warning.textContent =
+          "Mastercard no está disponible por el momento. Usa una tarjeta Visa, AMEX o Diners Club.";
+        cardNumberInput.parentNode?.appendChild(warning);
+      }
+    } else if (existing) {
+      existing.remove();
+    }
+  };
+
+  cardNumberInput.addEventListener("input", check);
+  cardNumberInput.addEventListener("blur", check);
+}
+
 /** Vuelve a dejar el form limpio (solo las marcas de texto) */
 function resetFormContent(form: HTMLElement): void {
   while (form.firstChild) {
@@ -269,6 +302,7 @@ export function DatafastPaymentWidget({
         readyCalledRef.current = true;
         setPhase("ready");
         injectCustomFields();
+        watchMastercardBrand();
       },
       onBeforeSubmitCard: () => {
         const cardholderInput = document.querySelector(
@@ -320,6 +354,7 @@ export function DatafastPaymentWidget({
         readyCalledRef.current = true;
         setPhase("ready");
         injectCustomFields();
+        watchMastercardBrand();
       }
     }, WIDGET_POLL_MS);
 
@@ -399,6 +434,12 @@ export function DatafastPaymentWidget({
               </p>
             </div>
           )}
+
+          <div className="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-xs text-amber-800 ring-1 ring-amber-200">
+            Solo aceptamos tarjetas Visa, AMEX y Diners Club (sujeto a
+            disponibilidad del emisor). Mastercard no está disponible por el
+            momento.
+          </div>
 
           {/* El form siempre se renderiza pero se oculta con CSS si hay error */}
           <form

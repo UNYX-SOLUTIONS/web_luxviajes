@@ -108,6 +108,7 @@ export default function VisasPage() {
       price: selectedVisa.precio ?? 0,
       validity: selectedVisa.validez || "Variable según destino",
       processing: selectedVisa.procesamiento || "15-30 días hábiles",
+      requisitos: selectedVisa.requisitos,
       includes: [
         "Asesoría personalizada con especialista",
         "Revisión y validación de documentos",
@@ -327,6 +328,7 @@ export default function VisasPage() {
                           validity: visa.validez || "Variable según destino",
                           processing:
                             visa.procesamiento || "15-30 días hábiles",
+                          requisitos: visa.requisitos,
                           includes: [
                             "Documentos requeridos",
                             "Asesoría personalizada",

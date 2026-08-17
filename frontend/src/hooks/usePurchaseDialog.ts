@@ -11,6 +11,7 @@ interface ServiceData {
   validity?: string;
   processing?: string;
   includes?: string[];
+  requisitos?: string;
 }
 
 export interface CustomerFormData {

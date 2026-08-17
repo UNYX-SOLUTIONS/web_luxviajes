@@ -55,7 +55,7 @@ export function Header({ activeLink }: HeaderProps) {
         <div className="flex h-20 items-center md:h-24 lg:h-28 xl:h-32">
           {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
-            <div className="relative w-45 h-17.5 md:w-55 md:h-15 2xl:w-65 2xl:h-25">
+            <div className="relative w-32 h-12 sm:w-36 sm:h-13 md:w-45 md:h-17.5 lg:w-50 lg:h-18 xl:w-55 xl:h-20 2xl:w-65 2xl:h-25">
               <Image
                 src="/images/logo_white.png"
                 alt="Luxviajes Logo"
@@ -63,7 +63,7 @@ export function Header({ activeLink }: HeaderProps) {
                 className="object-contain object-left"
                 loading="eager"
                 priority
-                sizes="(max-width: 768px) 180px, (max-width: 1535px) 220px, 320px"
+                sizes="(max-width: 480px) 120px, (max-width: 640px) 140px, (max-width: 768px) 160px, (max-width: 1024px) 180px, (max-width: 1536px) 220px, 320px"
               />
             </div>
           </Link>

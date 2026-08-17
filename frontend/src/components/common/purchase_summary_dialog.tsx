@@ -43,6 +43,7 @@ interface ServiceItem {
   validity?: string;
   processing?: string;
   includes?: string[];
+  requisitos?: string;
 }
 
 export interface CustomerFormData {
@@ -104,6 +105,7 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
         validity: service.validity,
         processing: service.processing,
         includes: service.includes,
+        requisitos: service.requisitos,
       });
       setShowAuthGate(true);
       return;
@@ -186,6 +188,12 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
         appointmentTime,
       );
     }
+
+    console.log("Enviando cita:", {
+      appointmentDay,
+      appointmentTime,
+      appointmentIso,
+    });
 
     onPay(formData, {
       creditType,
@@ -376,6 +384,33 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                         </span>
                                       </div>
                                     ))}
+                                  </div>
+                                </div>
+                              )}
+
+                            {service.requisitos &&
+                              service.requisitos
+                                .split("\n")
+                                .filter((req) => req.trim()).length > 0 && (
+                                <div className="mt-5">
+                                  <h5 className="text-sm font-semibold text-neutral-900 mb-3">
+                                    Requisitos de la visa:
+                                  </h5>
+                                  <div className="space-y-2">
+                                    {service.requisitos
+                                      .split("\n")
+                                      .filter((req) => req.trim())
+                                      .map((req, idx) => (
+                                        <div
+                                          key={idx}
+                                          className="flex items-start gap-2.5"
+                                        >
+                                          <CheckBadgeIcon className="h-4 w-4 shrink-0 text-accent-green mt-0.5" />
+                                          <span className="text-sm text-neutral-700">
+                                            {req.trim()}
+                                          </span>
+                                        </div>
+                                      ))}
                                   </div>
                                 </div>
                               )}
@@ -651,6 +686,11 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                     cuotas.
                                   </p>
                                 )}
+                                <p className="text-xs text-neutral-500 mt-1.5">
+                                  Solo aceptamos tarjetas Visa, AMEX y Diners
+                                  Club (sujeto a disponibilidad del emisor).
+                                  Mastercard no está disponible por el momento.
+                                </p>
                               </div>
 
                               {showMinAmountNotice && (
@@ -660,29 +700,32 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                 </div>
                               )}
 
-                              <div>
-                                <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                                  <CreditCardIcon className="h-3.5 w-3.5" />{" "}
-                                  Tipo de crédito
-                                </label>
-                                <select
-                                  value={creditType}
-                                  onChange={(e) => {
-                                    setCreditType(e.target.value);
-                                    setInstallments(0);
-                                  }}
-                                  className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50 bg-white"
-                                  disabled={
-                                    isLoading || enabledCreditTypes.length <= 1
-                                  }
-                                >
-                                  {enabledCreditTypes.map((opt) => (
-                                    <option key={opt.code} value={opt.code}>
-                                      {opt.label}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
+                              {cardClass !== "DEBIT" && (
+                                <div>
+                                  <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
+                                    <CreditCardIcon className="h-3.5 w-3.5" />{" "}
+                                    Tipo de crédito
+                                  </label>
+                                  <select
+                                    value={creditType}
+                                    onChange={(e) => {
+                                      setCreditType(e.target.value);
+                                      setInstallments(0);
+                                    }}
+                                    className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50 bg-white"
+                                    disabled={
+                                      isLoading ||
+                                      enabledCreditTypes.length <= 1
+                                    }
+                                  >
+                                    {enabledCreditTypes.map((opt) => (
+                                      <option key={opt.code} value={opt.code}>
+                                        {opt.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
 
                               {isDeferred && (
                                 <div>
@@ -788,6 +831,14 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                   <CalendarIcon className="h-4 w-4" />
                                   Escoger cita
                                 </button>
+                              )}
+
+                              {!appointmentDay && (
+                                <p className="text-xs text-amber-600">
+                                  Aún no has seleccionado fecha y hora para tu
+                                  cita de asesoría. Si no la eliges, nos
+                                  contactaremos contigo para coordinarla.
+                                </p>
                               )}
 
                               <label className="flex items-center gap-2 text-sm text-neutral-700">
