@@ -34,6 +34,12 @@ import {
 } from "@/config/creditTypes";
 import { getLocalISOStringFromDate } from "@/components/common/AppointmentBase";
 import { AppointmentDialog } from "@/components/common/appointment_dialog";
+import {
+  validateFullName,
+  validateEmailField,
+  validateEcuadorianPhone,
+  validateEcuadorianCedula,
+} from "@/lib/form-validators";
 
 interface ServiceItem {
   id: string | number;
@@ -53,6 +59,25 @@ export interface CustomerFormData {
   phone: string;
   identificationDocId: string;
 }
+
+const CUSTOMER_FIELD_ORDER: (keyof CustomerFormData)[] = [
+  "givenName",
+  "surname",
+  "email",
+  "phone",
+  "identificationDocId",
+];
+
+const CUSTOMER_FIELD_VALIDATORS: Record<
+  keyof CustomerFormData,
+  (value: string) => string | undefined
+> = {
+  givenName: validateFullName,
+  surname: validateFullName,
+  email: validateEmailField,
+  phone: validateEcuadorianPhone,
+  identificationDocId: validateEcuadorianCedula,
+};
 
 export interface PaymentOptions {
   creditType: string;
@@ -154,31 +179,57 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
     return `${currency} ${price.toFixed(2)}`;
   };
 
+  const inputClassName = (hasError: boolean) =>
+    `w-full rounded-lg border px-3 py-2.5 text-sm outline-none disabled:opacity-50 ${
+      hasError
+        ? "border-red-500 ring-1 ring-red-500 focus:ring-red-500 focus:border-red-500"
+        : "border-neutral-300 focus:border-primary-400"
+    }`;
+
   const handleInputChange = (field: keyof CustomerFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+    setFormErrors((prev) => {
+      if (!prev[field]) return prev;
+      return { ...prev, [field]: CUSTOMER_FIELD_VALIDATORS[field](value) };
+    });
   };
 
-  const validateForm = (): boolean => {
+  const handleInputBlur = (field: keyof CustomerFormData) => {
+    setFormErrors((prev) => ({
+      ...prev,
+      [field]: CUSTOMER_FIELD_VALIDATORS[field](formData[field]),
+    }));
+  };
+
+  const validateForm = (): Partial<
+    Record<keyof CustomerFormData, string>
+  > => {
     const errors: Partial<Record<keyof CustomerFormData, string>> = {};
 
-    if (!formData.givenName.trim()) errors.givenName = "Requerido";
-    if (!formData.surname.trim()) errors.surname = "Requerido";
-    if (!formData.email.trim() || !formData.email.includes("@"))
-      errors.email = "Email inválido";
-    if (!formData.phone.trim()) errors.phone = "Requerido";
-    if (
-      !formData.identificationDocId.trim() ||
-      formData.identificationDocId.length !== 10
-    )
-      errors.identificationDocId = "Cédula debe tener 10 dígitos";
+    for (const field of CUSTOMER_FIELD_ORDER) {
+      const error = CUSTOMER_FIELD_VALIDATORS[field](formData[field]);
+      if (error) errors[field] = error;
+    }
 
     setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    return errors;
   };
 
   const handlePayClick = () => {
-    if (!validateForm()) return;
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      const firstErrorField = CUSTOMER_FIELD_ORDER.find(
+        (field) => errors[field],
+      );
+      if (firstErrorField) {
+        const input = document.getElementById(
+          `customer-${firstErrorField}`,
+        ) as HTMLInputElement | null;
+        input?.scrollIntoView({ behavior: "smooth", block: "center" });
+        input?.focus({ preventScroll: true });
+      }
+      return;
+    }
     if (!paymentOptionsValid) return;
 
     let appointmentIso: string | undefined;
@@ -534,10 +585,15 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
 
                             <div className="space-y-4">
                               <div>
-                                <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                                  <UserIcon className="h-3.5 w-3.5" /> Nombre
+                                <label
+                                  htmlFor="customer-givenName"
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1"
+                                >
+                                  <UserIcon className="h-3.5 w-3.5" /> Nombre{" "}
+                                  <span className="text-red-500 ml-0.5">*</span>
                                 </label>
                                 <input
+                                  id="customer-givenName"
                                   type="text"
                                   value={formData.givenName}
                                   onChange={(e) =>
@@ -546,86 +602,118 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                       e.target.value,
                                     )
                                   }
-                                  className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
+                                  onBlur={() => handleInputBlur("givenName")}
+                                  className={inputClassName(
+                                    Boolean(formErrors.givenName),
+                                  )}
                                   placeholder="Tu nombre"
                                   disabled={isLoading}
                                 />
                                 {formErrors.givenName && (
-                                  <p className="text-xs text-red-600 mt-1">
+                                  <p className="text-xs text-red-600 mt-1 font-medium">
                                     {formErrors.givenName}
                                   </p>
                                 )}
                               </div>
 
                               <div>
-                                <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                                  <UserIcon className="h-3.5 w-3.5" /> Apellido
+                                <label
+                                  htmlFor="customer-surname"
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1"
+                                >
+                                  <UserIcon className="h-3.5 w-3.5" /> Apellido{" "}
+                                  <span className="text-red-500 ml-0.5">*</span>
                                 </label>
                                 <input
+                                  id="customer-surname"
                                   type="text"
                                   value={formData.surname}
                                   onChange={(e) =>
                                     handleInputChange("surname", e.target.value)
                                   }
-                                  className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
+                                  onBlur={() => handleInputBlur("surname")}
+                                  className={inputClassName(
+                                    Boolean(formErrors.surname),
+                                  )}
                                   placeholder="Tu apellido"
                                   disabled={isLoading}
                                 />
                                 {formErrors.surname && (
-                                  <p className="text-xs text-red-600 mt-1">
+                                  <p className="text-xs text-red-600 mt-1 font-medium">
                                     {formErrors.surname}
                                   </p>
                                 )}
                               </div>
 
                               <div>
-                                <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                                  <EnvelopeIcon className="h-3.5 w-3.5" /> Email
+                                <label
+                                  htmlFor="customer-email"
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1"
+                                >
+                                  <EnvelopeIcon className="h-3.5 w-3.5" /> Email{" "}
+                                  <span className="text-red-500 ml-0.5">*</span>
                                 </label>
                                 <input
+                                  id="customer-email"
                                   type="email"
                                   value={formData.email}
                                   onChange={(e) =>
                                     handleInputChange("email", e.target.value)
                                   }
-                                  className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
+                                  onBlur={() => handleInputBlur("email")}
+                                  className={inputClassName(
+                                    Boolean(formErrors.email),
+                                  )}
                                   placeholder="tu@email.com"
                                   disabled={isLoading}
                                 />
                                 {formErrors.email && (
-                                  <p className="text-xs text-red-600 mt-1">
+                                  <p className="text-xs text-red-600 mt-1 font-medium">
                                     {formErrors.email}
                                   </p>
                                 )}
                               </div>
 
                               <div>
-                                <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
-                                  <PhoneIcon className="h-3.5 w-3.5" /> Teléfono
+                                <label
+                                  htmlFor="customer-phone"
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1"
+                                >
+                                  <PhoneIcon className="h-3.5 w-3.5" /> Teléfono{" "}
+                                  <span className="text-red-500 ml-0.5">*</span>
                                 </label>
                                 <input
+                                  id="customer-phone"
                                   type="tel"
                                   value={formData.phone}
                                   onChange={(e) =>
                                     handleInputChange("phone", e.target.value)
                                   }
-                                  className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
+                                  onBlur={() => handleInputBlur("phone")}
+                                  className={inputClassName(
+                                    Boolean(formErrors.phone),
+                                  )}
                                   placeholder="0991234567"
                                   disabled={isLoading}
                                 />
                                 {formErrors.phone && (
-                                  <p className="text-xs text-red-600 mt-1">
+                                  <p className="text-xs text-red-600 mt-1 font-medium">
                                     {formErrors.phone}
                                   </p>
                                 )}
                               </div>
 
                               <div>
-                                <label className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1">
+                                <label
+                                  htmlFor="customer-identificationDocId"
+                                  className="flex items-center gap-1.5 text-xs font-semibold text-neutral-700 mb-1"
+                                >
                                   <IdentificationIcon className="h-3.5 w-3.5" />{" "}
-                                  Cédula
+                                  Cédula{" "}
+                                  <span className="text-red-500 ml-0.5">*</span>
                                 </label>
                                 <input
+                                  id="customer-identificationDocId"
                                   type="text"
                                   value={formData.identificationDocId}
                                   onChange={(e) =>
@@ -634,13 +722,18 @@ export const PurchaseSummaryDialog: React.FC<PurchaseSummaryDialogProps> = ({
                                       e.target.value,
                                     )
                                   }
-                                  className="w-full rounded-lg border border-neutral-300 px-3 py-2.5 text-sm outline-none focus:border-primary-400 disabled:opacity-50"
+                                  onBlur={() =>
+                                    handleInputBlur("identificationDocId")
+                                  }
+                                  className={inputClassName(
+                                    Boolean(formErrors.identificationDocId),
+                                  )}
                                   placeholder="10 dígitos"
                                   maxLength={10}
                                   disabled={isLoading}
                                 />
                                 {formErrors.identificationDocId && (
-                                  <p className="text-xs text-red-600 mt-1">
+                                  <p className="text-xs text-red-600 mt-1 font-medium">
                                     {formErrors.identificationDocId}
                                   </p>
                                 )}
