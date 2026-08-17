@@ -79,10 +79,17 @@ function watchMastercardBrand(): void {
 
   if (!cardNumberInput || cardNumberInput.dataset.brandWatch === "true") return;
 
+  // El widget de Datafast puede renderizar el campo dentro de un iframe o
+  // reemplazar el nodo; solo escuchar si realmente es un input con .value.
+  if (typeof cardNumberInput.value !== "string") return;
+
   cardNumberInput.dataset.brandWatch = "true";
 
-  const check = (): void => {
-    const digits = cardNumberInput.value.replace(/\s+/g, "");
+  const check = (event: Event): void => {
+    const target = event.target as HTMLInputElement | null;
+    const value =
+      target && typeof target.value === "string" ? target.value : "";
+    const digits = value.replace(/\s+/g, "");
     const isMastercard = /^5[1-5]/.test(digits);
 
     const existing = document.getElementById("brand-warning");
