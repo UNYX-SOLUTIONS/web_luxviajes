@@ -7,6 +7,7 @@ export interface PendingPurchase {
   validity?: string;
   processing?: string;
   includes?: string[];
+  requisitos?: string;
 }
 
 const STORAGE_KEY = "luxviajes_pending_purchase";

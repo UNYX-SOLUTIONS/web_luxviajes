@@ -555,7 +555,9 @@ export class PaymentService {
       lastName: transaction.customer.surname,
       email: transaction.customer.email,
       phone: transaction.customer.phone,
-      appointment_date: appointmentIso ? appointmentIso.split('T')[0] : null,
+      // Formato completo con hora y offset (2026-08-17T16:05:23-05:00),
+      // requerido por el campo datetime de Kommo (Y-m-d\TH:i:sP).
+      appointment_date: appointmentIso,
       appointment_iso: appointmentIso,
       receivePromotion: metadata.receivePromotion ?? false,
       source: 'bought',
@@ -674,7 +676,9 @@ export class PaymentService {
       lastName: transaction.customer.surname,
       email: transaction.customer.email,
       phone: transaction.customer.phone,
-      appointment_date: appointmentIso ? appointmentIso.split('T')[0] : null,
+      // Formato completo con hora y offset (2026-05-05T09:00:00-05:00),
+      // igual que el webhook de agendamiento normal (AppointmentBase).
+      appointment_date: appointmentIso,
       appointment_iso: appointmentIso,
       receivePromotion: metadata.receivePromotion ?? false,
       source: 'bought',

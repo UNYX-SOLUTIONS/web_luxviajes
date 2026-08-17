@@ -8,6 +8,10 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 import {
   ArrowRightOnRectangleIcon,
   UserCircleIcon,
+  ChevronDownIcon,
+  BriefcaseIcon,
+  NewspaperIcon,
+  EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 import { NAVIGATION_LINKS } from "@/constants";
 import { cn } from "@/utils/cn";
@@ -19,6 +23,25 @@ interface HeaderProps {
   activeLink?: string;
 }
 
+// Opciones secundarias para el menú desplegable "Más"
+const SECONDARY_LINKS = [
+  {
+    label: "Contáctanos",
+    href: "/contact",
+    icon: EnvelopeIcon,
+  },
+  {
+    label: "Trabaja con nosotros",
+    href: "/help#trabaja-con-nosotros",
+    icon: BriefcaseIcon,
+  },
+  {
+    label: "Blog",
+    href: "/blog",
+    icon: NewspaperIcon,
+  },
+];
+
 export function Header({ activeLink }: HeaderProps) {
   const pathname = usePathname();
   const currentActiveLink = activeLink || pathname;
@@ -26,10 +49,13 @@ export function Header({ activeLink }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showSecondaryMenu, setShowSecondaryMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const secondaryMenuRef = useRef<HTMLDivElement>(null);
 
   const { isAuthenticated, user, logout } = useAuth();
 
+  // Cerrar menús al hacer clic fuera
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -37,6 +63,12 @@ export function Header({ activeLink }: HeaderProps) {
         !userMenuRef.current.contains(event.target as Node)
       ) {
         setShowUserMenu(false);
+      }
+      if (
+        secondaryMenuRef.current &&
+        !secondaryMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowSecondaryMenu(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -49,13 +81,18 @@ export function Header({ activeLink }: HeaderProps) {
     return (f + (l || f)).substring(0, 2).toUpperCase();
   };
 
+  // Links principales (excluyendo los que están en SECONDARY_LINKS)
+  const MAIN_LINKS = NAVIGATION_LINKS.filter(
+    (link) => !SECONDARY_LINKS.some((sec) => sec.href === link.href)
+  );
+
   return (
     <header className="fixed left-0 right-0 top-0 z-50 w-full bg-[#2D0D46]/95 shadow-sm">
       <div className="w-full px-4 sm:px-6 md:px-5 lg:px-8 xl:px-10">
         <div className="flex h-20 items-center md:h-24 lg:h-28 xl:h-32">
           {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
-            <div className="relative w-45 h-17.5 md:w-55 md:h-15 2xl:w-65 2xl:h-25">
+            <div className="relative w-32 h-12 sm:w-36 sm:h-13 md:w-45 md:h-17.5 lg:w-50 lg:h-18 xl:w-55 xl:h-20 2xl:w-65 2xl:h-25">
               <Image
                 src="/images/logo_white.png"
                 alt="Luxviajes Logo"
@@ -63,7 +100,7 @@ export function Header({ activeLink }: HeaderProps) {
                 className="object-contain object-left"
                 loading="eager"
                 priority
-                sizes="(max-width: 768px) 180px, (max-width: 1535px) 220px, 320px"
+                sizes="(max-width: 480px) 120px, (max-width: 640px) 140px, (max-width: 768px) 160px, (max-width: 1024px) 180px, (max-width: 1536px) 220px, 320px"
               />
             </div>
           </Link>
@@ -79,7 +116,8 @@ export function Header({ activeLink }: HeaderProps) {
               xl:ml-12 xl:gap-6
             "
           >
-            {NAVIGATION_LINKS.map((link) => {
+            {/* Links Principales */}
+            {MAIN_LINKS.map((link) => {
               const isActive = currentActiveLink === link.href;
 
               return (
@@ -108,6 +146,75 @@ export function Header({ activeLink }: HeaderProps) {
               );
             })}
 
+            {/* Menú "Más" con opciones secundarias */}
+            <div className="relative" ref={secondaryMenuRef}>
+              <button
+                onClick={() => setShowSecondaryMenu((prev) => !prev)}
+                className={cn(
+                  `
+                    flex items-center gap-1
+                    whitespace-nowrap
+                    border-b-2 border-transparent
+                    pb-1
+                    text-[12px] font-medium
+                    leading-none
+                    transition-colors
+                    lg:text-sm
+                    xl:text-lg
+                    2xl:text-xl
+                  `,
+                  showSecondaryMenu
+                    ? "border-[#8A3BB7] text-white"
+                    : "text-[#CCC6D0] hover:text-purple-400",
+                )}
+              >
+                Más
+                <ChevronDownIcon
+                  className={cn(
+                    "h-3 w-3 transition-transform lg:h-4 lg:w-4",
+                    showSecondaryMenu && "rotate-180",
+                  )}
+                />
+              </button>
+
+              {showSecondaryMenu && (
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-white shadow-lg ring-1 ring-black/5 py-1">
+                  {SECONDARY_LINKS.map((link) => {
+                    const Icon = link.icon;
+                    // Verificar si el link está activo (considerando anchors)
+                    const isActive = 
+                      currentActiveLink === link.href || 
+                      (link.href.includes("#") && currentActiveLink === link.href.split("#")[0]);
+
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={cn(
+                          `
+                            flex items-center gap-3
+                            px-4 py-2.5
+                            text-sm
+                            transition-colors
+                          `,
+                          isActive
+                            ? "bg-primary-50 text-primary-700 font-semibold rounded-xl"
+                            : "text-neutral-700 hover:bg-neutral-50 rounded-xl",
+                        )}
+                        onClick={() => {
+                          setShowSecondaryMenu(false);
+                        }}
+                      >
+                        <Icon className="h-4 w-4 text-neutral-400" />
+                        {link.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Auth / User Menu */}
             {isAuthenticated ? (
               <div className="relative ml-2" ref={userMenuRef}>
                 <button
@@ -122,22 +229,12 @@ export function Header({ activeLink }: HeaderProps) {
                   <span className="hidden text-[11px] font-medium text-[#CCC6D0] lg:inline lg:text-xs xl:text-sm">
                     {user?.primerNombre?.split(" ")[0]}
                   </span>
-                  <svg
+                  <ChevronDownIcon
                     className={cn(
                       "hidden h-3 w-3 text-[#CCC6D0] transition-transform lg:inline",
                       showUserMenu && "rotate-180",
                     )}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                  />
                 </button>
 
                 {showUserMenu && (
@@ -175,22 +272,6 @@ export function Header({ activeLink }: HeaderProps) {
               </div>
             ) : (
               <div className="flex items-center gap-2 ml-2">
-                {/* <Link
-                  href="/auth/login"
-                  className="
-                    whitespace-nowrap
-                    rounded-lg
-                    px-3 py-1.5
-                    text-[11px] font-medium
-                    text-[#CCC6D0]
-                    transition-colors
-                    hover:text-white
-                    lg:text-xs lg:px-4
-                    xl:text-sm
-                  "
-                >
-                  Iniciar sesión
-                </Link> */}
                 <button
                   onClick={() => setShowAuthDialog(true)}
                   className="
@@ -236,7 +317,8 @@ export function Header({ activeLink }: HeaderProps) {
         {isMobileMenuOpen && (
           <nav className="border-t border-white/10 pb-4 pt-2 md:hidden">
             <div className="flex flex-col gap-3">
-              {NAVIGATION_LINKS.map((link) => {
+              {/* Links Principales en mobile */}
+              {MAIN_LINKS.map((link) => {
                 const isActive = currentActiveLink === link.href;
 
                 return (
@@ -260,6 +342,42 @@ export function Header({ activeLink }: HeaderProps) {
                   </Link>
                 );
               })}
+
+              {/* Separador para menú secundario en mobile */}
+              <div className="border-t border-white/10 pt-3 mt-1">
+                <p className="px-4 py-1 text-xs uppercase tracking-wider text-[#CCC6D0]/50">
+                  Más opciones
+                </p>
+                {SECONDARY_LINKS.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = 
+                    currentActiveLink === link.href || 
+                    (link.href.includes("#") && currentActiveLink === link.href.split("#")[0]);
+
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={cn(
+                        `
+                          flex items-center gap-3
+                          rounded-lg
+                          px-4 py-2
+                          font-medium
+                          transition-colors
+                        `,
+                        isActive
+                          ? "bg-[#500088] text-white"
+                          : "text-[#CCC6D0] hover:bg-white/10 hover:text-white",
+                      )}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {link.label}
+                    </Link>
+                  );
+                })}
+              </div>
 
               {/* Mobile auth buttons */}
               <div className="border-t border-white/10 pt-3 mt-1">
@@ -299,13 +417,6 @@ export function Header({ activeLink }: HeaderProps) {
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    {/* <Link
-                      href="/auth/login"
-                      className="rounded-lg px-4 py-2 font-medium text-[#CCC6D0] hover:bg-white/10 hover:text-white transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Iniciar sesión
-                    </Link> */}
                     <button
                       onClick={() => {
                         setShowAuthDialog(true);
@@ -313,7 +424,7 @@ export function Header({ activeLink }: HeaderProps) {
                       }}
                       className="rounded-lg bg-[#8A3BB7] px-4 py-2 text-left font-semibold text-white hover:bg-[#7B33A5] transition-colors"
                     >
-                      Inciar sesión
+                      Iniciar sesión
                     </button>
                   </div>
                 )}
