@@ -202,7 +202,7 @@ export function Footer() {
               Privacidad
             </Link>
             <Link
-              href="/#"
+              href="/help"
               onClick={handleScrollToTop}
               className="hover:text-primary-600 transition-colors"
             >
