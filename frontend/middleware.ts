@@ -18,7 +18,7 @@ function addSecurityHeaders(response: NextResponse, request: NextRequest): void 
   response.headers.set("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
   response.headers.set(
     "Content-Security-Policy",
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.oppwa.com https://www.datafast.com.ec; style-src 'self' 'unsafe-inline' https://*.oppwa.com; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://cms.agencialuxviajes.com https://api.ipify.org https://*.oppwa.com; frame-src 'self' https:; media-src 'self' https://cms.agencialuxviajes.com"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.oppwa.com https://www.datafast.com.ec; style-src 'self' 'unsafe-inline' https://*.oppwa.com; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://cms.agencialuxviajes.com https://api.ipify.org https://*.oppwa.com https://flow.agencialuxviajes.com; frame-src 'self' https:; media-src 'self' https://cms.agencialuxviajes.com"
   );
 
   if (process.env.NODE_ENV === "production") {

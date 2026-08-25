@@ -180,7 +180,7 @@ export function Footer() {
         <div className="flex flex-col gap-4 sm:gap-6 md:flex-row md:justify-between md:items-center py-6 text-xs text-neutral-500">
           <p className="text-center md:text-left">© {currentYear} {COMPANY_INFO.name}. Todos los derechos reservados | Diseñado por UNYX SOLUTIONS</p>
           <div className="flex gap-4 sm:gap-6 justify-center md:justify-end">
-            <Link href="/privacy" onClick={handleScrollToTop} className="hover:text-primary-600 transition-colors">
+            <Link href="/help" onClick={handleScrollToTop} className="hover:text-primary-600 transition-colors">
               Privacidad
             </Link>
             <Link href="/#" onClick={handleScrollToTop} className="hover:text-primary-600 transition-colors">
