@@ -185,8 +185,10 @@ export function Footer() {
           <p className="text-center md:text-left">
             © {currentYear} {COMPANY_INFO.name}. Todos los derechos reservados |
             Diseñado por{" "}
+            {/* Mandarlo a otra ventana */}
             <a
               href="https://unyxsolutions.com/"
+              target="_blank"
               rel="noopener noreferrer"
               className="hover:text-blue-600 transition-colors font-semibold text-blue-800"
             >
